@@ -26,6 +26,9 @@ Phase: **0 — Foundation (Gate 0)** · Started 2026-08-20
 - **D-004 (2026-08-20) Stack versions at install time.** Next.js 16.3.1 (npm `latest`, matches PRD §22.2 "Next.js 16.x"), React 19.2.8, Tailwind 4.3.3, Zod 4.4.3, decimal.js 10.6.0, Vitest 4.1.11, fast-check 4.9.0, Playwright 1.62.1, turbo 2.10.11. TypeScript pinned to the 5.9 line: npm `latest` is 7.0.2 (new native compiler; no stable 6.x exists) and PRD §22.2 requires ecosystem compatibility verification before adopting a new major — typescript-eslint/tooling verification against TS7 is deferred to a later phase.
 - **D-005 (2026-08-20) `exactOptionalPropertyTypes` dropped from the base tsconfig.** Verified conflict: Zod's `.optional()` emits `T | undefined` properties, incompatible with the §14 contract interfaces under that flag (TS2375 in `calculation-core`). `strict` + `noUncheckedIndexedAccess` retained.
 
+- **D-006 (2026-08-20) Draft rules on Vercel preview deployments.** Owner asked for a deployed, working calculator; the GST pack is `in_review` (verification is a human release gate), so a production deployment fail-closes by design. Guard extended: `PC_ALLOW_DRAFT_RULES` now also works when `NEXT_PUBLIC_VERCEL_ENV === "preview"` (Vercel system value) — preview URLs show the calculator behind the persistent "DRAFT RULES — NOT VERIFIED" banner; production deployments still compile the flag to `false`. **Owner may veto**; verifying the GST pack in VERIFICATION-QUEUE.md and activating it is the path to a fully working production site.
+- **D-007 (2026-08-20) No WebGL hero shader at P0.** DESIGN.md's dot-matrix WebGL background replaced with a static CSS dot-matrix + 1px grid-line overlay: §27 LCP/JS budgets outweigh the effect on a calculator product. Revisit post-launch if budgets allow.
+
 ## Done
 
 - Git repo initialised (`main`); root configs (pnpm workspace, turbo, tsconfig base); governing docs written.
