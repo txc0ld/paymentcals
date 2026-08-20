@@ -180,6 +180,30 @@ const breadthEntries: RegistryEntry[] = [
       "An indicative borrowing range from your income, expenses and commitments under generic assumptions with an editable rate buffer. Not pre-approval.",
   }),
   simpleEntry({
+    id: "AU-HOME-017",
+    slug: "stamp-duty-calculator",
+    displayName: "Stamp Duty Calculator",
+    category: "property-mortgage",
+    calculationClass: "B",
+    engines: ["E08"],
+    rulePacks: ["stamp-duty"],
+    title: "Stamp Duty Calculator Australia: All States",
+    description:
+      "Estimate general transfer duty by state from official revenue-office rate tables, with unsupported states clearly blocked rather than guessed.",
+  }),
+  simpleEntry({
+    id: "AU-HOME-018",
+    slug: "property-buying-costs-calculator",
+    displayName: "Property Buying Costs Calculator",
+    category: "property-mortgage",
+    calculationClass: "B",
+    engines: ["E08"],
+    rulePacks: ["stamp-duty"],
+    title: "Complete Property Buying Costs Calculator Australia",
+    description:
+      "Add general transfer duty to your conveyancing, inspection and other upfront costs for a complete picture of the cash needed to buy.",
+  }),
+  simpleEntry({
     id: "AU-BIZ-006",
     slug: "contractor-day-rate-calculator",
     displayName: "Contractor Day Rate Calculator",

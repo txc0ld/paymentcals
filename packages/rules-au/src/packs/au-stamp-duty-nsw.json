@@ -1,0 +1,81 @@
+{
+  "rulePackId": "au-stamp-duty-nsw",
+  "jurisdiction": "AU",
+  "subdivision": "NSW",
+  "domain": "stamp-duty",
+  "effectiveFrom": "2026-07-01",
+  "effectiveTo": null,
+  "status": "in_review",
+  "schemaVersion": 1,
+  "rulesVersion": "0.1.0",
+  "sources": [
+    {
+      "sourceId": "revenue-nsw-transfer-duty-rates-2026-08-20",
+      "authority": "Revenue NSW",
+      "title": "Transfer duty - current thresholds and rates",
+      "url": "https://www.revenue.nsw.gov.au/_resources/duties-links/current-thresholds-and-rates",
+      "jurisdiction": "AU",
+      "domain": "stamp-duty",
+      "retrievedAt": "2026-08-20T22:45:00+08:00",
+      "archivedSnapshotRef": "compliance-archive/sources/state-revenue/nsw-rates.2026-08-20.html",
+      "contentHash": "1f23b707ca19f21a5a2ed64aadb949652cae32566e0992b254701848451da673",
+      "notes": "General rates. effectiveFrom is the pack window start, not stated on the page [VERIFY]. Confirm NSW per-$100 rounding convention [VERIFY]."
+    }
+  ],
+  "review": {
+    "preparedBy": "claude-build-agent",
+    "approvedBy": null,
+    "approvedAt": null
+  },
+  "verifiedAt": null,
+  "rules": {
+    "general": {
+      "brackets": [
+        {
+          "over": "0",
+          "upTo": "18000",
+          "baseAmount": "0",
+          "ratePer100": "1.25"
+        },
+        {
+          "over": "18000",
+          "upTo": "38000",
+          "baseAmount": "225",
+          "ratePer100": "1.50"
+        },
+        {
+          "over": "38000",
+          "upTo": "103000",
+          "baseAmount": "525",
+          "ratePer100": "1.75"
+        },
+        {
+          "over": "103000",
+          "upTo": "387000",
+          "baseAmount": "1662",
+          "ratePer100": "3.50"
+        },
+        {
+          "over": "387000",
+          "upTo": "1290000",
+          "baseAmount": "11602",
+          "ratePer100": "4.50"
+        },
+        {
+          "over": "1290000",
+          "upTo": "3870000",
+          "baseAmount": "52237",
+          "ratePer100": "5.50"
+        },
+        {
+          "over": "3870000",
+          "upTo": null,
+          "baseAmount": "194137",
+          "ratePer100": "7.00"
+        }
+      ],
+      "per100Rounding": "part_thereof_up",
+      "minimumDuty": "20"
+    }
+  }
+}

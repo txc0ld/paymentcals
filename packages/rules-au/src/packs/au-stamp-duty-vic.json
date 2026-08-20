@@ -1,0 +1,32 @@
+{
+  "rulePackId": "au-stamp-duty-vic",
+  "jurisdiction": "AU",
+  "subdivision": "VIC",
+  "domain": "stamp-duty",
+  "effectiveFrom": "2026-07-01",
+  "effectiveTo": null,
+  "status": "in_review",
+  "schemaVersion": 1,
+  "rulesVersion": "0.1.0",
+  "sources": [
+    {
+      "sourceId": "sro-vic-rates-unfetchable-2026-08-20",
+      "authority": "State Revenue Office Victoria",
+      "title": "Land transfer duty current rates (fetch blocked)",
+      "url": "https://www.sro.vic.gov.au/land-transfer-duty-current-rates",
+      "jurisdiction": "AU",
+      "domain": "stamp-duty",
+      "retrievedAt": "2026-08-20T22:45:00+08:00",
+      "notes": "Automated fetch returned HTTP 403 (bot protection). Rules left null; the calculator renders VIC as not yet supported until a human transcribes the official table."
+    }
+  ],
+  "review": {
+    "preparedBy": "claude-build-agent",
+    "approvedBy": null,
+    "approvedAt": null
+  },
+  "verifiedAt": null,
+  "rules": {
+    "general": null
+  }
+}

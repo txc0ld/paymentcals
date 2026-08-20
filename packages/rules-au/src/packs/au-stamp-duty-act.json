@@ -1,0 +1,34 @@
+{
+  "rulePackId": "au-stamp-duty-act",
+  "jurisdiction": "AU",
+  "subdivision": "ACT",
+  "domain": "stamp-duty",
+  "effectiveFrom": "2026-07-01",
+  "effectiveTo": null,
+  "status": "in_review",
+  "schemaVersion": 1,
+  "rulesVersion": "0.1.0",
+  "sources": [
+    {
+      "sourceId": "act-revenue-rates-unfetchable-2026-08-20",
+      "authority": "ACT Revenue Office",
+      "title": "Conveyance duty page (client-rendered)",
+      "url": "https://www.revenue.act.gov.au/duties/conveyance-duty",
+      "jurisdiction": "AU",
+      "domain": "stamp-duty",
+      "retrievedAt": "2026-08-20T22:45:00+08:00",
+      "archivedSnapshotRef": "compliance-archive/sources/state-revenue/act.2026-08-20.html",
+      "contentHash": "2ff8fc039d0854ae2ab6066fed6a719296f69897f99814d3691d459854c40a52",
+      "notes": "Rate tables not present in the fetched HTML. Rules left null; ACT renders as not yet supported."
+    }
+  ],
+  "review": {
+    "preparedBy": "claude-build-agent",
+    "approvedBy": null,
+    "approvedAt": null
+  },
+  "verifiedAt": null,
+  "rules": {
+    "general": null
+  }
+}

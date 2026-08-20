@@ -1,0 +1,34 @@
+{
+  "rulePackId": "au-stamp-duty-sa",
+  "jurisdiction": "AU",
+  "subdivision": "SA",
+  "domain": "stamp-duty",
+  "effectiveFrom": "2026-07-01",
+  "effectiveTo": null,
+  "status": "in_review",
+  "schemaVersion": 1,
+  "rulesVersion": "0.1.0",
+  "sources": [
+    {
+      "sourceId": "revenuesa-rates-unfetchable-2026-08-20",
+      "authority": "RevenueSA",
+      "title": "Stamp duty on land calculation page (client-rendered)",
+      "url": "https://www.revenuesa.sa.gov.au/stamp-duty-land/calculate-stamp-duty",
+      "jurisdiction": "AU",
+      "domain": "stamp-duty",
+      "retrievedAt": "2026-08-20T22:45:00+08:00",
+      "archivedSnapshotRef": "compliance-archive/sources/state-revenue/sa-calc.2026-08-20.html",
+      "contentHash": "ef5cfe0ff674301d42383c29f908bf47a2f16ab16f5c434c9ebe637e60ddb595",
+      "notes": "Page content is rendered client-side; no rate table in the fetched HTML. Rules left null; SA renders as not yet supported."
+    }
+  ],
+  "review": {
+    "preparedBy": "claude-build-agent",
+    "approvedBy": null,
+    "approvedAt": null
+  },
+  "verifiedAt": null,
+  "rules": {
+    "general": null
+  }
+}

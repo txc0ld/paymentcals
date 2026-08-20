@@ -1,0 +1,81 @@
+{
+  "rulePackId": "au-stamp-duty-tas",
+  "jurisdiction": "AU",
+  "subdivision": "TAS",
+  "domain": "stamp-duty",
+  "effectiveFrom": "2026-07-01",
+  "effectiveTo": null,
+  "status": "in_review",
+  "schemaVersion": 1,
+  "rulesVersion": "0.1.0",
+  "sources": [
+    {
+      "sourceId": "sro-tas-rates-of-duty-2026-08-20",
+      "authority": "State Revenue Office Tasmania",
+      "title": "Property transfer duties - rates of duty",
+      "url": "https://www.sro.tas.gov.au/property-transfer-duties/rates-of-duty",
+      "jurisdiction": "AU",
+      "domain": "stamp-duty",
+      "retrievedAt": "2026-08-20T22:45:00+08:00",
+      "archivedSnapshotRef": "compliance-archive/sources/state-revenue/tas-rates.2026-08-20.html",
+      "contentHash": "62fb1e335cfafd8b7062163d49296fbd8c0774afbd0720bf04f239fb0996e732",
+      "notes": "General rates ('or part' per the page). Not more than $3,000 attracts flat $50."
+    }
+  ],
+  "review": {
+    "preparedBy": "claude-build-agent",
+    "approvedBy": null,
+    "approvedAt": null
+  },
+  "verifiedAt": null,
+  "rules": {
+    "general": {
+      "brackets": [
+        {
+          "over": "0",
+          "upTo": "3000",
+          "baseAmount": "50",
+          "ratePer100": "0"
+        },
+        {
+          "over": "3000",
+          "upTo": "25000",
+          "baseAmount": "50",
+          "ratePer100": "1.75"
+        },
+        {
+          "over": "25000",
+          "upTo": "75000",
+          "baseAmount": "435",
+          "ratePer100": "2.25"
+        },
+        {
+          "over": "75000",
+          "upTo": "200000",
+          "baseAmount": "1560",
+          "ratePer100": "3.50"
+        },
+        {
+          "over": "200000",
+          "upTo": "375000",
+          "baseAmount": "5935",
+          "ratePer100": "4.00"
+        },
+        {
+          "over": "375000",
+          "upTo": "725000",
+          "baseAmount": "12935",
+          "ratePer100": "4.25"
+        },
+        {
+          "over": "725000",
+          "upTo": null,
+          "baseAmount": "27810",
+          "ratePer100": "4.50"
+        }
+      ],
+      "per100Rounding": "part_thereof_up",
+      "minimumDuty": "50"
+    }
+  }
+}

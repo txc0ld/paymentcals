@@ -61,6 +61,19 @@ Pack: `au-payg-withholding-2026-27` (in_review)
 - [ ] Period-conversion conventions (fortnightly/monthly/quarterly) and earnings rounding (whole dollars + 99c)
 - Note: withholding packs for FY2024-25/2025-26 were deliberately not authored (historical payroll out of P0 scope; annual liability still covers those FYs).
 
+## State revenue offices — transfer/stamp duty (general rates)
+
+Packs: `au-stamp-duty-{nsw,vic,qld,wa,sa,tas,act,nt}` (in_review) · snapshots in `compliance-archive/sources/state-revenue/`
+
+- [ ] **NSW** (Revenue NSW thresholds page): 7 brackets, $1.25–$7.00 per $100, minimum $20. Confirm the per-$100 rounding convention and the effective window (page undated).
+- [ ] **QLD** (QRO rates page): 5 brackets; the engine reproduces the page's own $850,000 → $31,275 worked example.
+- [ ] **TAS** (SRO rates of duty): 7 brackets, flat $50 ≤ $3,000.
+- [ ] **VIC — NOT AUTHORED**: sro.vic.gov.au blocked automated fetch (HTTP 403). Transcribe the official current-rates table manually; the route shows "VIC not yet supported" until then.
+- [ ] **WA — NOT AUTHORED**: known wa.gov.au URLs returned 404. Locate the current RevenueWA transfer duty rates and transcribe.
+- [ ] **SA — NOT AUTHORED**: revenuesa.sa.gov.au calculation page is client-rendered; no rates in HTML. Transcribe manually.
+- [ ] **ACT — NOT AUTHORED**: revenue.act.gov.au conveyance page is client-rendered. Transcribe manually.
+- [ ] **NT — NOT AUTHORED**: the NT conveyance formula (quadratic under the threshold) needs a schema extension plus manual transcription.
+
 ## Golden fixtures awaiting expected values
 
 - [ ] `packages/test-fixtures/src/gst/au-biz-001.fixture.json` — fill `expected` values from the official ATO examples or a verified manual calculation.

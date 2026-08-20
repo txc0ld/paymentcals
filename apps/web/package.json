@@ -24,6 +24,7 @@
     "@paymentcalcs/engine-debt": "workspace:*",
     "@paymentcalcs/engine-loans": "workspace:*",
     "@paymentcalcs/engine-mortgage-ledger": "workspace:*",
+    "@paymentcalcs/engine-property": "workspace:*",
     "@paymentcalcs/engine-savings": "workspace:*",
     "@paymentcalcs/financial-solvers": "workspace:*",
     "@paymentcalcs/rule-schema": "workspace:*",

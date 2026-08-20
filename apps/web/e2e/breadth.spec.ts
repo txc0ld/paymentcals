@@ -54,4 +54,23 @@ test.describe("breadth routes", () => {
     await expect(page.getByText("Target day rate (excluding GST)").first()).toBeVisible();
     await expect(page.getByText("Invoice amount per day")).toBeVisible();
   });
+
+  test("stamp duty reproduces the QRO worked example and blocks unsupported states", async ({ page }) => {
+    await page.goto("/au/property-mortgage/stamp-duty-calculator");
+    await page.getByLabel("State or territory").selectOption("QLD");
+    await page.getByLabel("Dutiable value (usually the price)").fill("850000");
+    await expect(page.getByRole("status").filter({ hasText: "$31,275.00" })).toBeVisible();
+
+    await page.getByLabel("State or territory").selectOption("VIC");
+    await expect(page.getByText("VIC not yet supported").first()).toBeVisible();
+    await expect(page.getByText(/never substitutes another state/)).toBeVisible();
+  });
+
+  test("buying costs adds duty to entered costs", async ({ page }) => {
+    await page.goto("/au/property-mortgage/property-buying-costs-calculator");
+    await page.getByLabel("State or territory").selectOption("NSW");
+    await page.getByLabel("Property price").fill("450000");
+    await page.getByLabel("Conveyancing and legal").fill("2000");
+    await expect(page.getByRole("status").filter({ hasText: "$16,437.00" })).toBeVisible();
+  });
 });

@@ -1,0 +1,69 @@
+{
+  "rulePackId": "au-stamp-duty-qld",
+  "jurisdiction": "AU",
+  "subdivision": "QLD",
+  "domain": "stamp-duty",
+  "effectiveFrom": "2026-07-01",
+  "effectiveTo": null,
+  "status": "in_review",
+  "schemaVersion": 1,
+  "rulesVersion": "0.1.0",
+  "sources": [
+    {
+      "sourceId": "qro-transfer-duty-rates-2026-08-20",
+      "authority": "Queensland Revenue Office",
+      "title": "Transfer duty rates",
+      "url": "https://qro.qld.gov.au/duties/transfer-duty/calculating/rates/",
+      "jurisdiction": "AU",
+      "domain": "stamp-duty",
+      "retrievedAt": "2026-08-20T22:45:00+08:00",
+      "archivedSnapshotRef": "compliance-archive/sources/state-revenue/qld.2026-08-20.html",
+      "contentHash": "5324d6654f4d79c38b41bb038db3daa63066873cdded49134b64abd3d4f4fc25",
+      "notes": "General rates ('or part of $100' per the page)."
+    }
+  ],
+  "review": {
+    "preparedBy": "claude-build-agent",
+    "approvedBy": null,
+    "approvedAt": null
+  },
+  "verifiedAt": null,
+  "rules": {
+    "general": {
+      "brackets": [
+        {
+          "over": "0",
+          "upTo": "5000",
+          "baseAmount": "0",
+          "ratePer100": "0"
+        },
+        {
+          "over": "5000",
+          "upTo": "75000",
+          "baseAmount": "0",
+          "ratePer100": "1.50"
+        },
+        {
+          "over": "75000",
+          "upTo": "540000",
+          "baseAmount": "1050",
+          "ratePer100": "3.50"
+        },
+        {
+          "over": "540000",
+          "upTo": "1000000",
+          "baseAmount": "17325",
+          "ratePer100": "4.50"
+        },
+        {
+          "over": "1000000",
+          "upTo": null,
+          "baseAmount": "38025",
+          "ratePer100": "5.75"
+        }
+      ],
+      "per100Rounding": "part_thereof_up",
+      "minimumDuty": null
+    }
+  }
+}

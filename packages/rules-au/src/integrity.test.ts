@@ -62,7 +62,7 @@ describe("fail-closed resolution", () => {
   it("fails closed when no pack covers the domain or date (PC-RULE-0001)", async () => {
     const missingDomain = await resolveRulePack(allAuRulePacks, auIntegrityManifest, {
       ...query,
-      domain: "stamp-duty",
+      domain: "land-tax",
       allowDraftRules: true,
     });
     expect(missingDomain).toMatchObject({ ok: false, code: "PC-RULE-0001" });

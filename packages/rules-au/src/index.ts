@@ -20,7 +20,16 @@ import sg2425 from "./packs/au-super-guarantee-2024-25.json" with { type: "json"
 import sg2526 from "./packs/au-super-guarantee-2025-26.json" with { type: "json" };
 import sg2627 from "./packs/au-super-guarantee-2026-27.json" with { type: "json" };
 import payg2627 from "./packs/au-payg-withholding-2026-27.json" with { type: "json" };
+import dutyNsw from "./packs/au-stamp-duty-nsw.json" with { type: "json" };
+import dutyVic from "./packs/au-stamp-duty-vic.json" with { type: "json" };
+import dutyQld from "./packs/au-stamp-duty-qld.json" with { type: "json" };
+import dutyWa from "./packs/au-stamp-duty-wa.json" with { type: "json" };
+import dutySa from "./packs/au-stamp-duty-sa.json" with { type: "json" };
+import dutyTas from "./packs/au-stamp-duty-tas.json" with { type: "json" };
+import dutyAct from "./packs/au-stamp-duty-act.json" with { type: "json" };
+import dutyNt from "./packs/au-stamp-duty-nt.json" with { type: "json" };
 import manifest from "../integrity-manifest.json" with { type: "json" };
+import { zStampDutyRulePack, type StampDutyRulePack } from "./domains/stamp-duty";
 
 /** Every pack is validated at module load — a malformed pack can never resolve. */
 export const gstPack: GstRulePack = zGstRulePack.parse(auGstStandard);
@@ -40,6 +49,9 @@ export const superGuaranteePacks: SuperGuaranteeRulePack[] = [sg2425, sg2526, sg
 export const paygWithholdingPacks: PaygWithholdingRulePack[] = [
   zPaygWithholdingRulePack.parse(payg2627),
 ];
+export const stampDutyPacks: StampDutyRulePack[] = [
+  dutyNsw, dutyVic, dutyQld, dutyWa, dutySa, dutyTas, dutyAct, dutyNt,
+].map((p) => zStampDutyRulePack.parse(p));
 
 export const allAuRulePacks: readonly RulePackV1[] = [
   gstPack,
@@ -48,6 +60,7 @@ export const allAuRulePacks: readonly RulePackV1[] = [
   ...stslPacks,
   ...superGuaranteePacks,
   ...paygWithholdingPacks,
+  ...stampDutyPacks,
 ];
 
 export const auIntegrityManifest: IntegrityManifest = manifest;
@@ -78,3 +91,10 @@ export {
   type PaygWithholdingRulePack,
   type PaygWithholdingRules,
 } from "./domains/payg-withholding";
+export {
+  zStampDutyRulePack,
+  zStampDutyRules,
+  type DutyBracket,
+  type StampDutyRulePack,
+  type StampDutyRules,
+} from "./domains/stamp-duty";

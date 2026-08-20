@@ -68,6 +68,9 @@ importers:
       '@paymentcalcs/engine-mortgage-ledger':
         specifier: workspace:*
         version: link:../../packages/engine-mortgage-ledger
+      '@paymentcalcs/engine-property':
+        specifier: workspace:*
+        version: link:../../packages/engine-property
       '@paymentcalcs/engine-savings':
         specifier: workspace:*
         version: link:../../packages/engine-savings
@@ -258,6 +261,15 @@ importers:
       zod:
         specifier: 4.4.3
         version: 4.4.3
+
+  packages/engine-property:
+    dependencies:
+      '@paymentcalcs/calculation-core':
+        specifier: workspace:*
+        version: link:../calculation-core
+      '@paymentcalcs/rules-au':
+        specifier: workspace:*
+        version: link:../rules-au
 
   packages/engine-savings:
     dependencies:
