@@ -27,7 +27,18 @@
   --color-positive: var(--pc-positive);
   --color-lime: var(--pc-lime-500);
   --font-sans: var(--pc-font-sans);
+  --font-display: var(--pc-font-display);
   --font-mono: var(--pc-font-mono);
+}
+
+/* Headings: Montserrat Medium, uppercase (owner directive 2026-08-20). */
+h1,
+h2,
+h3 {
+  font-family: var(--pc-font-display);
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: var(--pc-tracking-tight);
 }
 
 html {

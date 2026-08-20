@@ -37,7 +37,9 @@ export function decodeUrlState(param: string): UrlStateDecodeResult {
     if (
       typeof parsed !== "object" ||
       parsed === null ||
-      typeof (parsed as { calculatorId?: unknown }).calculatorId !== "string"
+      typeof (parsed as { calculatorId?: unknown }).calculatorId !== "string" ||
+      typeof (parsed as { input?: unknown }).input !== "object" ||
+      (parsed as { input?: unknown }).input === null
     ) {
       return { ok: false, reason: "malformed" };
     }

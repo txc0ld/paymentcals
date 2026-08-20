@@ -1,5 +1,9 @@
 import type { NextConfig } from "next";
 
+console.log(
+  `[pc-build-env] VERCEL_ENV=${process.env.VERCEL_ENV} NEXT_PUBLIC_VERCEL_ENV=${process.env.NEXT_PUBLIC_VERCEL_ENV} NEXT_PUBLIC_PC_ALLOW_DRAFT_RULES=${process.env.NEXT_PUBLIC_PC_ALLOW_DRAFT_RULES}`,
+);
+
 const nextConfig: NextConfig = {
   transpilePackages: [
     "@paymentcalcs/analytics-safe",

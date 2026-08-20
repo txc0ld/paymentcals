@@ -25,7 +25,7 @@ export default function HomePage() {
           </h1>
           <p className="mt-8 max-w-xl text-[15px] leading-7 text-ink-2">
             Australian pay, tax, mortgage and business calculators built like instruments: versioned
-            official rules, exact arithmetic, and a full trace of every figure — assumptions,
+            official rules, exact arithmetic, and a full trace of every figure, with assumptions,
             sources and limitations included.
           </p>
           <div className="mt-10 flex flex-wrap items-center gap-4">
@@ -48,7 +48,7 @@ export default function HomePage() {
         <div className="mx-auto grid w-full max-w-[1360px] grid-cols-1 divide-y divide-hairline px-4 sm:grid-cols-3 sm:divide-x sm:divide-y-0 md:px-8">
           {[
             ["Versioned rules", "Every statutory number cites its official source and review date."],
-            ["Exact arithmetic", "Integer cents and audited decimals — never floating-point money."],
+            ["Exact arithmetic", "Integer cents and audited decimals. Never floating-point money."],
             ["Local first", "Calculations run in your browser. Your numbers stay on your device."],
           ].map(([title, copy]) => (
             <div key={title} className="grid gap-2 py-8 sm:px-8 sm:first:ps-0">
@@ -115,9 +115,9 @@ export default function HomePage() {
           </h2>
           <ol className="reveal-up reveal-delay-1 grid content-start gap-6">
             {[
-              ["01", "Official rule packs", "Rates and thresholds live in versioned, hash-verified rule packs citing ATO and state revenue sources — never hard-coded."],
+              ["01", "Official rule packs", "Rates and thresholds live in versioned, hash-verified rule packs citing ATO and state revenue sources. Never hard-coded."],
               ["02", "Deterministic engines", "The same inputs always produce the same result, reconciled to the cent and replayable from the calculation trace."],
-              ["03", "Full explainability", "Every result carries its working, assumptions by category, sources and limitations — one tab away."],
+              ["03", "Full explainability", "Every result carries its working, assumptions by category, sources and limitations, one tab away."],
             ].map(([number, title, copy]) => (
               <li key={number} className="grid grid-cols-[auto_1fr] gap-4 border-t border-hairline pt-5">
                 <span className="font-mono text-[11px] text-ink-3">{number}</span>

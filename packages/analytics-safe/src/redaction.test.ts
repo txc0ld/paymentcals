@@ -42,6 +42,13 @@ describe("§18.4 rejection — forbidden property classes never pass", () => {
     expectRejected("user_typed_value", {});
   });
 
+  it("accepts path-only pageviews and rejects URLs carrying scenario state", () => {
+    expect(redactEvent("page_view", { path: "/au/business/gst-calculator" }).accepted).toBe(true);
+    expectRejected("page_view", { path: "/au/business/gst-calculator?s=1.eyJhbW91bnQi" }, "path");
+    expectRejected("page_view", { path: "https://paymentcalcs.com/au" }, "path");
+    expectRejected("page_view", { url: "/au?s=abc" }, "url");
+  });
+
   it("rejects allowlisted keys whose values fail their validator", () => {
     expectRejected("calculation_completed", { calculator_id: "salary is 90k" }, "calculator_id");
     expectRejected("calculation_completed", { financial_year: "ninety" }, "financial_year");

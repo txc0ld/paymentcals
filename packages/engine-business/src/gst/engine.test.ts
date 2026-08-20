@@ -173,6 +173,58 @@ describe("GST properties", () => {
     );
   });
 
+  it("invoice-total rounding preserves each line's entered basis (codex finding #3)", () => {
+    // Two 5c inclusive-priced taxable lines: exact GST each ≈ 0.4545c.
+    // Authoritative total GST = round(0.909c) = 1c. Entered inclusive amounts
+    // must remain 5c each; the pre-fix behaviour produced an 11c invoice.
+    const r = run({
+      mode: "line_items",
+      roundingLevel: "invoice_total",
+      items: [
+        { id: "a", amount: aud("5"), amountIs: "inclusive", treatment: "taxable", quantity: 1 },
+        { id: "b", amount: aud("5"), amountIs: "inclusive", treatment: "taxable", quantity: 1 },
+      ],
+    });
+    const out = r.output!;
+    expect(out.lines![0]!.inclusiveAmount.minorUnits).toBe("5");
+    expect(out.lines![1]!.inclusiveAmount.minorUnits).toBe("5");
+    expect(out.inclusiveAmount.minorUnits).toBe("10");
+    expect(out.gstAmount.minorUnits).toBe("1");
+  });
+
+  it("largest-remainder keeps every line within one cent of exact GST (codex finding #4)", () => {
+    const itemArb = fc.record({
+      id: fc.uuid(),
+      amount: fc.bigInt({ min: 1n, max: 99999n }).map((n) => aud(n.toString())),
+      amountIs: fc.constantFrom("exclusive" as const, "inclusive" as const),
+      treatment: fc.constant("taxable" as const),
+      quantity: fc.integer({ min: 1, max: 9 }),
+    });
+    fc.assert(
+      fc.property(fc.array(itemArb, { minLength: 2, maxLength: 15 }), (items) => {
+        const out = run({ mode: "line_items", items, roundingLevel: "invoice_total" }).output!;
+        for (let i = 0; i < items.length; i += 1) {
+          const item = items[i]!;
+          const line = out.lines![i]!;
+          const entered = BigInt(item.amount.minorUnits) * BigInt(item.quantity);
+          if (item.amountIs === "inclusive") {
+            expect(line.inclusiveAmount.minorUnits).toBe(entered.toString());
+          } else {
+            expect(line.exclusiveAmount.minorUnits).toBe(entered.toString());
+          }
+          // gst within 1 cent of exact: exclusive → exact = entered/10, so
+          // |10·gst − entered| ≤ 10; inclusive → exact = entered/11, so
+          // |11·gst − entered| ≤ 11.
+          const gst = BigInt(line.gstAmount.minorUnits);
+          const scaled = item.amountIs === "exclusive" ? gst * 10n : gst * 11n;
+          const bound = item.amountIs === "exclusive" ? 10n : 11n;
+          const diff = scaled > entered ? scaled - entered : entered - scaled;
+          expect(diff <= bound).toBe(true);
+        }
+      }),
+    );
+  });
+
   it("per-line vs invoice-total totals differ by at most half a cent per taxable line", () => {
     const itemArb = fc.record({
       id: fc.uuid(),

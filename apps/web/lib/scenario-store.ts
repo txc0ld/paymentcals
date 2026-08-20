@@ -30,9 +30,20 @@ function tx<T>(mode: IDBTransactionMode, run: (store: IDBObjectStore) => IDBRequ
       new Promise<T>((resolve, reject) => {
         const transaction = db.transaction(STORE, mode);
         const request = run(transaction.objectStore(STORE));
-        request.onsuccess = () => resolve(request.result);
-        request.onerror = () => reject(request.error ?? new Error("IndexedDB request failed"));
-        transaction.oncomplete = () => db.close();
+        // Resolve only on commit: a request can succeed and the transaction
+        // still abort, which must not report a phantom "Saved".
+        transaction.oncomplete = () => {
+          db.close();
+          resolve(request.result);
+        };
+        transaction.onerror = () => {
+          db.close();
+          reject(transaction.error ?? new Error("IndexedDB transaction failed"));
+        };
+        transaction.onabort = () => {
+          db.close();
+          reject(transaction.error ?? new Error("IndexedDB transaction aborted"));
+        };
       }),
   );
 }

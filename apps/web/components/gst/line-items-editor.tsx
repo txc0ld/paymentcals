@@ -37,7 +37,7 @@ export function LineItemsEditor({
   return (
     <div className="grid gap-4">
       <p className="text-[13px] leading-5 text-ink-3">
-        GST treatment is your selection per line — it is never inferred from item names.
+        GST treatment is your selection per line. It is never inferred from item names.
       </p>
       <ul className="grid gap-4">
         {items.map((item, index) => {

@@ -1,16 +1,20 @@
 import type { Metadata, Viewport } from "next";
-import { GeistSans } from "geist/font/sans";
+import { Montserrat, Plus_Jakarta_Sans } from "next/font/google";
 import { GeistMono } from "geist/font/mono";
 import Link from "next/link";
 import Script from "next/script";
 import "./globals.css";
 import { ThemeToggle } from "../components/theme-toggle";
 import { RevealObserver } from "../components/reveal-observer";
+import { PageViewTracker } from "../components/page-view-tracker";
+
+const jakarta = Plus_Jakarta_Sans({ subsets: ["latin"], variable: "--font-jakarta" });
+const montserrat = Montserrat({ subsets: ["latin"], weight: ["500"], variable: "--font-montserrat" });
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://paymentcalcs.com"),
   title: {
-    default: "PaymentCalcs — Australian financial calculators that show their working",
+    default: "PaymentCalcs: Australian financial calculators that show their working",
     template: "%s · PaymentCalcs",
   },
   description:
@@ -33,7 +37,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <head>
         <script dangerouslySetInnerHTML={{ __html: THEME_INIT }} />
       </head>
-      <body className={`${GeistSans.variable} ${GeistMono.variable} min-h-[100dvh] bg-canvas text-ink`}>
+      <body
+        className={`${jakarta.variable} ${montserrat.variable} ${GeistMono.variable} min-h-[100dvh] bg-canvas text-ink`}
+      >
         <a
           href="#main"
           className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:border focus:border-hairline-strong focus:bg-surface focus:px-4 focus:py-2 focus:font-mono focus:text-xs focus:uppercase focus:tracking-[0.14em]"
@@ -73,7 +79,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               <span className="font-mono text-xs uppercase tracking-[0.2em] text-ink">PaymentCalcs</span>
               <p className="max-w-xs text-[13px] leading-5 text-ink-3">
                 Deterministic calculators for Australian money decisions. Every figure shows its
-                working, assumptions and sources.
+                working, its assumptions and its sources.
               </p>
             </div>
             <div className="grid content-start gap-2 font-mono text-[11px] uppercase tracking-[0.14em] text-ink-3">
@@ -84,18 +90,22 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             </div>
             <div className="grid content-start gap-2 font-mono text-[11px] uppercase tracking-[0.14em] text-ink-3">
               <span className="text-ink-2">Status</span>
-              <span>P0 build — pre-launch preview</span>
+              <span>P0 build · pre-launch preview</span>
               <span>© {new Date().getFullYear()} PaymentCalcs</span>
             </div>
           </div>
         </footer>
 
         <RevealObserver />
+        <PageViewTracker />
         {process.env.NODE_ENV === "production" ? (
+          // script.manual.js: no automatic pageviews. The URL carries scenario
+          // state in ?s=, so pageviews are emitted path-only through
+          // analytics-safe (PageViewTracker) — never the full URL (§18.4).
           <Script
             defer
             data-domain="paymentcalcs.com"
-            src="https://plausible.io/js/script.js"
+            src="https://plausible.io/js/script.manual.js"
             strategy="afterInteractive"
           />
         ) : null}

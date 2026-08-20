@@ -5,6 +5,7 @@ import {
   compareMoney,
   dec,
   moneyFromDecimalMinorUnits,
+  moneyFromMinorUnits,
   moneyToDecimalString,
   multiplyMoney,
   subtractMoney,
@@ -16,7 +17,6 @@ import {
   type CalculationResultV1,
   type DecimalValue,
   type ISODateTime,
-  type Money,
   type ReconciliationV1,
   type RoundingProfile,
   type RulePackManifestRef,
@@ -226,35 +226,32 @@ export function computeGst(
     }
 
     const lines: GstLineResult[] = [];
+    // Per taxable line: exact (unrounded) GST in minor units, and which entered
+    // amount is authoritative for that line. The entered basis is never changed
+    // by rounding: an inclusive-priced line keeps its inclusive amount and an
+    // exclusive-priced line keeps its exclusive amount.
+    const taxable: Array<{ index: number; exactGstMinor: DecimalValue; basis: "exclusive" | "inclusive" }> = [];
     let exactGstTotalMinor = new Dec(0) as DecimalValue;
-    let lastTaxableIndex = -1;
 
     for (const item of input.items) {
       const lineAmount = multiplyMoney(item.amount, new Dec(item.quantity) as DecimalValue, mode);
-      let exclusive: Money;
-      let gst: Money;
-      let inclusive: Money;
+      let exclusive = lineAmount;
+      let gst = zeroMoney(currency, scale);
+      let inclusive = lineAmount;
 
-      if (item.treatment !== "taxable") {
-        exclusive = lineAmount;
-        gst = zeroMoney(currency, scale);
-        inclusive = lineAmount;
-      } else if (item.amountIs === "exclusive") {
-        exclusive = lineAmount;
-        const exactGstMinor = dec(exclusive.minorUnits).times(rate) as DecimalValue;
+      if (item.treatment === "taxable") {
+        const exactGstMinor =
+          item.amountIs === "exclusive"
+            ? (dec(lineAmount.minorUnits).times(rate) as DecimalValue)
+            : (dec(lineAmount.minorUnits).times(rate).div(onePlusRate) as DecimalValue);
         gst = moneyFromDecimalMinorUnits(currency, scale, exactGstMinor, mode);
-        inclusive = addMoney(exclusive, gst);
+        if (item.amountIs === "exclusive") {
+          inclusive = addMoney(exclusive, gst);
+        } else {
+          exclusive = subtractMoney(inclusive, gst);
+        }
+        taxable.push({ index: lines.length, exactGstMinor, basis: item.amountIs });
         exactGstTotalMinor = exactGstTotalMinor.plus(exactGstMinor) as DecimalValue;
-        lastTaxableIndex = lines.length;
-      } else {
-        inclusive = lineAmount;
-        const exactGstMinor = dec(inclusive.minorUnits)
-          .times(rate)
-          .div(onePlusRate) as DecimalValue;
-        gst = moneyFromDecimalMinorUnits(currency, scale, exactGstMinor, mode);
-        exclusive = subtractMoney(inclusive, gst);
-        exactGstTotalMinor = exactGstTotalMinor.plus(exactGstMinor) as DecimalValue;
-        lastTaxableIndex = lines.length;
       }
 
       lines.push({
@@ -268,21 +265,45 @@ export function computeGst(
       });
     }
 
-    if (input.roundingLevel === "invoice_total" && lastTaxableIndex >= 0) {
-      // Authoritative GST is the exact total rounded once; any difference from
-      // the per-line rounding is assigned to the last taxable line so lines
-      // always sum exactly to the totals (§12.15 AC — rounding level is shown).
+    if (input.roundingLevel === "invoice_total" && taxable.length > 0) {
+      // Authoritative GST is the exact total rounded once. Cents are allocated
+      // to lines by the largest-remainder method, so every line stays within
+      // one cent of its exact GST, lines sum exactly to the total, and each
+      // line's entered basis amount is preserved (§12.15 AC).
       const authoritativeGst = moneyFromDecimalMinorUnits(currency, scale, exactGstTotalMinor, mode);
-      const summedLineGst = sumMoney(currency, scale, lines.map((l) => l.gstAmount));
-      const adjustment = subtractMoney(authoritativeGst, summedLineGst);
-      if (adjustment.minorUnits !== "0") {
-        const line = lines[lastTaxableIndex]!;
-        line.gstAmount = addMoney(line.gstAmount, adjustment);
-        line.inclusiveAmount = addMoney(line.exclusiveAmount, line.gstAmount);
+      const floors = taxable.map((t) => ({
+        ...t,
+        floorMinor: t.exactGstMinor.floor() as DecimalValue,
+      }));
+      const floorSum = floors.reduce(
+        (acc, f) => acc.plus(f.floorMinor) as DecimalValue,
+        new Dec(0) as DecimalValue,
+      );
+      let deficit = Number(dec(authoritativeGst.minorUnits).minus(floorSum).toFixed(0));
+      const byRemainder = [...floors].sort((a, b) => {
+        const cmp = b.exactGstMinor.minus(b.floorMinor).comparedTo(a.exactGstMinor.minus(a.floorMinor));
+        return cmp !== 0 ? cmp : a.index - b.index;
+      });
+      let anyChanged = false;
+      for (const entry of byRemainder) {
+        const cents = entry.floorMinor.plus(deficit > 0 ? 1 : 0) as DecimalValue;
+        if (deficit > 0) deficit -= 1;
+        const line = lines[entry.index]!;
+        const gst = moneyFromMinorUnits(currency, cents.toFixed(0), scale);
+        if (gst.minorUnits !== line.gstAmount.minorUnits) anyChanged = true;
+        line.gstAmount = gst;
+        if (entry.basis === "exclusive") {
+          line.inclusiveAmount = addMoney(line.exclusiveAmount, gst);
+        } else {
+          line.exclusiveAmount = subtractMoney(line.inclusiveAmount, gst);
+        }
+      }
+      if (anyChanged) {
         warnings.push({
           code: "PC-CALC-0101",
           severity: "info",
-          message: `Invoice-total rounding assigned a ${moneyToDecimalString(adjustment)} ${currency} adjustment to the final taxable line.`,
+          message:
+            "Invoice-total rounding adjusted individual line GST by up to one cent so lines reconcile exactly to the invoice total.",
         });
       }
     }

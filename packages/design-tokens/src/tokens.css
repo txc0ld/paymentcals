@@ -20,9 +20,11 @@
   --pc-grey-400: #a7adb3;
   --pc-lime-500: #ccff00;
   --pc-blue-500: #3977ff;
-  --pc-amber-500: #f3a712;
+  --pc-mauve-300: #e0b0ff; /* owner-directed warning/attention hue */
+  --pc-mauve-700: #6f4291; /* accessible light-theme variant, 6.9:1 on paper */
   --pc-red-500: #e5484d;
-  --pc-green-600: #18794e;
+  --pc-green-300: #00ff7f; /* owner-directed positive hue */
+  --pc-green-700: #00753f; /* accessible light-theme variant, 5.4:1 on paper */
 
   /* Semantic — light (Swiss print: near-black on off-white, hairlines) */
   --pc-bg: var(--pc-paper-50);
@@ -39,23 +41,25 @@
   --pc-accent-contrast: var(--pc-paper-50);
   --pc-focus-ring: var(--pc-blue-500);
   --pc-info: #2557c9;
-  --pc-warn: #8a5f08;
-  --pc-warn-surface: rgba(243, 167, 18, 0.1);
+  --pc-warn: var(--pc-mauve-700);
+  --pc-warn-surface: rgba(224, 176, 255, 0.16);
   --pc-error: #c53337;
   --pc-error-surface: rgba(229, 72, 77, 0.08);
-  --pc-positive: var(--pc-green-600);
+  --pc-positive: var(--pc-green-700);
   --pc-selection-bg: var(--pc-ink-950);
   --pc-selection-text: var(--pc-paper-50);
 
-  /* Type — Geist wired by the app via next/font variables */
-  --pc-font-sans: var(--font-geist-sans, ui-sans-serif, system-ui, sans-serif);
+  /* Type — wired by the app via next/font variables.
+     Body: Plus Jakarta Sans · Headings: Montserrat 500 uppercase · Money: Geist Mono */
+  --pc-font-sans: var(--font-jakarta, ui-sans-serif, system-ui, sans-serif);
+  --pc-font-display: var(--font-montserrat, var(--pc-font-sans));
   --pc-font-mono: var(--font-geist-mono, ui-monospace, "Cascadia Mono", monospace);
-  --pc-text-h1: clamp(2.5rem, 6vw, 5.5rem);
-  --pc-text-h2: clamp(1.9rem, 3.6vw, 3.25rem);
-  --pc-text-h3: clamp(1.25rem, 1.8vw, 1.5rem);
+  --pc-text-h1: clamp(2.1rem, 4.6vw, 3.9rem);
+  --pc-text-h2: clamp(1.5rem, 2.8vw, 2.4rem);
+  --pc-text-h3: clamp(1.15rem, 1.6vw, 1.4rem);
   --pc-text-result-xl: clamp(2.5rem, 5vw, 3.5rem);
   --pc-text-body: clamp(1rem, 1.1vw, 1.0625rem);
-  --pc-tracking-tight: -0.035em;
+  --pc-tracking-tight: 0.015em; /* uppercase display needs positive tracking */
   --pc-tracking-micro: 0.18em;
 
   /* Geometry — sharp Swiss editorial: hairlines over shadows */
@@ -83,11 +87,11 @@
   --pc-accent-contrast: var(--pc-ink-950);
   --pc-focus-ring: var(--pc-lime-500);
   --pc-info: #6d9bff;
-  --pc-warn: var(--pc-amber-500);
-  --pc-warn-surface: rgba(243, 167, 18, 0.12);
+  --pc-warn: var(--pc-mauve-300);
+  --pc-warn-surface: rgba(224, 176, 255, 0.12);
   --pc-error: #ff6b6f;
   --pc-error-surface: rgba(229, 72, 77, 0.14);
-  --pc-positive: #3dd68c;
+  --pc-positive: var(--pc-green-300);
   --pc-selection-bg: #f4f5f3;
   --pc-selection-text: #050607;
 }

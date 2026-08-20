@@ -21,7 +21,8 @@ const entries: RegistryEntry[] = [
     disclosureSet: ["universal-footer-v2.0"],
     sourceSet: ["ato-how-gst-works-2026-08-20"],
     seo: {
-      title: "GST Calculator Australia — Add, Remove or Split 10% GST",
+      // Rate-neutral by design: statutory numbers live only in rule packs.
+      title: "GST Calculator Australia: Add, Remove or Split GST",
       description:
         "Add GST, remove GST or split a GST-inclusive amount using the current Australian GST rate, with full working shown and sources cited.",
     },

@@ -35,6 +35,8 @@ const ALLOWED_PROPERTIES: Record<string, (value: AllowedValue) => boolean> = {
   action: (v) =>
     typeof v === "string" &&
     ["save", "share", "export_csv", "export_json", "print", "reset", "mode_switch"].includes(v),
+  /** Route path only — never a query string, fragment or user-provided text. */
+  path: (v) => typeof v === "string" && /^\/[a-z0-9\-/]{0,80}$/.test(v),
 };
 
 const ALLOWED_EVENTS = [

@@ -7,6 +7,7 @@ import {
   CalculatorShell,
   DraftRulesBanner,
   EmptyState,
+  EngineFailureState,
   ExplainabilityTabs,
   MoneyField,
   PrimaryResult,
@@ -60,13 +61,22 @@ const PRIMARY_LABELS: Record<SimpleMode, string> = {
 
 const LIMITATIONS = [
   "This tool works with amounts you enter and the standard GST rate only. It does not determine whether you are or must be registered for GST.",
-  "Whether a supply is taxable, GST-free or input taxed is your selection — the calculator never infers it from item names, and entitlement to input tax credits is not assessed.",
+  "Whether a supply is taxable, GST-free or input taxed is your selection. The calculator never infers it from item names, and entitlement to input tax credits is not assessed.",
   "Special GST rules (margin scheme, reverse charge, imports, long-term accommodation) are out of scope for this calculator.",
   "Result accuracy class A: deterministic arithmetic on your inputs under the resolved rule pack.",
 ];
 
+/** Shared cap across editor, URL state and engine schema. */
+const MAX_INVOICE_LINES = 200;
+
+/** Today in the calculator's jurisdiction, not UTC (rule packs are date-gated). */
 function todayIso(): string {
-  return new Date().toISOString().slice(0, 10);
+  return new Intl.DateTimeFormat("en-CA", {
+    timeZone: "Australia/Sydney",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).format(new Date());
 }
 
 export function GstCalculator() {
@@ -116,7 +126,12 @@ export function GstCalculator() {
       return;
     }
     const decoded = decodeUrlState(param);
-    if (decoded.ok && decoded.state.calculatorId === entry.id) {
+    if (
+      decoded.ok &&
+      decoded.state.calculatorId === entry.id &&
+      typeof decoded.state.input === "object" &&
+      decoded.state.input !== null
+    ) {
       const input = decoded.state.input as Partial<UrlInputState>;
       if (input.uiMode === "simple" || input.uiMode === "advanced") setUiMode(input.uiMode);
       if (input.simpleMode && ["add", "remove", "split"].includes(input.simpleMode)) {
@@ -124,7 +139,11 @@ export function GstCalculator() {
       }
       if (typeof input.amountRaw === "string") setAmountRaw(input.amountRaw.slice(0, 24));
       if (Array.isArray(input.items) && input.items.length > 0) {
-        setItems(input.items.slice(0, 50).map((item, i) => ({ ...emptyLine(`line-${i + 1}`), ...item, id: `line-${i + 1}` })));
+        setItems(
+          input.items
+            .slice(0, MAX_INVOICE_LINES)
+            .map((item, i) => ({ ...emptyLine(`line-${i + 1}`), ...item, id: `line-${i + 1}` })),
+        );
       }
       if (input.roundingLevel === "per_line" || input.roundingLevel === "invoice_total") {
         setRoundingLevel(input.roundingLevel);
@@ -157,15 +176,16 @@ export function GstCalculator() {
     }> = [];
     for (const item of items) {
       const money = parseMoneyInput(item.amountRaw);
-      const quantity = Number.parseInt(item.quantityRaw, 10);
       if (!money.ok) {
         if (money.error) itemErrors[item.id] = money.error;
         continue;
       }
-      if (!Number.isInteger(quantity) || quantity < 1) {
-        itemErrors[item.id] = "Quantity must be a whole number of at least 1.";
+      // Strict integer parse: "1.9" or "1abc" must error, never truncate.
+      if (!/^\d{1,4}$/.test(item.quantityRaw.trim()) || Number(item.quantityRaw) < 1) {
+        itemErrors[item.id] = "Quantity must be a whole number between 1 and 9999.";
         continue;
       }
+      const quantity = Number(item.quantityRaw.trim());
       engineItems.push({
         id: item.id,
         ...(item.label.trim() ? { label: item.label.trim() } : {}),
@@ -214,11 +234,14 @@ export function GstCalculator() {
     ).then((calculated) => {
       if (cancelled) return;
       setResult(calculated);
-      analytics.track("calculation_completed", {
+      const succeeded =
+        calculated.status === "success" || calculated.status === "success_with_warnings";
+      analytics.track(succeeded ? "calculation_completed" : "calculation_failed", {
         calculator_id: entry.id,
         mode: uiMode === "simple" ? "simple" : "advanced",
         has_warnings: calculated.warnings.length > 0,
         duration_bucket: performance.now() - started < 100 ? "under_100ms" : "under_750ms",
+        ...(succeeded ? {} : { error_code: calculated.errors[0]?.code ?? "PC-CALC-0000" }),
       });
     });
     return () => {
@@ -398,9 +421,11 @@ export function GstCalculator() {
             <EmptyState>
               No result can be shown while the required rule set is unavailable.
             </EmptyState>
+          ) : result && !output && result.errors.length > 0 ? (
+            <EngineFailureState referenceId={result.calculationId} />
           ) : !output ? (
             <EmptyState>
-              Enter an amount to see the GST breakdown instantly — with the full working shown
+              Enter an amount to see the GST breakdown instantly, with the full working shown
               below the result.
             </EmptyState>
           ) : (
@@ -443,10 +468,10 @@ export function GstCalculator() {
                 <div className="grid gap-3">
                   <p className="max-w-2xl text-[14px] leading-6 text-ink">
                     {output.mode === "add"
-                      ? `Adding ${formatRatePercent(output.rate)} GST to ${formatMoney(output.exclusiveAmount)} gives ${formatMoney(output.inclusiveAmount)} — the GST component is ${formatMoney(output.gstAmount)}.`
+                      ? `Adding ${formatRatePercent(output.rate)} GST to ${formatMoney(output.exclusiveAmount)} gives ${formatMoney(output.inclusiveAmount)}. The GST component is ${formatMoney(output.gstAmount)}.`
                       : output.mode === "line_items"
                         ? `This invoice totals ${formatMoney(output.inclusiveAmount)} including ${formatMoney(output.gstAmount)} GST across ${output.lines?.length ?? 0} lines (${output.roundingLevel === "per_line" ? "rounded per line" : "rounded at the invoice total"}).`
-                        : `${formatMoney(output.inclusiveAmount)} including GST is ${formatMoney(output.exclusiveAmount)} excluding GST — the GST component is ${formatMoney(output.gstAmount)}.`}
+                        : `${formatMoney(output.inclusiveAmount)} including GST is ${formatMoney(output.exclusiveAmount)} excluding GST. The GST component is ${formatMoney(output.gstAmount)}.`}
                   </p>
                   <p className="text-[13px] leading-5 text-ink-3">
                     Figures are estimates under the assumptions shown; the Working tab traces every step.
