@@ -62,7 +62,139 @@ const homeEntry = (partial: {
     ownership: { owner: "tmayorx@gmail.com", reviewCadence: "annual" },
   });
 
+const simpleEntry = (partial: {
+  id: string;
+  slug: string;
+  displayName: string;
+  category: "savings-investing" | "loans-debt" | "property-mortgage" | "business";
+  scope?: "au" | "global";
+  calculationClass?: "A" | "B" | "C";
+  engines: string[];
+  rulePacks?: string[];
+  disclosures?: string[];
+  title: string;
+  description: string;
+}) =>
+  zRegistryEntry.parse({
+    id: partial.id,
+    slug: partial.slug,
+    displayName: partial.displayName,
+    category: partial.category,
+    jurisdictionScope: partial.scope ?? "au",
+    releasePriority: "P0",
+    calculationClass: partial.calculationClass ?? "A",
+    engineDependencies: partial.engines,
+    rulePackDependencies: partial.rulePacks ?? [],
+    supportedModes: ["simple", "advanced"],
+    inputSchemaVersion: "1",
+    resultSchemaVersion: "1",
+    disclosureSet: partial.disclosures ?? ["universal-footer-v2.0"],
+    sourceSet: [],
+    seo: { title: partial.title, description: partial.description },
+    ownership: { owner: "tmayorx@gmail.com", reviewCadence: "annual" },
+  });
+
+const breadthEntries: RegistryEntry[] = [
+  simpleEntry({
+    id: "GL-SAVE-002",
+    slug: "compound-interest-calculator",
+    displayName: "Compound Interest Calculator",
+    category: "savings-investing",
+    scope: "global",
+    engines: ["E14"],
+    title: "Compound Interest Calculator with Yearly Breakdown",
+    description:
+      "See how savings grow with compound interest and regular deposits, with a year-by-year breakdown, exact formulas and every assumption editable.",
+  }),
+  simpleEntry({
+    id: "GL-SAVE-003",
+    slug: "savings-goal-calculator",
+    displayName: "Savings Goal Calculator",
+    category: "savings-investing",
+    scope: "global",
+    engines: ["E14", "E24"],
+    title: "Savings Goal Calculator: Reach a Target Amount",
+    description:
+      "Work out the regular deposit needed to reach a savings target by a chosen date, verified by re-running the forward calculation.",
+  }),
+  simpleEntry({
+    id: "AU-DEBT-001",
+    slug: "loan-calculator",
+    displayName: "Loan Calculator",
+    category: "loans-debt",
+    engines: ["E11"],
+    title: "Personal Loan Repayment Calculator Australia",
+    description:
+      "Estimate loan repayments, total interest and payoff date for personal loans with a full amortisation schedule and optional monthly fees.",
+  }),
+  simpleEntry({
+    id: "AU-DEBT-003",
+    slug: "car-loan-calculator",
+    displayName: "Car Loan Calculator",
+    category: "loans-debt",
+    engines: ["E11"],
+    title: "Car Loan Repayment Calculator with Balloon Payment",
+    description:
+      "Estimate car loan repayments including balloon or residual payments, with total cost, interest and the schedule shown in full.",
+  }),
+  simpleEntry({
+    id: "AU-DEBT-012",
+    slug: "credit-card-payoff-calculator",
+    displayName: "Credit Card Payoff Calculator",
+    category: "loans-debt",
+    engines: ["E12"],
+    title: "Credit Card Payoff Calculator: Minimum vs Fixed Payments",
+    description:
+      "See how long a credit card takes to pay off on minimum payments versus a fixed amount, cycle by cycle, with promotional-rate expiry modelled.",
+  }),
+  simpleEntry({
+    id: "AU-HOME-019",
+    slug: "home-deposit-calculator",
+    displayName: "Home Deposit Calculator",
+    category: "property-mortgage",
+    engines: ["E01"],
+    title: "Home Deposit Calculator Australia",
+    description:
+      "Work out the deposit needed for a property price at your chosen loan-to-value ratio, alongside the upfront costs you enter.",
+  }),
+  simpleEntry({
+    id: "AU-HOME-020",
+    slug: "lvr-calculator",
+    displayName: "LVR Calculator",
+    category: "property-mortgage",
+    engines: ["E01"],
+    title: "LVR Calculator: Loan to Value Ratio",
+    description:
+      "Calculate your loan-to-value ratio from a property value and loan amount, with the standard LVR bands lenders commonly reference.",
+  }),
+  simpleEntry({
+    id: "AU-HOME-022",
+    slug: "borrowing-affordability-estimate",
+    displayName: "Affordability Estimate",
+    category: "property-mortgage",
+    calculationClass: "C",
+    engines: ["E10"],
+    disclosures: ["universal-footer-v2.0", "affordability-addendum-v2.0"],
+    title: "Home Loan Affordability Estimate Australia",
+    description:
+      "An indicative borrowing range from your income, expenses and commitments under generic assumptions with an editable rate buffer. Not pre-approval.",
+  }),
+  simpleEntry({
+    id: "AU-BIZ-006",
+    slug: "contractor-day-rate-calculator",
+    displayName: "Contractor Day Rate Calculator",
+    category: "business",
+    calculationClass: "B",
+    engines: ["E19", "E20"],
+    rulePacks: ["gst"],
+    title: "Contractor Day Rate Calculator Australia",
+    description:
+      "Convert a target income into a contractor day rate covering super replacement, leave, overheads and utilisation, with GST quoted separately.",
+  }),
+];
+
 const entries: RegistryEntry[] = [
+  ...breadthEntries,
   homeEntry({
     id: "AU-HOME-001",
     slug: "mortgage-repayment-calculator",

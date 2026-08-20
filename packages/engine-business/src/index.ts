@@ -9,6 +9,12 @@ export {
 } from "./gst/engine";
 export { GST_FORMULAS, type GstFormulaId } from "./gst/formulas";
 export {
+  WEEKDAYS_PER_YEAR,
+  contractorRates,
+  type ContractorInput,
+  type ContractorResult,
+} from "./contractor/engine";
+export {
   GST_TREATMENTS,
   zGstInput,
   zGstLineItem,

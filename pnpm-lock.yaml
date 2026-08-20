@@ -59,12 +59,18 @@ importers:
       '@paymentcalcs/engine-compensation':
         specifier: workspace:*
         version: link:../../packages/engine-compensation
+      '@paymentcalcs/engine-debt':
+        specifier: workspace:*
+        version: link:../../packages/engine-debt
       '@paymentcalcs/engine-loans':
         specifier: workspace:*
         version: link:../../packages/engine-loans
       '@paymentcalcs/engine-mortgage-ledger':
         specifier: workspace:*
         version: link:../../packages/engine-mortgage-ledger
+      '@paymentcalcs/engine-savings':
+        specifier: workspace:*
+        version: link:../../packages/engine-savings
       '@paymentcalcs/financial-solvers':
         specifier: workspace:*
         version: link:../../packages/financial-solvers
@@ -229,6 +235,12 @@ importers:
         specifier: workspace:*
         version: link:../rules-au
 
+  packages/engine-debt:
+    dependencies:
+      '@paymentcalcs/calculation-core':
+        specifier: workspace:*
+        version: link:../calculation-core
+
   packages/engine-loans:
     dependencies:
       '@paymentcalcs/calculation-core':
@@ -246,6 +258,12 @@ importers:
       zod:
         specifier: 4.4.3
         version: 4.4.3
+
+  packages/engine-savings:
+    dependencies:
+      '@paymentcalcs/calculation-core':
+        specifier: workspace:*
+        version: link:../calculation-core
 
   packages/eslint-config:
     dependencies:
