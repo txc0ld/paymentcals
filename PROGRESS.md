@@ -1,6 +1,16 @@
 # PROGRESS
 
-Phase: **0 — Foundation (Gate 0)** · Started 2026-08-20
+Phase: **1 — Pay slice (Gate 1) COMPLETE, checkpoint pending owner verification** · 2026-08-20
+
+## Phase 1 summary (all done 2026-08-20)
+
+- 13 pay rule packs (`in_review`) authored from same-day ATO fetches with archived, hash-pinned snapshots: income tax ×3 FY (+LITO), Medicare/MLS ×3, STSL ×3, super guarantee ×3, PAYG withholding 2026-27 (Schedule 1 scales 1–6 + Schedule 8 STSL components, machine-parsed).
+- Engines: E24 bisection (§13.28 safeguards), E02 annual liability (brackets/LITO/Medicare incl. low-income reduction/MLS/STSL marginal + whole-income), E03 schedule-formula withholding (never annual÷periods), E04 package decomposition with max-contribution-base cap + §12.1.7 iterative verification. Net-to-gross solver with round-trip tests.
+- Tests: 63 engine tests including generated bracket-boundary suites (PAY-AC-003), ATO worked examples reproduced exactly (PAY-AC-004: Christina/Barry/Priya STSL, Angie Medicare $98.90, Tom MLS $1,170), monotonicity/limit properties, closed-form-vs-iterative agreement. One ATO source arithmetic anomaly found and queued (STSL Example 4).
+- Routes: all nine PAY routes live (001 flagship with Simple/Advanced, 002/003/005/006/007 variants, 004 net-to-gross solver UI, 011 schedule withholding, 013 HELP). Liability and withholding rendered as separately labelled sections with an explicit variance note (PAY-AC-002). 18 Playwright e2e green incl. axe and FY re-resolution (PAY-AC-005).
+- Known deferrals (logged): WHM withholding (Schedule 15 registration logic) surfaces an explicit unsupported reason; withholding packs for FY2024-25/2025-26 not authored (historical payroll); family Medicare reduction is a capped estimate with a warning; Compare mode arrives with the Phase 2 compare framework.
+
+Phase 0: **complete** (see below). Next: owner verification checkpoint, then Phase 2 (Mortgage slice).
 
 ## Phase 0 task breakdown
 

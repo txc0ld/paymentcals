@@ -2,11 +2,10 @@ import Link from "next/link";
 import { calculatorRegistry, routePath } from "@paymentcalcs/calculator-registry";
 
 const ROADMAP: Array<{ group: string; count: number; detail: string }> = [
-  { group: "Pay & Tax", count: 9, detail: "Take-home, net-to-gross, PAYG withholding, HELP" },
   { group: "Property & Mortgage", count: 11, detail: "Repayments, simulator, stamp duty, LVR" },
   { group: "Loans & Debt", count: 3, detail: "Loans, car loans, credit-card payoff" },
   { group: "Savings", count: 2, detail: "Compound interest, savings goals" },
-  { group: "Business", count: 2, detail: "GST, contractor day rate" },
+  { group: "Business", count: 1, detail: "Contractor day rate" },
 ];
 
 export default function HomePage() {

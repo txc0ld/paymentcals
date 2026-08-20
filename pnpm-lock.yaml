@@ -47,9 +47,21 @@ importers:
       '@paymentcalcs/design-tokens':
         specifier: workspace:*
         version: link:../../packages/design-tokens
+      '@paymentcalcs/engine-au-tax':
+        specifier: workspace:*
+        version: link:../../packages/engine-au-tax
+      '@paymentcalcs/engine-au-withholding':
+        specifier: workspace:*
+        version: link:../../packages/engine-au-withholding
       '@paymentcalcs/engine-business':
         specifier: workspace:*
         version: link:../../packages/engine-business
+      '@paymentcalcs/engine-compensation':
+        specifier: workspace:*
+        version: link:../../packages/engine-compensation
+      '@paymentcalcs/financial-solvers':
+        specifier: workspace:*
+        version: link:../../packages/financial-solvers
       '@paymentcalcs/rule-schema':
         specifier: workspace:*
         version: link:../../packages/rule-schema

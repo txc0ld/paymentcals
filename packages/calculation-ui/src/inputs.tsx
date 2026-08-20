@@ -155,3 +155,96 @@ export function FieldGroup({ legend, children }: { legend: string; children: Rea
     </fieldset>
   );
 }
+
+/** Labelled select in the clay input style. */
+export function SelectField<T extends string>({
+  id,
+  label,
+  value,
+  onChange,
+  options,
+  description,
+}: {
+  id: string;
+  label: string;
+  value: T;
+  onChange: (value: T) => void;
+  options: ReadonlyArray<{ value: T; label: string }>;
+  description?: string;
+}) {
+  const descriptionId = useId();
+  return (
+    <div className="flex min-w-0 flex-col gap-1.5">
+      <label htmlFor={id} className="font-mono text-[11px] uppercase tracking-[0.14em] text-ink-2">
+        {label}
+      </label>
+      {description ? (
+        <p id={descriptionId} className="text-[13px] leading-5 text-ink-3">
+          {description}
+        </p>
+      ) : null}
+      <select
+        id={id}
+        value={value}
+        onChange={(event) => onChange(event.target.value as T)}
+        aria-describedby={description ? descriptionId : undefined}
+        className="clay-input min-h-11 w-full appearance-none bg-surface px-3 text-[15px] text-ink outline-none focus:border-focus"
+      >
+        {options.map((option) => (
+          <option key={option.value} value={option.value}>
+            {option.label}
+          </option>
+        ))}
+      </select>
+    </div>
+  );
+}
+
+/** Labelled boolean toggle rendered as an accessible switch. */
+export function ToggleField({
+  id,
+  label,
+  description,
+  checked,
+  onChange,
+}: {
+  id: string;
+  label: string;
+  description?: string;
+  checked: boolean;
+  onChange: (checked: boolean) => void;
+}) {
+  const descriptionId = useId();
+  return (
+    <div className="flex min-w-0 items-start justify-between gap-4">
+      <div className="grid gap-0.5">
+        <label htmlFor={id} className="font-mono text-[11px] uppercase tracking-[0.14em] text-ink-2">
+          {label}
+        </label>
+        {description ? (
+          <p id={descriptionId} className="text-[13px] leading-5 text-ink-3">
+            {description}
+          </p>
+        ) : null}
+      </div>
+      <button
+        id={id}
+        type="button"
+        role="switch"
+        aria-checked={checked}
+        aria-describedby={description ? descriptionId : undefined}
+        onClick={() => onChange(!checked)}
+        className={`relative mt-0.5 h-7 w-12 shrink-0 rounded-full border transition-colors duration-[var(--pc-duration-fast)] ease-[var(--pc-ease)] focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-focus ${
+          checked ? "border-transparent bg-accent" : "border-hairline-strong bg-surface-2"
+        }`}
+      >
+        <span
+          aria-hidden="true"
+          className={`absolute top-0.5 h-[22px] w-[22px] rounded-full bg-surface shadow-[0_2px_4px_rgba(0,0,0,0.25)] transition-transform duration-[var(--pc-duration-fast)] ease-[var(--pc-ease)] ${
+            checked ? "translate-x-[22px]" : "translate-x-0.5"
+          }`}
+        />
+      </button>
+    </div>
+  );
+}

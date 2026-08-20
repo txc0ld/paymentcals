@@ -1,0 +1,89 @@
+{
+  "fixtureId": "pay/au-pay-001",
+  "calculatorId": "AU-PAY-001",
+  "engine": "E02",
+  "rulePackId": "au-income-tax-2026-27",
+  "officialSourceForExpected": "Verify against the ATO simple tax calculator and Moneysmart income tax calculator for the matching financial year; record the tool and date used.",
+  "cases": [
+    {
+      "caseId": "resident-100k-2026-27",
+      "description": "Resident, $100,000 annual salary, no extras, FY2026-27",
+      "input": {
+        "financialYear": "2026-27",
+        "income": { "amount": { "currency": "AUD", "minorUnits": "10000000", "scale": 2 }, "frequency": "annually" },
+        "package": { "treatment": "base_plus_super" },
+        "taxpayer": { "residency": "resident" }
+      },
+      "expected": null,
+      "verifiedBy": null,
+      "verifiedAt": null
+    },
+    {
+      "caseId": "resident-45k-boundary-2026-27",
+      "description": "Resident at the $45,000 bracket boundary, FY2026-27",
+      "input": {
+        "financialYear": "2026-27",
+        "income": { "amount": { "currency": "AUD", "minorUnits": "4500000", "scale": 2 }, "frequency": "annually" },
+        "package": { "treatment": "base_plus_super" },
+        "taxpayer": { "residency": "resident" }
+      },
+      "expected": null,
+      "verifiedBy": null,
+      "verifiedAt": null
+    },
+    {
+      "caseId": "resident-help-95k-2026-27",
+      "description": "Resident, $95,000, HELP debt enabled, FY2026-27",
+      "input": {
+        "financialYear": "2026-27",
+        "income": { "amount": { "currency": "AUD", "minorUnits": "9500000", "scale": 2 }, "frequency": "annually" },
+        "package": { "treatment": "base_plus_super" },
+        "taxpayer": { "residency": "resident" },
+        "studyLoans": { "enabled": true }
+      },
+      "expected": null,
+      "verifiedBy": null,
+      "verifiedAt": null
+    },
+    {
+      "caseId": "package-inc-super-110k-2026-27",
+      "description": "Total package $110,000 including super, FY2026-27",
+      "input": {
+        "financialYear": "2026-27",
+        "income": { "amount": { "currency": "AUD", "minorUnits": "11000000", "scale": 2 }, "frequency": "annually" },
+        "package": { "treatment": "total_package_including_super" },
+        "taxpayer": { "residency": "resident" }
+      },
+      "expected": null,
+      "verifiedBy": null,
+      "verifiedAt": null
+    },
+    {
+      "caseId": "foreign-resident-90k-2025-26",
+      "description": "Foreign resident, $90,000, FY2025-26",
+      "input": {
+        "financialYear": "2025-26",
+        "income": { "amount": { "currency": "AUD", "minorUnits": "9000000", "scale": 2 }, "frequency": "annually" },
+        "package": { "treatment": "base_plus_super" },
+        "taxpayer": { "residency": "foreign_resident", "claimsTaxFreeThreshold": false }
+      },
+      "expected": null,
+      "verifiedBy": null,
+      "verifiedAt": null
+    },
+    {
+      "caseId": "resident-60k-2024-25-old-stsl",
+      "description": "Resident, $60,000, HELP enabled under the 2024-25 whole-income system",
+      "input": {
+        "financialYear": "2024-25",
+        "income": { "amount": { "currency": "AUD", "minorUnits": "6000000", "scale": 2 }, "frequency": "annually" },
+        "package": { "treatment": "base_plus_super" },
+        "taxpayer": { "residency": "resident" },
+        "studyLoans": { "enabled": true }
+      },
+      "expected": null,
+      "verifiedBy": null,
+      "verifiedAt": null
+    }
+  ]
+}
