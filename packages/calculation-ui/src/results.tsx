@@ -56,7 +56,7 @@ export function PrimaryResult({
   const swept = useSweptValue(amount);
   const exact = formatMoney(amount);
   return (
-    <div className="flex min-w-0 flex-col gap-3 rounded-[var(--pc-radius-control)] border border-hairline-strong bg-surface/70 p-5 shadow-[0_18px_42px_color-mix(in_srgb,var(--pc-accent)_10%,transparent)]">
+    <div className="flex min-w-0 flex-col gap-3 border border-hairline-strong bg-surface p-5 md:p-6">
       <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-ink-3">{label}</span>
       {/* Visual sweep is aria-hidden; the true value is announced immediately. */}
       <span aria-hidden="true" data-money className="break-words font-mono text-[length:var(--pc-text-result-xl)] font-medium leading-none tracking-tight tabular-nums text-ink">

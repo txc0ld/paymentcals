@@ -420,7 +420,7 @@ export function PayCalculator({ variant }: { variant: PayVariant }) {
                     key={label}
                     type="button"
                     onClick={handler}
-                    className="nexus-quiet-button min-h-9 px-2.5 font-mono text-[10px] uppercase tracking-[0.14em] text-ink-2 hover:text-ink focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-focus"
+                    className="nexus-quiet-button min-h-11 px-2.5 font-mono text-[10px] uppercase tracking-[0.14em] text-ink-2 hover:text-ink focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-focus"
                   >
                     {label}
                   </button>

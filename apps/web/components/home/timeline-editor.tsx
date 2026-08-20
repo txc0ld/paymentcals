@@ -56,7 +56,7 @@ export function TimelineEditor({
               <button
                 type="button"
                 onClick={() => onChange(events.filter((other) => other.id !== event.id))}
-                className="nexus-quiet-button inline-flex min-h-9 items-center px-3 font-mono text-[10px] uppercase tracking-[0.14em] text-ink-3 hover:text-error focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-focus"
+                className="nexus-quiet-button inline-flex min-h-11 items-center px-3 font-mono text-[10px] uppercase tracking-[0.14em] text-ink-3 hover:text-error focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-focus"
               >
                 Remove
               </button>

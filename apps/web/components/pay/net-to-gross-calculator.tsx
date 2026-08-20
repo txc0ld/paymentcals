@@ -174,7 +174,7 @@ export function NetToGrossCalculator() {
             <EmptyState>Enter a target take-home amount to solve the gross salary that produces it.</EmptyState>
           ) : solved.status !== "solved" ? (
             <div className="nexus-panel-soft grid gap-3 p-6">
-              <h2 className="text-lg font-medium text-ink">No solution in range</h2>
+              <h2 className="text-lg font-semibold tracking-tight text-ink">No solution in range</h2>
               <p className="text-[14px] leading-6 text-ink-2">{solved.reason}</p>
             </div>
           ) : (

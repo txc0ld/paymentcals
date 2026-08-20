@@ -54,42 +54,6 @@ body {
   text-rendering: optimizeLegibility;
 }
 
-.aether-atmosphere::before,
-.aether-atmosphere::after {
-  position: fixed;
-  inset: 0;
-  z-index: -2;
-  pointer-events: none;
-  content: "";
-}
-
-.aether-atmosphere::before {
-  background:
-    radial-gradient(circle at 14% 8%, color-mix(in srgb, var(--pc-accent) 15%, transparent) 0, transparent 28rem),
-    radial-gradient(circle at 88% 22%, color-mix(in srgb, var(--pc-rose-500) 8%, transparent) 0, transparent 24rem),
-    radial-gradient(circle at 52% 82%, color-mix(in srgb, var(--pc-accent) 7%, transparent) 0, transparent 34rem);
-  animation: nexus-drift 22s var(--pc-ease) infinite alternate;
-}
-
-.aether-atmosphere::after {
-  z-index: -1;
-  background-image:
-    linear-gradient(var(--pc-grid-line) 1px, transparent 1px),
-    linear-gradient(90deg, var(--pc-grid-line) 1px, transparent 1px),
-    radial-gradient(circle, color-mix(in srgb, var(--pc-accent) 36%, transparent) 0 1px, transparent 1.25px);
-  background-position: center, center, 0 0;
-  background-size: 72px 72px, 72px 72px, 18px 18px;
-  mask-image: linear-gradient(to bottom, black, transparent 86%);
-  opacity: 0.32;
-}
-
-.aether-atmosphere {
-  position: fixed;
-  inset: 0;
-  z-index: 0;
-  pointer-events: none;
-}
-
 :focus-visible { outline-color: var(--pc-focus-ring); }
 
 .tabular,
@@ -97,6 +61,11 @@ body {
   font-family: var(--pc-font-mono);
   font-variant-numeric: tabular-nums;
 }
+
+/* ---------------------------------------------------------------- STRATA
+ * Swiss Editorial Tech: monochrome, sharp 1px borders, no rounded corners,
+ * no soft shadows. The nexus-* class names are retained as the shared
+ * component vocabulary; their treatment is now strictly editorial. */
 
 .nexus-panel,
 .nexus-panel-soft,
@@ -108,196 +77,195 @@ body {
 .nexus-result,
 .nexus-table {
   border: 1px solid var(--pc-hairline);
-  background: color-mix(in srgb, var(--pc-surface) 94%, transparent);
-}
-
-.nexus-panel,
-.nexus-result { border-radius: var(--pc-radius); }
-
-.nexus-panel {
-  box-shadow: inset 0 1px 0 color-mix(in srgb, var(--pc-text) 4%, transparent);
+  border-radius: 0;
+  background: var(--pc-surface);
 }
 
 .nexus-panel-soft,
 .nexus-line-item,
-.nexus-control,
-.nexus-input,
-.nexus-badge,
-.nexus-quiet-button,
-.nexus-table { border-radius: var(--pc-radius-control); }
-
-.nexus-panel-soft,
-.nexus-line-item,
-.nexus-table {
-  background: color-mix(in srgb, var(--pc-surface-2) 82%, transparent);
-}
+.nexus-table { background: var(--pc-surface-2); }
 
 .nexus-input {
   background: var(--pc-surface);
-  transition: border-color var(--pc-duration-fast) var(--pc-ease), box-shadow var(--pc-duration-fast) var(--pc-ease), transform var(--pc-duration-fast) var(--pc-ease);
+  transition: border-color var(--pc-duration-fast) var(--pc-ease), outline-color var(--pc-duration-fast) var(--pc-ease);
 }
 
 .nexus-input:focus,
 .nexus-input:focus-within {
   border-color: var(--pc-focus-ring);
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--pc-focus-ring) 18%, transparent);
+  outline: 1px solid var(--pc-focus-ring);
+  outline-offset: 0;
 }
 
-.nexus-badge { background: color-mix(in srgb, var(--pc-surface-2) 88%, transparent); }
+.nexus-badge { background: var(--pc-surface-2); }
 
 .nexus-primary,
 .nexus-quiet-button,
 .nexus-segment,
 .nexus-arrow {
-  transform: translateY(0);
-  transition: color var(--pc-duration-fast) var(--pc-ease), background-color var(--pc-duration-fast) var(--pc-ease), border-color var(--pc-duration-fast) var(--pc-ease), box-shadow var(--pc-duration-fast) var(--pc-ease), transform var(--pc-duration-fast) var(--pc-ease);
+  border-radius: 0;
+  transition: color var(--pc-duration-fast) var(--pc-ease), background-color var(--pc-duration-fast) var(--pc-ease), border-color var(--pc-duration-fast) var(--pc-ease);
 }
 
+/* Editorial button: asymmetric clip-path notch, sliding fill on hover.
+ * Works with bg-accent/text-accent-contrast utilities in both themes. */
+.btn-editorial,
 .nexus-primary {
-  border: 1px solid color-mix(in srgb, var(--pc-accent) 76%, var(--pc-hairline-strong));
-  border-radius: var(--pc-radius-control);
-  box-shadow: 0 8px 28px color-mix(in srgb, var(--pc-accent) 18%, transparent);
-}
-
-.nexus-primary:active,
-.nexus-quiet-button:active,
-.nexus-segment:active { transform: translateY(1px) scale(0.985); }
-.nexus-primary:disabled { box-shadow: none; transform: none; }
-.nexus-quiet-button { background: color-mix(in srgb, var(--pc-surface) 92%, transparent); }
-.nexus-segment { position: relative; border-radius: var(--pc-radius-control); }
-
-.nexus-result {
   position: relative;
   overflow: hidden;
-  border-color: var(--pc-hairline-strong);
-  background: radial-gradient(circle at 82% 0, color-mix(in srgb, var(--pc-accent) 14%, transparent), transparent 17rem), var(--pc-surface);
-  box-shadow: inset 0 1px 0 color-mix(in srgb, var(--pc-text) 4%, transparent), 0 18px 54px color-mix(in srgb, var(--pc-accent) 8%, transparent);
+  isolation: isolate;
+  border: 1px solid var(--pc-accent);
+  background: var(--pc-accent);
+  color: var(--pc-accent-contrast);
+  clip-path: polygon(0 0, 100% 0, 100% calc(100% - 1rem), calc(100% - 1rem) 100%, 0 100%);
 }
 
-.nexus-result [data-money],
-.nexus-result .tabular { text-shadow: 0 10px 30px color-mix(in srgb, var(--pc-accent) 32%, transparent); }
+.btn-editorial::before,
+.nexus-primary::before {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background: var(--pc-accent-contrast);
+  content: "";
+  transform: translateY(100%);
+  transition: transform var(--pc-duration) var(--pc-ease);
+}
+
+.btn-editorial > *,
+.nexus-primary > * { position: relative; z-index: 1; }
+
+.btn-editorial:hover,
+.nexus-primary:hover { color: var(--pc-accent); }
+.btn-editorial:hover::before,
+.nexus-primary:hover::before { transform: translateY(0); }
+.nexus-primary:disabled { opacity: 0.45; }
+.nexus-primary:disabled::before { display: none; }
+
+.nexus-quiet-button {
+  border: 1px solid var(--pc-hairline);
+  background: transparent;
+}
+
+.nexus-segment { position: relative; border-radius: 0; }
+
+.nexus-result {
+  border: 1px solid var(--pc-hairline-strong);
+  background: var(--pc-surface);
+}
 
 .nexus-method {
   border-block: 1px solid var(--pc-hairline);
-  background: color-mix(in srgb, var(--pc-surface) 76%, transparent);
+  background: var(--pc-surface);
 }
 
 .nexus-tab {
   position: relative;
   border-radius: 0;
-  transition: color var(--pc-duration-fast) var(--pc-ease), transform var(--pc-duration-fast) var(--pc-ease);
+  transition: color var(--pc-duration-fast) var(--pc-ease);
 }
 
 .nexus-tab::after {
   position: absolute;
-  right: 0.8rem;
+  right: 0;
   bottom: -0.55rem;
-  left: 0.8rem;
-  height: 2px;
-  background: var(--pc-accent);
+  left: 0;
+  height: 1px;
+  background: var(--pc-text);
   content: "";
   opacity: 0;
   transform: scaleX(0.4);
   transition: opacity var(--pc-duration-fast) var(--pc-ease), transform var(--pc-duration-fast) var(--pc-ease);
 }
 
-.nexus-tab[aria-selected="true"] { color: var(--pc-accent-text); }
+.nexus-tab[aria-selected="true"] { color: var(--pc-text); }
 .nexus-tab[aria-selected="true"]::after { opacity: 1; transform: scaleX(1); }
 
-.nexus-hero {
-  isolation: isolate;
-  min-height: min(760px, calc(100dvh - 5rem));
-}
-
-.nexus-hero::before {
-  position: absolute;
-  inset: -10% -5% 0;
-  z-index: -1;
-  pointer-events: none;
-  background: radial-gradient(circle at 24% 44%, color-mix(in srgb, var(--pc-accent) 22%, transparent), transparent 27rem), radial-gradient(circle at 78% 28%, color-mix(in srgb, var(--pc-rose-500) 11%, transparent), transparent 22rem);
-  content: "";
-  filter: blur(10px);
-}
-
-.nexus-orbit {
-  position: absolute;
-  top: 14%;
-  right: clamp(-11rem, 3vw, 2rem);
-  width: clamp(21rem, 42vw, 38rem);
-  aspect-ratio: 1;
-  pointer-events: none;
-  border: 1px solid var(--pc-hairline-strong);
-  border-radius: 50%;
-  box-shadow: inset 0 0 80px color-mix(in srgb, var(--pc-accent) 8%, transparent), 0 0 100px color-mix(in srgb, var(--pc-accent) 8%, transparent);
-  opacity: 0.72;
-}
-
-.nexus-orbit::before,
-.nexus-orbit::after {
-  position: absolute;
-  border: 1px solid var(--pc-hairline);
-  border-radius: 50%;
-  content: "";
-}
-.nexus-orbit::before { inset: 12%; }
-.nexus-orbit::after { inset: 28%; border-color: color-mix(in srgb, var(--pc-rose-500) 24%, transparent); box-shadow: 0 0 60px color-mix(in srgb, var(--pc-rose-500) 8%, transparent); }
-
-.nexus-matrix {
+/* Hero overlay: 1px vertical lines at edges and quarter points (z-0). */
+.hero-grid-lines {
   position: absolute;
   inset: 0;
-  z-index: -1;
+  z-index: 0;
   pointer-events: none;
-  background-image: radial-gradient(circle, color-mix(in srgb, var(--pc-accent) 42%, transparent) 0 1px, transparent 1.25px);
-  background-size: 22px 22px;
-  mask-image: radial-gradient(ellipse 55% 62% at 76% 44%, black 12%, transparent 72%);
-  opacity: 0.38;
+  border-inline: 1px solid var(--pc-grid-line);
+  background-image: linear-gradient(90deg, var(--pc-grid-line) 1px, transparent 1px);
+  background-size: 25% 100%;
 }
 
+/* Faux-border bento: 1px gaps over a hairline backdrop; cells set bg-canvas. */
+.swiss-grid {
+  display: grid;
+  gap: 1px;
+  border: 1px solid var(--pc-hairline);
+  background: var(--pc-hairline);
+}
+
+.swiss-grid > * { min-width: 0; }
+
+.glass-panel { background: var(--pc-surface); }
+
+.bar-glow { box-shadow: 0 0 24px color-mix(in srgb, var(--pc-text) 35%, transparent); }
+
+.editorial-badge {
+  position: relative;
+  padding-left: 3rem;
+}
+
+.editorial-badge::before {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  width: 2rem;
+  height: 1px;
+  background: var(--pc-text);
+  content: "";
+}
+
+.hover-lift {
+  transform: translateY(0);
+  transition: transform var(--pc-duration) var(--pc-ease), background-color var(--pc-duration-fast) var(--pc-ease);
+}
+
+/* Directory grid keeps the shared name; now sharp editorial cells. */
 .nexus-grid {
   display: grid;
-  gap: clamp(0.75rem, 1.5vw, 1rem);
+  gap: 1px;
+  border: 1px solid var(--pc-hairline);
+  background: var(--pc-hairline);
 }
 
 .nexus-grid > * {
   min-width: 0;
-  border: 1px solid var(--pc-hairline);
-  border-radius: var(--pc-radius);
-  background: radial-gradient(circle at 100% 0, color-mix(in srgb, var(--pc-accent) 8%, transparent), transparent 12rem), color-mix(in srgb, var(--pc-surface) 96%, transparent);
-  box-shadow: inset 0 1px 0 color-mix(in srgb, var(--pc-text) 4%, transparent);
+  border: 0;
+  border-radius: 0;
+  background: var(--pc-bg);
   transform: translateY(0);
-  transition: border-color var(--pc-duration-fast) var(--pc-ease), box-shadow var(--pc-duration-fast) var(--pc-ease), transform var(--pc-duration-fast) var(--pc-ease);
-}
-
-.nexus-grid > :nth-child(4n + 3) {
-  background: radial-gradient(circle at 100% 0, color-mix(in srgb, var(--pc-rose-500) 8%, transparent), transparent 11rem), color-mix(in srgb, var(--pc-surface) 96%, transparent);
+  transition: background-color var(--pc-duration-fast) var(--pc-ease), transform var(--pc-duration) var(--pc-ease);
 }
 
 .nexus-feature-grid > :first-child { min-height: 22rem; }
 
 .nexus-arrow {
   border: 1px solid var(--pc-hairline-strong);
-  border-radius: var(--pc-radius-control);
-  background: color-mix(in srgb, var(--pc-accent) 14%, var(--pc-surface));
-  color: var(--pc-accent-text);
+  border-radius: 0;
+  background: transparent;
+  color: var(--pc-text);
+  transition: transform var(--pc-duration-fast) var(--pc-ease);
 }
 
 /* IntersectionObserver adds .is-revealed. */
 .reveal-up {
-  clip-path: inset(0 0 20% 0);
   opacity: 0;
-  transform: translateY(1.5rem);
-  transition: clip-path 680ms var(--pc-ease), opacity 520ms var(--pc-ease), transform 680ms var(--pc-ease);
+  transform: translateY(2rem);
+  transition: opacity 700ms var(--pc-ease), transform 700ms var(--pc-ease);
 }
-.reveal-up.is-revealed { clip-path: inset(0 0 0 0); opacity: 1; transform: translateY(0); }
+.reveal-up.is-revealed { opacity: 1; transform: translateY(0); }
+.delay-0 { transition-delay: 0ms; }
+.delay-1 { transition-delay: 150ms; }
+.delay-2 { transition-delay: 300ms; }
 .reveal-delay-1 { transition-delay: 80ms; }
 .reveal-delay-2 { transition-delay: 160ms; }
 .reveal-delay-3 { transition-delay: 240ms; }
 .reveal-delay-4 { transition-delay: 320ms; }
-
-@keyframes nexus-drift {
-  from { transform: translate3d(-1%, -1%, 0) scale(1); }
-  to { transform: translate3d(1.5%, 1%, 0) scale(1.04); }
-}
 
 @media (min-width: 768px) {
   .nexus-feature-grid > :first-child { grid-column: span 2; }
@@ -308,31 +276,20 @@ body {
 }
 
 @media (hover: hover) and (pointer: fine) {
-  .nexus-primary:hover,
+  .hover-lift:hover { transform: translateY(-8px); }
   .nexus-quiet-button:hover,
-  .nexus-segment:hover {
-    border-color: var(--pc-hairline-strong);
-    box-shadow: 0 10px 30px color-mix(in srgb, var(--pc-accent) 13%, transparent);
-    transform: translateY(-2px);
-  }
-  .nexus-grid > a:hover {
-    border-color: var(--pc-hairline-strong);
-    box-shadow: 0 20px 55px color-mix(in srgb, var(--pc-accent) 15%, transparent);
-    transform: translateY(-4px);
-  }
+  .nexus-segment:hover { border-color: var(--pc-hairline-strong); background: var(--pc-surface-2); }
+  .nexus-grid > a:hover { background: var(--pc-surface); transform: translateY(-4px); }
   .nexus-grid > a:hover .nexus-arrow { transform: translate(2px, -2px); }
-  .nexus-tab:hover { color: var(--pc-text); transform: translateY(-1px); }
-}
-
-@media (max-width: 767px) {
-  .nexus-hero { min-height: 34rem; }
-  .nexus-orbit { top: 9rem; right: -15rem; width: 28rem; opacity: 0.42; }
+  .nexus-tab:hover { color: var(--pc-text); }
 }
 
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
-  .aether-atmosphere::before { animation: none; }
-  .reveal-up { clip-path: none; opacity: 1; transform: none; transition: none; }
+  .reveal-up { opacity: 1; transform: none; transition: none; }
+  .btn-editorial::before,
+  .nexus-primary::before,
+  .hover-lift,
   .nexus-primary,
   .nexus-input,
   .nexus-quiet-button,
@@ -343,6 +300,7 @@ body {
 }
 
 @media (forced-colors: active) {
+  .btn-editorial,
   .nexus-primary,
   .nexus-panel,
   .nexus-panel-soft,
@@ -353,6 +311,7 @@ body {
   .nexus-line-item,
   .nexus-result,
   .nexus-table,
+  .swiss-grid > *,
   .nexus-grid > * { border: 2px solid ButtonText; box-shadow: none; }
 }
 

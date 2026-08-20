@@ -62,7 +62,7 @@ export function ScheduleView({
         <button
           type="button"
           onClick={exportCsv}
-          className="nexus-quiet-button min-h-9 px-3 font-mono text-[10px] uppercase tracking-[0.14em] text-ink-2 hover:text-ink focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-focus"
+          className="nexus-quiet-button min-h-11 px-3 font-mono text-[10px] uppercase tracking-[0.14em] text-ink-2 hover:text-ink focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-focus"
         >
           Export full schedule (CSV)
         </button>

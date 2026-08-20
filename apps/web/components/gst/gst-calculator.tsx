@@ -501,7 +501,7 @@ export function GstCalculator() {
                                 <span className="text-ink-3"> × {line.quantity}</span>
                               ) : null}
                             </td>
-                            <td className="py-2 pe-4 font-mono text-[11px] uppercase tracking-[0.1em] text-ink-2">
+                            <td className="py-2 pe-4 font-mono text-[11px] uppercase tracking-[0.14em] text-ink-2">
                               {line.treatment.replace("_", " ")}
                             </td>
                             <td className="py-2 pe-4 text-right font-mono text-[13px] tabular-nums text-ink">
@@ -515,7 +515,7 @@ export function GstCalculator() {
                             </td>
                           </tr>
                         ))}
-                        <tr className="font-medium">
+                        <tr className="font-semibold">
                           <td className="py-2 pe-4 text-[13px] text-ink">Totals</td>
                           <td className="py-2 pe-4" />
                           <td className="py-2 pe-4 text-right font-mono text-[13px] tabular-nums text-ink">

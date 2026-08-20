@@ -21,15 +21,20 @@ const ENTRIES = [
 
 export default function ChangelogPage() {
   return (
-    <section className="mx-auto w-full max-w-[820px] px-4 py-16 md:px-8 md:py-24">
-      <h1 className="text-[length:var(--pc-text-h2)] font-medium leading-[1.02] tracking-[var(--pc-tracking-tight)] text-ink">
-        Changelog
-      </h1>
-      <ol className="mt-10 grid gap-8">
+    <section className="mx-auto w-full max-w-[100rem] px-4 py-16 md:px-8 md:py-24">
+      <header className="grid gap-4 border-b border-hairline pb-10">
+        <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-ink-3">
+          Release record // Public
+        </span>
+        <h1 className="text-balance text-[length:var(--pc-text-h2)] font-semibold leading-[0.98] tracking-[var(--pc-tracking-tight)] text-ink">
+          Changelog
+        </h1>
+      </header>
+      <ol className="mt-12 grid max-w-5xl gap-px bg-hairline">
         {ENTRIES.map((entry) => (
-          <li key={entry.date} className="nexus-panel-soft grid gap-3 p-6">
+          <li key={entry.date} className="grid gap-5 bg-surface p-6 md:grid-cols-[minmax(0,1fr)_minmax(0,2fr)] md:p-8">
             <div className="flex flex-wrap items-baseline justify-between gap-2">
-              <h2 className="text-lg font-medium text-ink">{entry.title}</h2>
+              <h2 className="text-lg font-semibold tracking-tight text-ink">{entry.title}</h2>
               <span className="font-mono text-[11px] uppercase tracking-[0.14em] text-ink-3">{entry.date}</span>
             </div>
             <ul className="grid gap-2">

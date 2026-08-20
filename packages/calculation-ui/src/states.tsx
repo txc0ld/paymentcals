@@ -13,7 +13,7 @@ export function RuleUnavailableState({
       <span className="nexus-badge mx-auto px-3 py-1 font-mono text-[10px] uppercase tracking-[0.16em] text-ink-2">
         Temporarily unavailable
       </span>
-      <h2 className="text-lg font-medium text-ink">Rules unavailable for {jurisdictionLabel}</h2>
+      <h2 className="text-lg font-semibold tracking-tight text-ink">Rules unavailable for {jurisdictionLabel}</h2>
       <p className="mx-auto max-w-md text-[14px] leading-6 text-ink-2">
         The verified rule set this calculator depends on could not be loaded, so no result is shown.
         This calculator never substitutes a different year or jurisdiction.
@@ -33,7 +33,7 @@ export function EngineFailureState({
 }) {
   return (
     <div role="alert" className="nexus-panel grid gap-4 border-error bg-error-surface p-8 text-center">
-      <h2 className="text-lg font-medium text-ink">This calculation could not be completed</h2>
+      <h2 className="text-lg font-semibold tracking-tight text-ink">This calculation could not be completed</h2>
       <p className="mx-auto max-w-md text-[14px] leading-6 text-ink-2">
         Your inputs are preserved on this device. No partial or stale result is shown.
       </p>

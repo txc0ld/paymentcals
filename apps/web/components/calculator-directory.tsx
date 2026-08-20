@@ -17,18 +17,18 @@ export function CalculatorGrid({ entries }: { entries: readonly RegistryEntry[] 
         <Link
           key={entry.id}
           href={routePath(entry)}
-          className={`reveal-up group grid min-h-52 content-between gap-8 p-6 focus-visible:outline-3 focus-visible:outline-offset-4 focus-visible:outline-focus ${index % 7 === 0 ? "lg:col-span-2" : ""} ${index < 4 ? `reveal-delay-${index + 1}` : ""}`}
+          className={`reveal-up group grid min-h-56 content-between gap-10 p-6 focus-visible:outline-3 focus-visible:outline-offset-[-3px] focus-visible:outline-focus md:p-8 ${index % 7 === 0 ? "lg:col-span-2" : ""} ${index < 4 ? `reveal-delay-${index + 1}` : ""}`}
         >
           <div className="flex items-start justify-between gap-4">
-            <span className="nexus-badge px-2.5 py-1 font-mono text-[10px] uppercase tracking-[0.18em] text-[var(--pc-accent-text)]">
+            <span className="nexus-badge px-2.5 py-1 font-mono text-[10px] uppercase tracking-[0.18em] text-ink-3">
               {entry.id}
             </span>
-            <span aria-hidden="true" className="nexus-arrow grid h-10 w-10 place-items-center font-mono">
+            <span aria-hidden="true" className="nexus-arrow grid h-11 w-11 place-items-center font-mono text-sm">
               ↗
             </span>
           </div>
           <div className="grid max-w-xl gap-2">
-            <span className={`${index % 7 === 0 ? "text-2xl md:text-3xl" : "text-xl"} font-semibold leading-tight text-ink`}>
+            <span className={`${index % 7 === 0 ? "text-2xl md:text-3xl" : "text-xl"} text-balance font-semibold leading-[1.05] tracking-tight text-ink`}>
               {entry.displayName}
             </span>
             <span className="max-w-[58ch] text-[13px] leading-5 text-ink-3">{entry.seo.description}</span>
@@ -42,12 +42,12 @@ export function CalculatorGrid({ entries }: { entries: readonly RegistryEntry[] 
 export function CategoryDirectory({ category }: { category: string }) {
   const entries = calculatorRegistry.filter((entry) => entry.category === category);
   return (
-    <section className="mx-auto w-full max-w-[1280px] px-4 py-16 md:px-8 md:py-24">
-      <div className="reveal-up mb-10 grid gap-4 border-b border-hairline pb-8">
-        <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-[var(--pc-accent-text)]">
+    <section className="mx-auto w-full max-w-[100rem] px-4 py-16 md:px-8 md:py-24">
+      <div className="reveal-up mb-12 grid gap-4 border-b border-hairline pb-10">
+        <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-ink-3">
           Directory // {entries.length} nodes
         </span>
-        <h1 className="max-w-[16ch] text-[length:var(--pc-text-h2)] leading-[1.02] text-ink">
+        <h1 className="max-w-[16ch] text-balance text-[length:var(--pc-text-h2)] font-semibold leading-[0.98] tracking-[var(--pc-tracking-tight)] text-ink">
           {CATEGORY_LABELS[category] ?? category}
         </h1>
         <p className="max-w-2xl text-[14px] leading-6 text-ink-2">

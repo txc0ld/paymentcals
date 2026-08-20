@@ -48,7 +48,7 @@ export function ExplainabilityTabs({
         role="tablist"
         aria-label="Explanation sections"
         onKeyDown={onKeyDown}
-        className="flex flex-wrap gap-1 border-b border-hairline bg-surface-2 p-2"
+        className="flex flex-wrap border-b border-hairline bg-surface-2"
       >
         {TABS.map((tab) => {
           const selected = tab === active;
@@ -61,9 +61,9 @@ export function ExplainabilityTabs({
               aria-controls={`${baseId}-panel-${tab}`}
               tabIndex={selected ? 0 : -1}
               onClick={() => setActive(tab)}
-              className={`nexus-tab relative min-h-11 px-4 font-mono text-[11px] uppercase tracking-[0.14em] focus-visible:outline-3 focus-visible:outline-offset-1 focus-visible:outline-focus ${
+              className={`nexus-tab relative -mb-px min-h-11 border-b border-e border-hairline px-4 font-mono text-[11px] uppercase tracking-[0.14em] focus-visible:z-10 focus-visible:outline-3 focus-visible:outline-offset-[-3px] focus-visible:outline-focus ${
                 selected
-                  ? "text-[var(--pc-accent-text)]"
+                  ? "bg-surface text-ink"
                   : "text-ink-3 hover:text-ink"
               }`}
             >
@@ -117,7 +117,7 @@ export function ExplainabilityTabs({
               <li key={assumption.id} className="grid gap-1 py-3 first:pt-0 last:pb-0">
                 <div className="flex flex-wrap items-baseline justify-between gap-2">
                   <span className="text-[14px] text-ink">{assumption.label}</span>
-                  <span className="nexus-badge px-2.5 py-1 font-mono text-[10px] uppercase tracking-[0.12em] text-ink-2">
+                  <span className="nexus-badge px-2.5 py-1 font-mono text-[10px] uppercase tracking-[0.14em] text-ink-2">
                     {CATEGORY_LABELS[assumption.category]}
                   </span>
                 </div>

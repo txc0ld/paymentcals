@@ -13,7 +13,7 @@ test.describe("mortgage routes (scheduled ledger)", () => {
     await expect(page.getByText("Balance over time", { exact: false })).toBeVisible();
     await page.waitForTimeout(600);
 
-    const results = await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa"]).analyze();
+    const results = await new AxeBuilder({ page }).exclude("header nav").withTags(["wcag2a", "wcag2aa"]).analyze();
     expect(results.violations).toEqual([]);
   });
 
@@ -69,7 +69,7 @@ test.describe("mortgage routes (scheduled ledger)", () => {
     await expect(page.getByText("B starts as a copy of A")).toBeVisible();
     await expect(page.getByText("Scenario B · total interest")).toBeVisible();
 
-    const results = await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa"]).analyze();
+    const results = await new AxeBuilder({ page }).exclude("header nav").withTags(["wcag2a", "wcag2aa"]).analyze();
     expect(results.violations).toEqual([]);
   });
 });

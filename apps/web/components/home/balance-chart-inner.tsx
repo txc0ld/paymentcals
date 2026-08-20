@@ -18,10 +18,15 @@ export default function BalanceChartInner({
       <ResponsiveContainer width="100%" height="100%">
         <AreaChart data={points} margin={{ top: 8, right: 8, bottom: 0, left: 8 }}>
           <CartesianGrid stroke="var(--pc-grid-line)" vertical={false} />
-          <XAxis dataKey="year" tick={{ fill: "var(--pc-text-tertiary)", fontSize: 11 }} tickLine={false} axisLine={false} />
+          <XAxis
+            dataKey="year"
+            tick={{ fill: "var(--pc-text-tertiary)", fontFamily: "var(--pc-font-mono)", fontSize: 11 }}
+            tickLine={false}
+            axisLine={false}
+          />
           <YAxis
             tickFormatter={(v: number) => `$${Math.round(v / 1000)}k`}
-            tick={{ fill: "var(--pc-text-tertiary)", fontSize: 11 }}
+            tick={{ fill: "var(--pc-text-tertiary)", fontFamily: "var(--pc-font-mono)", fontSize: 11 }}
             tickLine={false}
             axisLine={false}
             width={52}
@@ -34,13 +39,14 @@ export default function BalanceChartInner({
             contentStyle={{
               background: "var(--pc-surface)",
               border: "1px solid var(--pc-hairline-strong)",
-              borderRadius: "12px",
+              borderRadius: "0",
               fontFamily: "var(--pc-font-mono)",
               fontSize: "12px",
+              color: "var(--pc-text)",
             }}
           />
-          <Area type="monotone" dataKey="balance" stroke="var(--pc-violet-500)" strokeWidth={2} fill="var(--pc-violet-500)" fillOpacity={0.12} name="balance" />
-          <Area type="monotone" dataKey="offset" stroke="var(--pc-green-700)" strokeWidth={2} strokeDasharray="5 3" fill="none" name="offset" />
+          <Area type="monotone" dataKey="balance" stroke="var(--pc-text)" strokeWidth={2} fill="var(--pc-text)" fillOpacity={0.08} name="balance" />
+          <Area type="monotone" dataKey="offset" stroke="var(--pc-text-tertiary)" strokeWidth={2} strokeDasharray="5 3" fill="none" name="offset" />
         </AreaChart>
       </ResponsiveContainer>
     </div>

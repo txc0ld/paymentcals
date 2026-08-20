@@ -4,7 +4,7 @@ import type { ReactNode } from "react";
 export function Eyebrow({ children, className = "" }: { children: ReactNode; className?: string }) {
   return (
     <span
-      className={`nexus-badge inline-flex items-center gap-2 px-3 py-1.5 font-mono text-[10px] uppercase tracking-[0.18em] text-ink-3 before:h-2 before:w-2 before:rounded-full before:bg-positive before:content-[''] ${className}`}
+      className={`nexus-badge inline-flex items-center gap-2 px-3 py-1.5 font-mono text-[10px] uppercase tracking-[0.18em] text-ink-3 before:h-px before:w-5 before:bg-hairline-strong before:content-[''] ${className}`}
     >
       {children}
     </span>
@@ -26,7 +26,7 @@ export function Panel({
   );
 }
 
-/** Primary and quiet actions in the shared Aether control treatment. */
+/** Primary and quiet actions in the shared STRATA editorial treatment. */
 export function EditorialButton({
   children,
   onClick,
@@ -45,7 +45,7 @@ export function EditorialButton({
   ariaLabel?: string;
 }) {
   const base =
-    "nexus-primary inline-flex min-h-11 items-center justify-center gap-3 px-6 py-3 font-mono text-sm font-semibold uppercase tracking-[0.14em] focus-visible:outline-3 focus-visible:outline-offset-4 focus-visible:outline-focus disabled:cursor-not-allowed disabled:opacity-40";
+    "nexus-primary inline-flex min-h-11 items-center justify-center gap-3 px-6 py-3 font-mono text-[11px] font-semibold uppercase tracking-[0.16em] focus-visible:outline-3 focus-visible:outline-offset-4 focus-visible:outline-focus disabled:cursor-not-allowed disabled:opacity-40";
   const look =
     variant === "primary"
       ? "bg-accent text-accent-contrast"

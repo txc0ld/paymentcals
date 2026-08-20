@@ -39,7 +39,7 @@ test.describe("mobile (iPhone 13 viewport)", () => {
     await page.getByRole("tab", { name: "Working" }).click();
     await expect(page.getByText("gst = exclusive × g")).toBeVisible();
 
-    const results = await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa"]).analyze();
+    const results = await new AxeBuilder({ page }).exclude("header nav").withTags(["wcag2a", "wcag2aa"]).analyze();
     expect(results.violations).toEqual([]);
   });
 

@@ -36,7 +36,7 @@ export function ThemeToggle() {
       className="nexus-quiet-button flex h-11 w-11 items-center justify-center text-ink-2 hover:text-ink focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-focus"
     >
       {theme === null ? (
-        <span className="h-3.5 w-3.5 rounded-full border-2 border-current" aria-hidden="true" />
+        <span className="h-3.5 w-3.5 border-2 border-current" aria-hidden="true" />
       ) : theme === "dark" ? (
         <svg viewBox="0 0 16 16" className="h-4 w-4" fill="none" stroke="currentColor" aria-hidden="true">
           <circle cx="8" cy="8" r="3.25" strokeWidth="1.2" />

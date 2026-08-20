@@ -1,66 +1,62 @@
 /*
- * PaymentCalcs design tokens — "Aether Nexus" system (owner directive
- * 2026-08-21): violet #8B5CF6 primary, rose #F43F5E accent, near-black
- * #050505 ground, Inter display + Space Mono body/metadata. Dark is the
- * default theme (the source design is dark); an accessible light theme
- * remains available via the toggle. All small-text pairings below are
- * WCAG 2.2 AA validated (see PROGRESS.md decision log).
+ * PaymentCalcs design tokens — "STRATA" Swiss Editorial Tech system
+ * (owner directive 2026-08-21, supersedes the Aether Nexus violet system).
+ * Strict monochrome core: black #000000, white #ffffff, zinc-400 #a1a1aa.
+ * Sharp geometry (0 radius, 1px hairlines), Geist Sans + Geist Mono.
+ * Dark (black) is the source mode and the default; the light theme is the
+ * same system inverted. Semantic status colours are retained ONLY for
+ * calculator states (error/warn/positive), always paired with non-colour
+ * cues per PRD §20 — never used decoratively.
  */
 
 :root {
   /* Brand primitives */
-  --pc-violet-500: #8b5cf6;
-  --pc-violet-300: #a78bfa;
-  --pc-violet-700: #6d28d9;
-  --pc-violet-900: #4c1d95;
-  --pc-rose-500: #f43f5e;
-  --pc-rose-400: #fb7185;
-  --pc-rose-700: #be123c;
-  --pc-mauve-300: #e0b0ff;
-  --pc-mauve-700: #6f4291;
-  --pc-green-300: #00ff7f;
-  --pc-green-700: #00753f;
-  --pc-black-950: #050505;
-  --pc-slate-100: #e2e8f0;
+  --pc-black: #000000;
+  --pc-white: #ffffff;
+  --pc-zinc-300: #d4d4d8;
+  --pc-zinc-400: #a1a1aa;
+  --pc-zinc-600: #52525b;
+  --pc-zinc-700: #3f3f46;
+  --pc-zinc-800: #27272a;
 
-  /* Semantic — DARK is the default (Aether Nexus source mode) */
-  --pc-bg: #050505;
-  --pc-surface: #0a0a0c;
-  --pc-surface-2: #101014;
+  /* Semantic — DARK is the default (STRATA source mode) */
+  --pc-bg: #000000;
+  --pc-surface: #0a0a0a;
+  --pc-surface-2: #141414;
   --pc-text: #ffffff;
-  --pc-text-secondary: #cbd5e1;
-  --pc-text-tertiary: #94a3b8;
-  --pc-hairline: rgba(139, 92, 246, 0.18);
-  --pc-hairline-strong: rgba(139, 92, 246, 0.38);
-  --pc-grid-line: rgba(139, 92, 246, 0.08);
-  --pc-accent: var(--pc-violet-500);
-  --pc-accent-contrast: #ffffff;
-  --pc-accent-text: var(--pc-violet-300); /* small violet text on dark: 7.5:1 */
-  --pc-focus-ring: var(--pc-violet-300);
-  --pc-info: var(--pc-violet-300);
-  --pc-warn: var(--pc-mauve-300);
-  --pc-warn-surface: rgba(224, 176, 255, 0.1);
-  --pc-error: var(--pc-rose-400);
-  --pc-error-surface: rgba(244, 63, 94, 0.12);
-  --pc-positive: var(--pc-green-300);
-  --pc-selection-bg: var(--pc-violet-500);
-  --pc-selection-text: #ffffff;
+  --pc-text-secondary: var(--pc-zinc-300);
+  --pc-text-tertiary: var(--pc-zinc-400);
+  --pc-hairline: rgba(255, 255, 255, 0.14);
+  --pc-hairline-strong: rgba(255, 255, 255, 0.32);
+  --pc-grid-line: rgba(255, 255, 255, 0.1);
+  --pc-accent: #ffffff;
+  --pc-accent-contrast: #000000;
+  --pc-accent-text: #ffffff;
+  --pc-focus-ring: #ffffff;
+  --pc-info: var(--pc-zinc-300);
+  --pc-warn: #fbbf24;
+  --pc-warn-surface: rgba(251, 191, 36, 0.1);
+  --pc-error: #f87171;
+  --pc-error-surface: rgba(248, 113, 113, 0.1);
+  --pc-positive: #4ade80;
+  --pc-selection-bg: #ffffff;
+  --pc-selection-text: #000000;
 
-  /* Type — Inter display, Space Mono body/labels/money (inherently tabular) */
-  --pc-font-sans: var(--font-inter, ui-sans-serif, system-ui, sans-serif);
-  --pc-font-display: var(--font-inter, ui-sans-serif, system-ui, sans-serif);
-  --pc-font-mono: var(--font-space-mono, ui-monospace, "Cascadia Mono", monospace);
-  --pc-text-h1: clamp(2.4rem, 5.2vw, 4.5rem);
-  --pc-text-h2: clamp(1.6rem, 3vw, 2.6rem);
-  --pc-text-h3: clamp(1.15rem, 1.6vw, 1.45rem);
+  /* Type — Geist Sans interface, Geist Mono for labels/metadata/money */
+  --pc-font-sans: var(--font-geist-sans, ui-sans-serif, system-ui, sans-serif);
+  --pc-font-display: var(--font-geist-sans, ui-sans-serif, system-ui, sans-serif);
+  --pc-font-mono: var(--font-geist-mono, ui-monospace, "Cascadia Mono", monospace);
+  --pc-text-h1: clamp(3.5rem, 8vw, 8rem);
+  --pc-text-h2: clamp(2.5rem, 5vw, 4.5rem);
+  --pc-text-h3: clamp(1.25rem, 1.8vw, 1.6rem);
   --pc-text-result-xl: clamp(2.3rem, 4.6vw, 3.3rem);
-  --pc-text-body: clamp(0.95rem, 1.05vw, 1rem);
-  --pc-tracking-tight: -0.02em;
+  --pc-text-body: clamp(1rem, 1.2vw, 1.25rem);
+  --pc-tracking-tight: -0.03em;
   --pc-tracking-micro: 0.18em;
 
-  /* Geometry — one radius language, 1px violet-tinted borders */
-  --pc-radius: 14px;
-  --pc-radius-control: 10px;
+  /* Geometry — sharp: no rounded corners anywhere, 1px borders */
+  --pc-radius: 0px;
+  --pc-radius-control: 0px;
   --pc-border: 1px solid var(--pc-hairline);
 
   /* Motion */
@@ -70,26 +66,26 @@
 }
 
 [data-theme="light"] {
-  --pc-bg: #eef1f6;
-  --pc-surface: #ffffff;
-  --pc-surface-2: var(--pc-slate-100);
-  --pc-text: #0f172a;
-  --pc-text-secondary: #334155;
-  --pc-text-tertiary: #52607a;
-  --pc-hairline: rgba(76, 29, 149, 0.16);
-  --pc-hairline-strong: rgba(76, 29, 149, 0.34);
-  --pc-grid-line: rgba(76, 29, 149, 0.07);
-  --pc-accent: var(--pc-violet-700);
+  --pc-bg: #ffffff;
+  --pc-surface: #fafafa;
+  --pc-surface-2: #f4f4f5;
+  --pc-text: #09090b;
+  --pc-text-secondary: var(--pc-zinc-700);
+  --pc-text-tertiary: var(--pc-zinc-600);
+  --pc-hairline: rgba(0, 0, 0, 0.14);
+  --pc-hairline-strong: rgba(0, 0, 0, 0.32);
+  --pc-grid-line: rgba(0, 0, 0, 0.1);
+  --pc-accent: #000000;
   --pc-accent-contrast: #ffffff;
-  --pc-accent-text: var(--pc-violet-700); /* 5.8:1 on light surface */
-  --pc-focus-ring: var(--pc-violet-700);
-  --pc-info: var(--pc-violet-700);
-  --pc-warn: var(--pc-mauve-700);
-  --pc-warn-surface: rgba(224, 176, 255, 0.2);
-  --pc-error: var(--pc-rose-700);
-  --pc-error-surface: rgba(244, 63, 94, 0.1);
-  --pc-positive: var(--pc-green-700);
-  --pc-selection-bg: var(--pc-violet-700);
+  --pc-accent-text: #09090b;
+  --pc-focus-ring: #000000;
+  --pc-info: var(--pc-zinc-700);
+  --pc-warn: #92400e;
+  --pc-warn-surface: rgba(146, 64, 14, 0.08);
+  --pc-error: #b91c1c;
+  --pc-error-surface: rgba(185, 28, 28, 0.07);
+  --pc-positive: #15803d;
+  --pc-selection-bg: #000000;
   --pc-selection-text: #ffffff;
 }
 

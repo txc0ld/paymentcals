@@ -40,7 +40,7 @@ export function SegmentedControl<T extends string>({
       role="radiogroup"
       aria-label={label}
       onKeyDown={onKeyDown}
-      className="nexus-control inline-flex max-w-full flex-wrap gap-1 p-1"
+      className="nexus-control inline-flex max-w-full flex-wrap overflow-hidden"
     >
       {options.map((option) => {
         const selected = option.value === value;
@@ -52,10 +52,10 @@ export function SegmentedControl<T extends string>({
             tabIndex={selected ? 0 : -1}
             id={`${groupId}-${option.value}`}
             onClick={() => onChange(option.value)}
-            className={`nexus-segment min-h-11 border border-transparent px-4 font-mono text-[11px] uppercase tracking-[0.14em] focus-visible:outline-3 focus-visible:outline-offset-1 focus-visible:outline-focus ${
+            className={`nexus-segment -mb-px -me-px min-h-11 border-b border-e border-hairline px-4 font-mono text-[11px] uppercase tracking-[0.14em] focus-visible:z-10 focus-visible:outline-3 focus-visible:outline-offset-[-3px] focus-visible:outline-focus ${
               selected
-                ? "border-hairline-strong bg-[color-mix(in_srgb,var(--pc-accent)_14%,var(--pc-surface))] text-[var(--pc-accent-text)]"
-                : "text-ink-2 hover:bg-surface-2 hover:text-ink"
+                ? "bg-ink! text-canvas! hover:bg-ink! hover:text-canvas!"
+                : "bg-surface text-ink-2 hover:bg-surface-2 hover:text-ink"
             } ${size === "sm" ? "px-3 text-[10px]" : ""}`}
           >
             {option.label}
@@ -156,7 +156,7 @@ export function FieldGroup({ legend, children }: { legend: string; children: Rea
   );
 }
 
-/** Labelled select in the clay input style. */
+/** Labelled select in the editorial input style. */
 export function SelectField<T extends string>({
   id,
   label,
@@ -188,7 +188,7 @@ export function SelectField<T extends string>({
         value={value}
         onChange={(event) => onChange(event.target.value as T)}
         aria-describedby={description ? descriptionId : undefined}
-        className="nexus-input min-h-11 w-full appearance-none bg-surface px-3 text-[15px] text-ink outline-none focus:border-focus"
+        className="nexus-input min-h-11 w-full appearance-none bg-surface px-3 font-mono text-[14px] text-ink outline-none focus:border-focus"
       >
         {options.map((option) => (
           <option key={option.value} value={option.value}>
@@ -234,14 +234,16 @@ export function ToggleField({
         aria-checked={checked}
         aria-describedby={description ? descriptionId : undefined}
         onClick={() => onChange(!checked)}
-        className={`relative mt-0.5 h-7 w-12 shrink-0 rounded-[var(--pc-radius-control)] border transition-colors duration-[var(--pc-duration-fast)] ease-[var(--pc-ease)] focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-focus ${
-          checked ? "border-transparent bg-accent" : "border-hairline-strong bg-surface-2"
+        className={`relative mt-0.5 h-11 w-14 shrink-0 border transition-colors duration-[var(--pc-duration-fast)] ease-[var(--pc-ease)] focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-focus ${
+          checked ? "border-ink bg-ink" : "border-hairline-strong bg-surface-2"
         }`}
       >
         <span
           aria-hidden="true"
-          className={`absolute top-0.5 h-[22px] w-[22px] rounded-[7px] bg-surface shadow-[0_2px_4px_rgba(0,0,0,0.25)] transition-transform duration-[var(--pc-duration-fast)] ease-[var(--pc-ease)] ${
-            checked ? "translate-x-[22px]" : "translate-x-0.5"
+          className={`absolute top-1/2 h-5 w-5 -translate-y-1/2 border transition-transform duration-[var(--pc-duration-fast)] ease-[var(--pc-ease)] ${
+            checked
+              ? "translate-x-7 border-canvas bg-canvas"
+              : "translate-x-1.5 border-hairline-strong bg-ink-3"
           }`}
         />
       </button>

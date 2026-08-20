@@ -254,7 +254,7 @@ export function AffordabilityEstimate() {
           <EmptyState>Enter your income to see an indicative borrowing range under generic assumptions.</EmptyState>
         ) : range.high.isZero() ? (
           <div className="nexus-panel-soft grid gap-3 p-6">
-            <h2 className="text-lg font-medium text-ink">No surplus under these assumptions</h2>
+            <h2 className="text-lg font-semibold tracking-tight text-ink">No surplus under these assumptions</h2>
             <p className="text-[14px] leading-6 text-ink-2">
               After the expense floor and debt repayments there is no monthly surplus to service a
               loan in this model.

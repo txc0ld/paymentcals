@@ -45,37 +45,38 @@ export default async function MethodologyPage({ params }: { params: Promise<{ sl
   const packs = allAuRulePacks.filter((pack) => entry.rulePackDependencies.includes(pack.domain));
 
   return (
-    <article className="mx-auto w-full max-w-[820px] px-4 py-16 md:px-8 md:py-24">
+    <article className="mx-auto w-full max-w-[100rem] px-4 py-16 md:px-8 md:py-24">
       <p className="mb-4 font-mono text-[10px] uppercase tracking-[0.2em] text-ink-3">
         Methodology · {entry.id}
       </p>
-      <h1 className="text-[length:var(--pc-text-h2)] font-medium leading-[1.05] tracking-[var(--pc-tracking-tight)] text-ink">
+      <h1 className="max-w-[18ch] text-balance text-[length:var(--pc-text-h2)] font-semibold leading-[0.98] tracking-[var(--pc-tracking-tight)] text-ink">
         {entry.displayName}
       </h1>
-      <p className="mt-4 text-[15px] leading-7 text-ink-2">{entry.seo.description}</p>
+      <p className="mt-4 max-w-[65ch] text-[15px] leading-7 text-ink-2">{entry.seo.description}</p>
 
-      <h2 className="mt-12 text-[length:var(--pc-text-h3)] font-medium text-ink">Engines and formulas</h2>
-      <ul className="mt-4 grid gap-5">
-        {entry.engineDependencies.map((engineId) => {
-          const note = ENGINE_NOTES[engineId];
-          if (!note) return null;
-          return (
-            <li key={engineId} className="nexus-panel-soft grid gap-2 p-5">
-              <span className="font-mono text-[11px] uppercase tracking-[0.16em] text-ink-2">
-                {engineId} · {note.name}
-              </span>
-              <p className="text-[14px] leading-6 text-ink-2">{note.method}</p>
-              {note.formulas.length > 0 ? (
-                <p className="font-mono text-[11px] text-ink-3">Registered formulas: {note.formulas.join(" · ")}</p>
-              ) : null}
-            </li>
-          );
-        })}
-      </ul>
+      <div className="mt-14 max-w-5xl border-t border-hairline pt-8">
+        <h2 className="text-[length:var(--pc-text-h3)] font-semibold tracking-tight text-ink">Engines and formulas</h2>
+        <ul className="mt-5 grid gap-px bg-hairline md:grid-cols-2">
+          {entry.engineDependencies.map((engineId) => {
+            const note = ENGINE_NOTES[engineId];
+            if (!note) return null;
+            return (
+              <li key={engineId} className="grid gap-2 bg-surface p-5 md:p-6">
+                <span className="font-mono text-[11px] uppercase tracking-[0.16em] text-ink-2">
+                  {engineId} · {note.name}
+                </span>
+                <p className="text-[14px] leading-6 text-ink-2">{note.method}</p>
+                {note.formulas.length > 0 ? (
+                  <p className="font-mono text-[11px] text-ink-3">Registered formulas: {note.formulas.join(" · ")}</p>
+                ) : null}
+              </li>
+            );
+          })}
+        </ul>
 
       {packs.length > 0 ? (
         <>
-          <h2 className="mt-12 text-[length:var(--pc-text-h3)] font-medium text-ink">Rule packs</h2>
+          <h2 className="mt-12 border-t border-hairline pt-8 text-[length:var(--pc-text-h3)] font-semibold tracking-tight text-ink">Rule packs</h2>
           <p className="mt-2 text-[14px] leading-6 text-ink-2">
             Statutory values come only from versioned, hash-verified rule packs citing official
             sources. Current status of the packs this calculator can use:
@@ -84,7 +85,7 @@ export default async function MethodologyPage({ params }: { params: Promise<{ sl
             {packs.map((pack) => (
               <li key={pack.rulePackId} className="flex flex-wrap items-baseline justify-between gap-2 border-b border-hairline pb-2">
                 <span className="font-mono text-[13px] text-ink">{pack.rulePackId}</span>
-                <span className="font-mono text-[11px] uppercase tracking-[0.12em] text-ink-3">
+                <span className="font-mono text-[11px] uppercase tracking-[0.14em] text-ink-3">
                   {pack.status} · v{pack.rulesVersion}
                 </span>
               </li>
@@ -93,21 +94,22 @@ export default async function MethodologyPage({ params }: { params: Promise<{ sl
         </>
       ) : null}
 
-      <h2 className="mt-12 text-[length:var(--pc-text-h3)] font-medium text-ink">Verification</h2>
+      <h2 className="mt-12 border-t border-hairline pt-8 text-[length:var(--pc-text-h3)] font-semibold tracking-tight text-ink">Verification</h2>
       <p className="mt-2 text-[14px] leading-6 text-ink-2">
         Engines carry boundary tests at every bracket edge, property-based tests, reconciliation
         invariants and, where official worked examples exist, tests that reproduce them exactly.
-        The full source register is on the <Link href="/sources" className="underline decoration-hairline-strong underline-offset-2 hover:decoration-current">sources page</Link>.
+        The full source register is on the <Link href="/sources" className="inline-flex min-h-11 items-center underline decoration-hairline-strong underline-offset-2 hover:decoration-current focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-focus">sources page</Link>.
       </p>
 
       <p className="mt-12">
         <Link
           href={routePath(entry)}
-          className="nexus-primary inline-flex min-h-11 items-center gap-3 bg-accent px-6 py-3 font-mono text-sm font-semibold uppercase tracking-[0.16em] text-accent-contrast"
+          className="nexus-primary inline-flex min-h-11 items-center gap-3 bg-accent px-6 py-3 font-mono text-sm font-semibold uppercase tracking-[0.16em] text-accent-contrast focus-visible:outline-3 focus-visible:outline-offset-4 focus-visible:outline-focus"
         >
           Open the calculator <span aria-hidden="true">↗</span>
         </Link>
       </p>
+      </div>
     </article>
   );
 }

@@ -118,7 +118,7 @@ export function CreditCardCalculator() {
               />
             ) : (
               <div className="grid gap-2">
-                <h2 className="text-lg font-medium text-ink">This balance never pays off</h2>
+                <h2 className="text-lg font-semibold tracking-tight text-ink">This balance never pays off</h2>
                 <p className="text-[14px] leading-6 text-ink-2">
                   Under these settings the payments do not cover interest and charges, so the balance
                   does not amortise. Increase the payment to see a payoff date.
