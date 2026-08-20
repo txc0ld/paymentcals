@@ -1,0 +1,23 @@
+{
+  "name": "@paymentcalcs/engine-au-tax",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "lint": "eslint src"
+  },
+  "dependencies": {
+    "@paymentcalcs/calculation-core": "workspace:*",
+    "@paymentcalcs/engine-au-withholding": "workspace:*",
+    "@paymentcalcs/engine-compensation": "workspace:*",
+    "@paymentcalcs/financial-solvers": "workspace:*",
+    "@paymentcalcs/rule-schema": "workspace:*",
+    "@paymentcalcs/rules-au": "workspace:*",
+    "zod": "4.4.3"
+  }
+}

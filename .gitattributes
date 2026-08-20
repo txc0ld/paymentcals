@@ -1,3 +1,5 @@
 * text=auto eol=lf
 *.png binary
 *.woff2 binary
+# Source snapshots must keep their exact fetched bytes so content hashes verify.
+compliance-archive/** binary

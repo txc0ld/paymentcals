@@ -42,6 +42,7 @@ Packs: `au-stsl-2024-25` / `-2025-26` / `-2026-27` (in_review)
 - [ ] 2026-27 marginal: nil ≤ $69,528 · 15c to $129,717 · $9,028 + 17c to $186,050 · 10% of total over
 - [ ] 2025-26 marginal: nil ≤ $67,000 · 15c to $125,000 · $8,700 + 17c to $179,285 · 10% of total over
 - [ ] 2024-25 whole-income table (18 bands, 1%–10%, nil below $54,435)
+- [ ] **Source anomaly:** the ATO page's Example 4 prints "$99,736 × 5.5% = $5,485.52", but the arithmetic gives $5,485.48. The engine computes exactly; confirm the intended figure with the ATO calculator.
 
 ## ATO — Super guarantee
 

@@ -141,6 +141,39 @@ importers:
 
   packages/design-tokens: {}
 
+  packages/engine-au-tax:
+    dependencies:
+      '@paymentcalcs/calculation-core':
+        specifier: workspace:*
+        version: link:../calculation-core
+      '@paymentcalcs/engine-au-withholding':
+        specifier: workspace:*
+        version: link:../engine-au-withholding
+      '@paymentcalcs/engine-compensation':
+        specifier: workspace:*
+        version: link:../engine-compensation
+      '@paymentcalcs/financial-solvers':
+        specifier: workspace:*
+        version: link:../financial-solvers
+      '@paymentcalcs/rule-schema':
+        specifier: workspace:*
+        version: link:../rule-schema
+      '@paymentcalcs/rules-au':
+        specifier: workspace:*
+        version: link:../rules-au
+      zod:
+        specifier: 4.4.3
+        version: 4.4.3
+
+  packages/engine-au-withholding:
+    dependencies:
+      '@paymentcalcs/calculation-core':
+        specifier: workspace:*
+        version: link:../calculation-core
+      '@paymentcalcs/rules-au':
+        specifier: workspace:*
+        version: link:../rules-au
+
   packages/engine-business:
     dependencies:
       '@paymentcalcs/calculation-core':
@@ -160,6 +193,18 @@ importers:
         specifier: workspace:*
         version: link:../test-fixtures
 
+  packages/engine-compensation:
+    dependencies:
+      '@paymentcalcs/calculation-core':
+        specifier: workspace:*
+        version: link:../calculation-core
+      '@paymentcalcs/financial-solvers':
+        specifier: workspace:*
+        version: link:../financial-solvers
+      '@paymentcalcs/rules-au':
+        specifier: workspace:*
+        version: link:../rules-au
+
   packages/eslint-config:
     dependencies:
       eslint:
@@ -168,6 +213,12 @@ importers:
       typescript-eslint:
         specifier: 8.67.0
         version: 8.67.0(eslint@10.8.1(jiti@2.7.0))(typescript@5.9.3)
+
+  packages/financial-solvers:
+    dependencies:
+      '@paymentcalcs/calculation-core':
+        specifier: workspace:*
+        version: link:../calculation-core
 
   packages/rule-schema:
     dependencies:
