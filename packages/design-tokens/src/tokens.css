@@ -18,6 +18,11 @@
   --pc-zinc-600: #52525b;
   --pc-zinc-700: #3f3f46;
   --pc-zinc-800: #27272a;
+  /* Single accent (owner directive 2026-08-21): #ff1f5b. Black text on it
+   * (5.6:1); white on it fails AA (3.75:1) — never pair white text on accent.
+   * The -deep variant (5.75:1 on white) is for small accent text on light. */
+  --pc-pink-500: #ff1f5b;
+  --pc-pink-700: #cc0044;
 
   /* Semantic — DARK is the default (STRATA source mode) */
   --pc-bg: #000000;
@@ -29,17 +34,17 @@
   --pc-hairline: rgba(255, 255, 255, 0.14);
   --pc-hairline-strong: rgba(255, 255, 255, 0.32);
   --pc-grid-line: rgba(255, 255, 255, 0.1);
-  --pc-accent: #ffffff;
+  --pc-accent: var(--pc-pink-500);
   --pc-accent-contrast: #000000;
-  --pc-accent-text: #ffffff;
-  --pc-focus-ring: #ffffff;
+  --pc-accent-text: var(--pc-pink-500);
+  --pc-focus-ring: var(--pc-pink-500);
   --pc-info: var(--pc-zinc-300);
   --pc-warn: #fbbf24;
   --pc-warn-surface: rgba(251, 191, 36, 0.1);
   --pc-error: #f87171;
   --pc-error-surface: rgba(248, 113, 113, 0.1);
   --pc-positive: #4ade80;
-  --pc-selection-bg: #ffffff;
+  --pc-selection-bg: var(--pc-pink-500);
   --pc-selection-text: #000000;
 
   /* Type — Geist Sans interface, Geist Mono for labels/metadata/money */
@@ -75,18 +80,18 @@
   --pc-hairline: rgba(0, 0, 0, 0.14);
   --pc-hairline-strong: rgba(0, 0, 0, 0.32);
   --pc-grid-line: rgba(0, 0, 0, 0.1);
-  --pc-accent: #000000;
-  --pc-accent-contrast: #ffffff;
-  --pc-accent-text: #09090b;
-  --pc-focus-ring: #000000;
+  --pc-accent: var(--pc-pink-500);
+  --pc-accent-contrast: #000000;
+  --pc-accent-text: var(--pc-pink-700);
+  --pc-focus-ring: var(--pc-pink-700);
   --pc-info: var(--pc-zinc-700);
   --pc-warn: #92400e;
   --pc-warn-surface: rgba(146, 64, 14, 0.08);
   --pc-error: #b91c1c;
   --pc-error-surface: rgba(185, 28, 28, 0.07);
   --pc-positive: #15803d;
-  --pc-selection-bg: #000000;
-  --pc-selection-text: #ffffff;
+  --pc-selection-bg: var(--pc-pink-500);
+  --pc-selection-text: #000000;
 }
 
 ::selection {

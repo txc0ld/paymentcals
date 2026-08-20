@@ -169,8 +169,8 @@ body {
   right: 0;
   bottom: -0.55rem;
   left: 0;
-  height: 1px;
-  background: var(--pc-text);
+  height: 2px;
+  background: var(--pc-accent);
   content: "";
   opacity: 0;
   transform: scaleX(0.4);
@@ -203,7 +203,7 @@ body {
 
 .glass-panel { background: var(--pc-surface); }
 
-.bar-glow { box-shadow: 0 0 24px color-mix(in srgb, var(--pc-text) 35%, transparent); }
+.bar-glow { box-shadow: 0 0 24px color-mix(in srgb, var(--pc-accent) 45%, transparent); }
 
 .editorial-badge {
   position: relative;
@@ -216,7 +216,7 @@ body {
   left: 0;
   width: 2rem;
   height: 1px;
-  background: var(--pc-text);
+  background: var(--pc-accent);
   content: "";
 }
 

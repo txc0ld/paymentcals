@@ -117,7 +117,7 @@ export default function HomePage() {
                   <div
                     key={i}
                     style={{ height: `${h * 100}%` }}
-                    className={`flex-1 ${i === 4 ? "bar-glow bg-ink" : "bg-ink/15"}`}
+                    className={`flex-1 ${i === 4 ? "bar-glow bg-accent" : "bg-ink/15"}`}
                   />
                 ))}
               </div>

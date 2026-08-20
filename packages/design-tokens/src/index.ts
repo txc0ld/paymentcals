@@ -11,6 +11,9 @@ export const brand = {
   zinc400: "#a1a1aa",
   zinc600: "#52525b",
   zinc700: "#3f3f46",
+  /** Single accent. Pair with black text only (white fails AA at 3.75:1). */
+  pink500: "#ff1f5b",
+  pink700: "#cc0044",
 } as const;
 
 /** Monochrome categorical series for charts: luminance-stepped, so lines
