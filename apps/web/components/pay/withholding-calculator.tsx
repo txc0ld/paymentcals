@@ -170,7 +170,7 @@ export function WithholdingCalculator() {
               statement-of-formulas coefficients.
             </EmptyState>
           ) : (
-            <div className="clay-result grid gap-6 p-6">
+            <div className="nexus-result grid gap-6 p-6">
               <PrimaryResult
                 label={`Total withheld per ${cycle.replace("ly", "")}`}
                 amount={toMoney(computation.periodTotal)}

@@ -39,7 +39,7 @@ export default function BalanceChartInner({
               fontSize: "12px",
             }}
           />
-          <Area type="monotone" dataKey="balance" stroke="var(--pc-blue-500)" strokeWidth={2} fill="var(--pc-blue-500)" fillOpacity={0.12} name="balance" />
+          <Area type="monotone" dataKey="balance" stroke="var(--pc-violet-500)" strokeWidth={2} fill="var(--pc-violet-500)" fillOpacity={0.12} name="balance" />
           <Area type="monotone" dataKey="offset" stroke="var(--pc-green-700)" strokeWidth={2} strokeDasharray="5 3" fill="none" name="offset" />
         </AreaChart>
       </ResponsiveContainer>

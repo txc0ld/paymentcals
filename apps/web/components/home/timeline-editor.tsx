@@ -48,7 +48,7 @@ export function TimelineEditor({
       </p>
       <ol className="grid gap-3">
         {sorted.map((event) => (
-          <li key={event.id} className="clay-line-item grid min-w-0 gap-3 bg-surface-2 p-4">
+          <li key={event.id} className="nexus-line-item grid min-w-0 gap-3 bg-surface-2 p-4">
             <div className="flex items-center justify-between gap-3">
               <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-ink-3">
                 {EVENT_LABEL[event.kind]}
@@ -56,7 +56,7 @@ export function TimelineEditor({
               <button
                 type="button"
                 onClick={() => onChange(events.filter((other) => other.id !== event.id))}
-                className="clay-quiet-button inline-flex min-h-9 items-center px-3 font-mono text-[10px] uppercase tracking-[0.14em] text-ink-3 hover:text-error focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-focus"
+                className="nexus-quiet-button inline-flex min-h-9 items-center px-3 font-mono text-[10px] uppercase tracking-[0.14em] text-ink-3 hover:text-error focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-focus"
               >
                 Remove
               </button>
@@ -70,7 +70,7 @@ export function TimelineEditor({
                   type="date"
                   value={event.date}
                   onChange={(e) => update(event.id, { date: e.target.value })}
-                  className="clay-input min-h-11 bg-surface px-3 font-mono text-[14px] text-ink outline-none focus:border-focus"
+                  className="nexus-input min-h-11 bg-surface px-3 font-mono text-[14px] text-ink outline-none focus:border-focus"
                 />
               </label>
               <label className="grid gap-1">
@@ -82,7 +82,7 @@ export function TimelineEditor({
                   value={event.amountRaw}
                   onChange={(e) => update(event.id, { amountRaw: e.target.value })}
                   placeholder={event.kind === "rate_change" ? "6.25" : "0.00"}
-                  className="clay-input min-h-11 bg-surface px-3 font-mono text-[15px] tabular-nums text-ink outline-none focus:border-focus"
+                  className="nexus-input min-h-11 bg-surface px-3 font-mono text-[15px] tabular-nums text-ink outline-none focus:border-focus"
                 />
               </label>
             </div>

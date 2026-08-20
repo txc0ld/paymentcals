@@ -27,7 +27,7 @@ export default function ChangelogPage() {
       </h1>
       <ol className="mt-10 grid gap-8">
         {ENTRIES.map((entry) => (
-          <li key={entry.date} className="clay-panel-soft grid gap-3 p-6">
+          <li key={entry.date} className="nexus-panel-soft grid gap-3 p-6">
             <div className="flex flex-wrap items-baseline justify-between gap-2">
               <h2 className="text-lg font-medium text-ink">{entry.title}</h2>
               <span className="font-mono text-[11px] uppercase tracking-[0.14em] text-ink-3">{entry.date}</span>

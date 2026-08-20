@@ -1,138 +1,96 @@
 /*
- * PaymentCalcs design tokens — candy-clay interface merged with PRD §20
- * functional rules.
- *
- * Brand constants (PRD §20.2 hex values, already monochrome-leaning):
- *   ink 950/900/800 · paper 50/100 · grey 500/400 · lime accent · semantic set
- *
- * Semantic layer below is what components consume. Light is default;
- * [data-theme="dark"] overrides. No component references raw hex.
+ * PaymentCalcs design tokens — "Aether Nexus" system (owner directive
+ * 2026-08-21): violet #8B5CF6 primary, rose #F43F5E accent, near-black
+ * #050505 ground, Inter display + Space Mono body/metadata. Dark is the
+ * default theme (the source design is dark); an accessible light theme
+ * remains available via the toggle. All small-text pairings below are
+ * WCAG 2.2 AA validated (see PROGRESS.md decision log).
  */
 
 :root {
   /* Brand primitives */
-  --pc-ink-950: #0b0d0f;
-  --pc-ink-900: #121519;
-  --pc-ink-800: #1b2025;
-  --pc-paper-50: #f7f8f4;
-  --pc-paper-100: #f1f3ee;
-  --pc-grey-500: #7f8790;
-  --pc-grey-400: #a7adb3;
-  --pc-lime-500: #ccff00;
-  --pc-blue-500: #3977ff;
-  --pc-mauve-300: #e0b0ff; /* owner-directed warning/attention hue */
-  --pc-mauve-700: #6f4291; /* accessible light-theme variant, 6.9:1 on paper */
-  --pc-red-500: #e5484d;
-  --pc-green-300: #00ff7f; /* owner-directed positive hue */
-  --pc-green-700: #00753f; /* accessible light-theme variant, 5.4:1 on paper */
+  --pc-violet-500: #8b5cf6;
+  --pc-violet-300: #a78bfa;
+  --pc-violet-700: #6d28d9;
+  --pc-violet-900: #4c1d95;
+  --pc-rose-500: #f43f5e;
+  --pc-rose-400: #fb7185;
+  --pc-rose-700: #be123c;
+  --pc-mauve-300: #e0b0ff;
+  --pc-mauve-700: #6f4291;
+  --pc-green-300: #00ff7f;
+  --pc-green-700: #00753f;
+  --pc-black-950: #050505;
+  --pc-slate-100: #e2e8f0;
 
-  /* Semantic — light: bright candy washes with ink-safe content surfaces. */
-  --pc-bg: #f8f7ff;
-  --pc-surface: #fffaff;
-  --pc-surface-2: #f1f0ff;
-  --pc-text: var(--pc-ink-950);
-  --pc-text-secondary: #565e66;
-  /* grey-500 fails WCAG AA on paper (3.4:1); darkened for small-text use. */
-  --pc-text-tertiary: #5b636b;
-  --pc-hairline: rgba(88, 57, 118, 0.16);
-  --pc-hairline-strong: rgba(72, 45, 101, 0.34);
-  --pc-grid-line: rgba(109, 74, 142, 0.09);
-  --pc-accent: #1747b7;
-  --pc-accent-contrast: var(--pc-paper-50);
-  --pc-focus-ring: var(--pc-blue-500);
-  --pc-info: #2557c9;
-  --pc-warn: var(--pc-mauve-700);
-  --pc-warn-surface: rgba(224, 176, 255, 0.22);
-  --pc-error: #c53337;
-  --pc-error-surface: rgba(229, 72, 77, 0.1);
-  --pc-positive: var(--pc-green-700);
-  --pc-selection-bg: var(--pc-ink-950);
-  --pc-selection-text: var(--pc-paper-50);
+  /* Semantic — DARK is the default (Aether Nexus source mode) */
+  --pc-bg: #050505;
+  --pc-surface: #0a0a0c;
+  --pc-surface-2: #101014;
+  --pc-text: #ffffff;
+  --pc-text-secondary: #cbd5e1;
+  --pc-text-tertiary: #94a3b8;
+  --pc-hairline: rgba(139, 92, 246, 0.18);
+  --pc-hairline-strong: rgba(139, 92, 246, 0.38);
+  --pc-grid-line: rgba(139, 92, 246, 0.08);
+  --pc-accent: var(--pc-violet-500);
+  --pc-accent-contrast: #ffffff;
+  --pc-accent-text: var(--pc-violet-300); /* small violet text on dark: 7.5:1 */
+  --pc-focus-ring: var(--pc-violet-300);
+  --pc-info: var(--pc-violet-300);
+  --pc-warn: var(--pc-mauve-300);
+  --pc-warn-surface: rgba(224, 176, 255, 0.1);
+  --pc-error: var(--pc-rose-400);
+  --pc-error-surface: rgba(244, 63, 94, 0.12);
+  --pc-positive: var(--pc-green-300);
+  --pc-selection-bg: var(--pc-violet-500);
+  --pc-selection-text: #ffffff;
 
-  /* Type — wired by the app via next/font variables.
-     Body: Plus Jakarta Sans · Headings: Montserrat 500 uppercase · Money: Geist Mono */
-  --pc-font-sans: var(--font-jakarta, ui-sans-serif, system-ui, sans-serif);
-  --pc-font-display: var(--font-montserrat, var(--pc-font-sans));
-  --pc-font-mono: var(--font-geist-mono, ui-monospace, "Cascadia Mono", monospace);
-  --pc-text-h1: clamp(2.1rem, 4.6vw, 3.9rem);
-  --pc-text-h2: clamp(1.5rem, 2.8vw, 2.4rem);
-  --pc-text-h3: clamp(1.15rem, 1.6vw, 1.4rem);
-  --pc-text-result-xl: clamp(2.5rem, 5vw, 3.5rem);
-  --pc-text-body: clamp(1rem, 1.1vw, 1.0625rem);
-  --pc-tracking-tight: 0.015em; /* uppercase display needs positive tracking */
+  /* Type — Inter display, Space Mono body/labels/money (inherently tabular) */
+  --pc-font-sans: var(--font-inter, ui-sans-serif, system-ui, sans-serif);
+  --pc-font-display: var(--font-inter, ui-sans-serif, system-ui, sans-serif);
+  --pc-font-mono: var(--font-space-mono, ui-monospace, "Cascadia Mono", monospace);
+  --pc-text-h1: clamp(2.4rem, 5.2vw, 4.5rem);
+  --pc-text-h2: clamp(1.6rem, 3vw, 2.6rem);
+  --pc-text-h3: clamp(1.15rem, 1.6vw, 1.45rem);
+  --pc-text-result-xl: clamp(2.3rem, 4.6vw, 3.3rem);
+  --pc-text-body: clamp(0.95rem, 1.05vw, 1rem);
+  --pc-tracking-tight: -0.02em;
   --pc-tracking-micro: 0.18em;
 
-  /* Geometry — panels are clay-soft, controls are compact and tactile. */
-  --pc-radius: 2rem;
-  --pc-radius-control: 1.25rem;
-  --pc-radius-small: 0.875rem;
-  --pc-radius-pill: 999px;
+  /* Geometry — one radius language, 1px violet-tinted borders */
+  --pc-radius: 14px;
+  --pc-radius-control: 10px;
   --pc-border: 1px solid var(--pc-hairline);
 
-  /* Layered depth: top highlight, saturated lower edge, ambient shadow. */
-  --pc-shadow-panel:
-    inset 0 2px 0 rgba(255, 255, 255, 0.92),
-    0 7px 0 rgba(153, 86, 194, 0.24),
-    0 20px 44px rgba(91, 57, 121, 0.16);
-  --pc-shadow-panel-soft:
-    inset 0 2px 0 rgba(255, 255, 255, 0.78),
-    0 4px 0 rgba(57, 119, 255, 0.18),
-    0 12px 28px rgba(91, 57, 121, 0.12);
-  --pc-shadow-control:
-    inset 0 2px 0 rgba(255, 255, 255, 0.86),
-    0 4px 0 rgba(90, 64, 121, 0.2),
-    0 10px 20px rgba(91, 57, 121, 0.12);
-  --pc-shadow-action:
-    inset 0 2px 0 rgba(255, 255, 255, 0.36),
-    0 6px 0 #092e86,
-    0 16px 28px rgba(35, 78, 181, 0.25);
-  --pc-shadow-focus: 0 0 0 4px color-mix(in srgb, var(--pc-focus-ring) 24%, transparent);
-
   /* Motion */
-  --pc-ease: cubic-bezier(0.34, 1.56, 0.64, 1);
-  --pc-ease-out: cubic-bezier(0.23, 1, 0.32, 1);
-  --pc-duration: 520ms;
-  --pc-duration-fast: 160ms;
+  --pc-ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --pc-duration: 500ms;
+  --pc-duration-fast: 180ms;
 }
 
-[data-theme="dark"] {
-  --pc-bg: #0d0913;
-  --pc-surface: #17101f;
-  --pc-surface-2: #21172d;
-  --pc-text: #f4f5f3;
-  --pc-text-secondary: var(--pc-grey-400);
-  --pc-text-tertiary: var(--pc-grey-500);
-  --pc-hairline: rgba(224, 176, 255, 0.2);
-  --pc-hairline-strong: rgba(224, 176, 255, 0.42);
-  --pc-grid-line: rgba(224, 176, 255, 0.09);
-  --pc-accent: var(--pc-lime-500);         /* dark theme: lime primary (PRD §20.2) */
-  --pc-accent-contrast: var(--pc-ink-950);
-  --pc-focus-ring: var(--pc-lime-500);
-  --pc-info: #6d9bff;
-  --pc-warn: var(--pc-mauve-300);
-  --pc-warn-surface: rgba(224, 176, 255, 0.12);
-  --pc-error: #ff6b6f;
-  --pc-error-surface: rgba(229, 72, 77, 0.14);
-  --pc-positive: var(--pc-green-300);
-  --pc-selection-bg: #f4f5f3;
-  --pc-selection-text: #050607;
-  --pc-shadow-panel:
-    inset 0 2px 0 rgba(255, 255, 255, 0.12),
-    0 7px 0 rgba(224, 176, 255, 0.2),
-    0 20px 48px rgba(0, 0, 0, 0.42),
-    0 0 34px rgba(0, 255, 127, 0.08);
-  --pc-shadow-panel-soft:
-    inset 0 2px 0 rgba(255, 255, 255, 0.1),
-    0 4px 0 rgba(0, 255, 127, 0.16),
-    0 14px 30px rgba(0, 0, 0, 0.34);
-  --pc-shadow-control:
-    inset 0 2px 0 rgba(255, 255, 255, 0.1),
-    0 4px 0 rgba(224, 176, 255, 0.18),
-    0 10px 24px rgba(0, 0, 0, 0.36);
-  --pc-shadow-action:
-    inset 0 2px 0 rgba(255, 255, 255, 0.42),
-    0 6px 0 #4d6410,
-    0 16px 30px rgba(0, 255, 127, 0.16);
+[data-theme="light"] {
+  --pc-bg: #eef1f6;
+  --pc-surface: #ffffff;
+  --pc-surface-2: var(--pc-slate-100);
+  --pc-text: #0f172a;
+  --pc-text-secondary: #334155;
+  --pc-text-tertiary: #52607a;
+  --pc-hairline: rgba(76, 29, 149, 0.16);
+  --pc-hairline-strong: rgba(76, 29, 149, 0.34);
+  --pc-grid-line: rgba(76, 29, 149, 0.07);
+  --pc-accent: var(--pc-violet-700);
+  --pc-accent-contrast: #ffffff;
+  --pc-accent-text: var(--pc-violet-700); /* 5.8:1 on light surface */
+  --pc-focus-ring: var(--pc-violet-700);
+  --pc-info: var(--pc-violet-700);
+  --pc-warn: var(--pc-mauve-700);
+  --pc-warn-surface: rgba(224, 176, 255, 0.2);
+  --pc-error: var(--pc-rose-700);
+  --pc-error-surface: rgba(244, 63, 94, 0.1);
+  --pc-positive: var(--pc-green-700);
+  --pc-selection-bg: var(--pc-violet-700);
+  --pc-selection-text: #ffffff;
 }
 
 ::selection {

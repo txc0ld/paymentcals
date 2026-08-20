@@ -60,7 +60,7 @@ export default async function MethodologyPage({ params }: { params: Promise<{ sl
           const note = ENGINE_NOTES[engineId];
           if (!note) return null;
           return (
-            <li key={engineId} className="clay-panel-soft grid gap-2 p-5">
+            <li key={engineId} className="nexus-panel-soft grid gap-2 p-5">
               <span className="font-mono text-[11px] uppercase tracking-[0.16em] text-ink-2">
                 {engineId} · {note.name}
               </span>
@@ -103,7 +103,7 @@ export default async function MethodologyPage({ params }: { params: Promise<{ sl
       <p className="mt-12">
         <Link
           href={routePath(entry)}
-          className="btn-editorial inline-flex min-h-11 items-center gap-3 bg-accent px-6 py-3 font-mono text-xs uppercase tracking-[0.16em] text-accent-contrast"
+          className="nexus-primary inline-flex min-h-11 items-center gap-3 bg-accent px-6 py-3 font-mono text-sm font-semibold uppercase tracking-[0.16em] text-accent-contrast"
         >
           Open the calculator <span aria-hidden="true">↗</span>
         </Link>

@@ -74,7 +74,7 @@ export function CreditCardCalculator() {
               inputMode="decimal"
               value={ratePctRaw}
               onChange={(e) => setRatePctRaw(e.target.value)}
-              className="clay-input min-h-11 bg-surface px-3 font-mono text-[15px] tabular-nums text-ink outline-none focus:border-focus"
+              className="nexus-input min-h-11 bg-surface px-3 font-mono text-[15px] tabular-nums text-ink outline-none focus:border-focus"
             />
           </div>
           <div className="grid gap-1.5">
@@ -109,7 +109,7 @@ export function CreditCardCalculator() {
         !result ? (
           <EmptyState>Enter the balance and rate to see the payoff time cycle by cycle.</EmptyState>
         ) : (
-          <div className="clay-result grid gap-6 p-6">
+          <div className="nexus-result grid gap-6 p-6">
             {result.payoffDate ? (
               <PrimaryResult
                 label="Paid off"

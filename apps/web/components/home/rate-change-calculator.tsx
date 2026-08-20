@@ -104,7 +104,7 @@ export function RateChangeCalculator() {
               placeholder="6.49"
               value={newRatePctRaw}
               onChange={(e) => setNewRatePctRaw(e.target.value)}
-              className="clay-input min-h-11 bg-surface px-3 font-mono text-[15px] tabular-nums text-ink outline-none focus:border-focus"
+              className="nexus-input min-h-11 bg-surface px-3 font-mono text-[15px] tabular-nums text-ink outline-none focus:border-focus"
             />
           </div>
           <SelectField
@@ -123,7 +123,7 @@ export function RateChangeCalculator() {
         !changed.result || !baseline.result || newRepayment === null ? (
           <EmptyState>Enter your loan and the new rate to see the repayment change and lifetime effect.</EmptyState>
         ) : (
-          <div className="clay-result grid gap-6 p-6">
+          <div className="nexus-result grid gap-6 p-6">
             <PrimaryResult
               label="Repayment after the change"
               amount={moneyFromDecimalString("AUD", newRepayment, 2)}
@@ -135,7 +135,7 @@ export function RateChangeCalculator() {
                 amount={moneyFromDecimalString("AUD", changed.result.totalInterest, 2)}
                 detail={`vs ${formatMajor(baseline.result.totalInterest)} unchanged`}
               />
-              <div className="grid gap-1 rounded-[inherit] border border-hairline bg-surface p-4">
+              <div className="grid gap-1 rounded-[var(--pc-radius-control)] border border-hairline bg-surface p-4">
                 <span className="font-mono text-[10px] uppercase tracking-[0.16em] text-ink-3">Paid off</span>
                 <span className="font-mono text-xl tabular-nums text-ink">
                   {changed.result.payoffDate ?? "beyond term"}

@@ -126,7 +126,7 @@ export function SavingsCalculator({ variant }: { variant: "compound" | "goal" })
                 placeholder="4.50"
                 value={ratePctRaw}
                 onChange={(e) => setRatePctRaw(e.target.value)}
-                className="clay-input min-h-11 bg-surface px-3 font-mono text-[15px] tabular-nums text-ink outline-none focus:border-focus"
+                className="nexus-input min-h-11 bg-surface px-3 font-mono text-[15px] tabular-nums text-ink outline-none focus:border-focus"
               />
             </div>
             <div className="grid gap-1.5">
@@ -138,7 +138,7 @@ export function SavingsCalculator({ variant }: { variant: "compound" | "goal" })
                 inputMode="numeric"
                 value={yearsRaw}
                 onChange={(e) => setYearsRaw(e.target.value)}
-                className="clay-input min-h-11 bg-surface px-3 font-mono text-[15px] tabular-nums text-ink outline-none focus:border-focus"
+                className="nexus-input min-h-11 bg-surface px-3 font-mono text-[15px] tabular-nums text-ink outline-none focus:border-focus"
               />
             </div>
           </div>
@@ -173,7 +173,7 @@ export function SavingsCalculator({ variant }: { variant: "compound" | "goal" })
               : "Enter a rate and timeframe to see the balance grow with compound interest."}
           </EmptyState>
         ) : (
-          <div className="clay-result grid gap-6 p-6">
+          <div className="nexus-result grid gap-6 p-6">
             {variant === "goal" && perPeriodNeeded ? (
               <PrimaryResult
                 label={`Deposit needed per ${compounding === "monthly" ? "month" : compounding === "quarterly" ? "quarter" : "year"}`}
@@ -192,7 +192,7 @@ export function SavingsCalculator({ variant }: { variant: "compound" | "goal" })
               <ResultMetric label="Total interest earned" amount={moneyFromDecimalString("AUD", result.totalInterest.toFixed(2), 2)} />
             </div>
             <div className="overflow-x-auto border-t border-hairline pt-4">
-              <table className="clay-table w-full min-w-[420px] border-collapse text-left">
+              <table className="nexus-table w-full min-w-[420px] border-collapse text-left">
                 <caption className="sr-only">Year-by-year savings growth</caption>
                 <thead>
                   <tr className="border-b border-hairline font-mono text-[10px] uppercase tracking-[0.14em] text-ink-3">

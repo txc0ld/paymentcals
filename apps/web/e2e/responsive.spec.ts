@@ -12,7 +12,7 @@ test.describe("mobile (iPhone 13 viewport)", () => {
     );
     expect(overflow).toBeLessThanOrEqual(0);
 
-    const cta = page.getByRole("link", { name: /Open the GST calculator/i });
+    const cta = page.getByRole("link", { name: /Open calculators/i });
     await expect(cta).toBeVisible();
     const box = (await cta.boundingBox())!;
     expect(box.height).toBeGreaterThanOrEqual(44);

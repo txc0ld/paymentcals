@@ -69,7 +69,7 @@ export function DepositCalculator() {
               inputMode="decimal"
               value={lvrPctRaw}
               onChange={(e) => setLvrPctRaw(e.target.value)}
-              className="clay-input min-h-11 bg-surface px-3 font-mono text-[15px] tabular-nums text-ink outline-none focus:border-focus"
+              className="nexus-input min-h-11 bg-surface px-3 font-mono text-[15px] tabular-nums text-ink outline-none focus:border-focus"
             />
           </div>
           <MoneyField
@@ -86,7 +86,7 @@ export function DepositCalculator() {
         !result ? (
           <EmptyState>Enter the property price and target LVR to see the deposit needed.</EmptyState>
         ) : (
-          <div className="clay-result grid gap-6 p-6">
+          <div className="nexus-result grid gap-6 p-6">
             <PrimaryResult
               label={`Deposit at ${lvrPctRaw}% LVR`}
               amount={moneyFromDecimalString("AUD", result.deposit, 2)}
@@ -143,7 +143,7 @@ export function LvrCalculator() {
         lvr === null ? (
           <EmptyState>Enter the property value and loan amount to calculate the LVR.</EmptyState>
         ) : (
-          <div className="clay-result grid gap-6 p-6">
+          <div className="nexus-result grid gap-6 p-6">
             <div className="flex flex-col gap-2">
               <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-ink-3">
                 Loan-to-value ratio
@@ -238,13 +238,13 @@ export function AffordabilityEstimate() {
               <label htmlFor="aff-rate" className="font-mono text-[11px] uppercase tracking-[0.14em] text-ink-2">
                 Interest rate % p.a.
               </label>
-              <input id="aff-rate" inputMode="decimal" value={ratePctRaw} onChange={(e) => setRatePctRaw(e.target.value)} className="clay-input min-h-11 bg-surface px-3 font-mono text-[15px] tabular-nums text-ink outline-none focus:border-focus" />
+              <input id="aff-rate" inputMode="decimal" value={ratePctRaw} onChange={(e) => setRatePctRaw(e.target.value)} className="nexus-input min-h-11 bg-surface px-3 font-mono text-[15px] tabular-nums text-ink outline-none focus:border-focus" />
             </div>
             <div className="grid gap-1.5">
               <label htmlFor="aff-buffer" className="font-mono text-[11px] uppercase tracking-[0.14em] text-ink-2">
                 Assessment buffer % (editable)
               </label>
-              <input id="aff-buffer" inputMode="decimal" value={bufferPctRaw} onChange={(e) => setBufferPctRaw(e.target.value)} className="clay-input min-h-11 bg-surface px-3 font-mono text-[15px] tabular-nums text-ink outline-none focus:border-focus" />
+              <input id="aff-buffer" inputMode="decimal" value={bufferPctRaw} onChange={(e) => setBufferPctRaw(e.target.value)} className="nexus-input min-h-11 bg-surface px-3 font-mono text-[15px] tabular-nums text-ink outline-none focus:border-focus" />
             </div>
           </div>
         </div>
@@ -253,7 +253,7 @@ export function AffordabilityEstimate() {
         !range ? (
           <EmptyState>Enter your income to see an indicative borrowing range under generic assumptions.</EmptyState>
         ) : range.high.isZero() ? (
-          <div className="clay-panel-soft grid gap-3 p-6">
+          <div className="nexus-panel-soft grid gap-3 p-6">
             <h2 className="text-lg font-medium text-ink">No surplus under these assumptions</h2>
             <p className="text-[14px] leading-6 text-ink-2">
               After the expense floor and debt repayments there is no monthly surplus to service a
@@ -261,7 +261,7 @@ export function AffordabilityEstimate() {
             </p>
           </div>
         ) : (
-          <div className="clay-result grid gap-6 p-6">
+          <div className="nexus-result grid gap-6 p-6">
             <PrimaryResult
               label="Indicative borrowing range"
               amount={moneyFromDecimalString("AUD", range.high.toFixed(2), 2)}

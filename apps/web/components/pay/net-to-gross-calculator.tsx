@@ -173,12 +173,12 @@ export function NetToGrossCalculator() {
           ) : !solved ? (
             <EmptyState>Enter a target take-home amount to solve the gross salary that produces it.</EmptyState>
           ) : solved.status !== "solved" ? (
-            <div className="clay-panel-soft grid gap-3 p-6">
+            <div className="nexus-panel-soft grid gap-3 p-6">
               <h2 className="text-lg font-medium text-ink">No solution in range</h2>
               <p className="text-[14px] leading-6 text-ink-2">{solved.reason}</p>
             </div>
           ) : (
-            <div className="clay-result grid gap-6 p-6">
+            <div className="nexus-result grid gap-6 p-6">
               <PrimaryResult
                 label={includesSuper ? "Required package (incl. super)" : "Required gross salary"}
                 amount={solved.grossAnnual!}

@@ -27,7 +27,7 @@ export function CalculatorHeader({
   actions?: ReactNode;
 }) {
   return (
-    <header className="clay-panel grid min-w-0 gap-5 p-6 md:p-8">
+    <header className="nexus-panel grid min-w-0 gap-5 p-6 md:p-8">
       <div className="flex min-w-0 flex-wrap items-center justify-between gap-x-6 gap-y-4">
         <h1 className="text-[length:var(--pc-text-h2)] font-medium leading-[1.05] tracking-[var(--pc-tracking-tight)] text-ink">
           {meta.title}
@@ -70,7 +70,7 @@ export function CalculatorShell({
     <div className="mx-auto grid w-full max-w-[1280px] gap-8 px-4 py-8 md:gap-10 md:px-8 md:py-12">
       {header}
       <div className="grid min-w-0 gap-8 lg:grid-cols-[minmax(360px,440px)_1fr] lg:items-start lg:gap-10">
-        <section aria-label="Inputs" className="clay-panel grid min-w-0 gap-6 p-5 md:p-7">
+        <section aria-label="Inputs" className="nexus-panel grid min-w-0 gap-6 p-5 md:p-7">
           {inputs}
         </section>
         <section aria-label="Results" className="grid min-w-0 gap-6 lg:sticky lg:top-24">

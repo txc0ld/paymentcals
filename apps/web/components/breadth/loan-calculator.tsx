@@ -114,7 +114,7 @@ export function LoanCalculator({ variant }: { variant: "personal" | "car" }) {
         !result ? (
           <EmptyState>Enter the loan to see repayments, total interest and the schedule.</EmptyState>
         ) : (
-          <div className="clay-result grid gap-6 p-6">
+          <div className="nexus-result grid gap-6 p-6">
             <PrimaryResult
               label={`Repayment per ${state.frequency === "monthly" ? "month" : state.frequency === "fortnightly" ? "fortnight" : "week"}`}
               amount={moneyFromDecimalString(
@@ -152,7 +152,7 @@ export function LoanCalculator({ variant }: { variant: "personal" | "car" }) {
                 )}
                 detail={balloonInfo && balloonInfo.error === null ? "including the balloon at term end" : undefined}
               />
-              <div className="grid gap-1 rounded-[inherit] border border-hairline bg-surface p-4">
+              <div className="grid gap-1 rounded-[var(--pc-radius-control)] border border-hairline bg-surface p-4">
                 <span className="font-mono text-[10px] uppercase tracking-[0.16em] text-ink-3">Paid off</span>
                 <span className="font-mono text-xl tabular-nums text-ink">
                   {balloonInfo && balloonInfo.error === null
@@ -172,7 +172,7 @@ export function LoanCalculator({ variant }: { variant: "personal" | "car" }) {
       }
       explanation={
         result && !balloonInfo ? (
-          <div className="clay-panel-soft min-w-0 p-5 md:p-6">
+          <div className="nexus-panel-soft min-w-0 p-5 md:p-6">
             <ScheduleView result={result} calculatorId={entry.id} frequency={state.frequency} />
           </div>
         ) : null

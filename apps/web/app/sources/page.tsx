@@ -22,7 +22,7 @@ export default function SourcesPage() {
       </p>
       <ul className="mt-10 grid gap-6">
         {allAuRulePacks.map((pack) => (
-          <li key={pack.rulePackId} className="clay-panel-soft grid gap-3 p-5">
+          <li key={pack.rulePackId} className="nexus-panel-soft grid gap-3 p-5">
             <div className="flex flex-wrap items-baseline justify-between gap-2">
               <span className="font-mono text-[14px] text-ink">{pack.rulePackId}</span>
               <span className="border border-hairline px-2 py-0.5 font-mono text-[10px] uppercase tracking-[0.14em] text-ink-2">

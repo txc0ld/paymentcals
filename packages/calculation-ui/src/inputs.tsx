@@ -40,7 +40,7 @@ export function SegmentedControl<T extends string>({
       role="radiogroup"
       aria-label={label}
       onKeyDown={onKeyDown}
-      className="clay-control inline-flex max-w-full flex-wrap gap-1 p-1"
+      className="nexus-control inline-flex max-w-full flex-wrap gap-1 p-1"
     >
       {options.map((option) => {
         const selected = option.value === value;
@@ -52,9 +52,9 @@ export function SegmentedControl<T extends string>({
             tabIndex={selected ? 0 : -1}
             id={`${groupId}-${option.value}`}
             onClick={() => onChange(option.value)}
-            className={`clay-segment min-h-11 rounded-2xl px-4 font-mono text-[11px] uppercase tracking-[0.14em] focus-visible:outline-3 focus-visible:outline-offset-1 focus-visible:outline-focus ${
+            className={`nexus-segment min-h-11 border border-transparent px-4 font-mono text-[11px] uppercase tracking-[0.14em] focus-visible:outline-3 focus-visible:outline-offset-1 focus-visible:outline-focus ${
               selected
-                ? "bg-accent text-accent-contrast shadow-[inset_0_1px_0_rgba(255,255,255,0.35),0_3px_0_color-mix(in_srgb,var(--pc-accent)_72%,#0b0d0f)]"
+                ? "border-hairline-strong bg-[color-mix(in_srgb,var(--pc-accent)_14%,var(--pc-surface))] text-[var(--pc-accent-text)]"
                 : "text-ink-2 hover:bg-surface-2 hover:text-ink"
             } ${size === "sm" ? "px-3 text-[10px]" : ""}`}
           >
@@ -105,7 +105,7 @@ export function MoneyField({
         </p>
       ) : null}
       <div
-        className={`clay-input flex items-stretch overflow-hidden ${
+        className={`nexus-input flex items-stretch overflow-hidden ${
           error ? "border-error" : "border-hairline-strong focus-within:border-ink"
         }`}
       >
@@ -147,7 +147,7 @@ export function MoneyField({
 
 export function FieldGroup({ legend, children }: { legend: string; children: ReactNode }) {
   return (
-    <fieldset className="clay-panel-soft flex flex-col gap-4 p-5">
+    <fieldset className="nexus-panel-soft flex flex-col gap-4 p-5">
       <legend className="px-3 font-mono text-[10px] uppercase tracking-[0.18em] text-ink-3">
         {legend}
       </legend>
@@ -188,7 +188,7 @@ export function SelectField<T extends string>({
         value={value}
         onChange={(event) => onChange(event.target.value as T)}
         aria-describedby={description ? descriptionId : undefined}
-        className="clay-input min-h-11 w-full appearance-none bg-surface px-3 text-[15px] text-ink outline-none focus:border-focus"
+        className="nexus-input min-h-11 w-full appearance-none bg-surface px-3 text-[15px] text-ink outline-none focus:border-focus"
       >
         {options.map((option) => (
           <option key={option.value} value={option.value}>
@@ -234,13 +234,13 @@ export function ToggleField({
         aria-checked={checked}
         aria-describedby={description ? descriptionId : undefined}
         onClick={() => onChange(!checked)}
-        className={`relative mt-0.5 h-7 w-12 shrink-0 rounded-full border transition-colors duration-[var(--pc-duration-fast)] ease-[var(--pc-ease)] focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-focus ${
+        className={`relative mt-0.5 h-7 w-12 shrink-0 rounded-[var(--pc-radius-control)] border transition-colors duration-[var(--pc-duration-fast)] ease-[var(--pc-ease)] focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-focus ${
           checked ? "border-transparent bg-accent" : "border-hairline-strong bg-surface-2"
         }`}
       >
         <span
           aria-hidden="true"
-          className={`absolute top-0.5 h-[22px] w-[22px] rounded-full bg-surface shadow-[0_2px_4px_rgba(0,0,0,0.25)] transition-transform duration-[var(--pc-duration-fast)] ease-[var(--pc-ease)] ${
+          className={`absolute top-0.5 h-[22px] w-[22px] rounded-[7px] bg-surface shadow-[0_2px_4px_rgba(0,0,0,0.25)] transition-transform duration-[var(--pc-duration-fast)] ease-[var(--pc-ease)] ${
             checked ? "translate-x-[22px]" : "translate-x-0.5"
           }`}
         />

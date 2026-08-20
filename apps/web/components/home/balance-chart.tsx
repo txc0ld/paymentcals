@@ -43,7 +43,7 @@ export function BalanceChart({ rows, periodsPerYear }: { rows: SLedgerRow[]; per
         <button
           type="button"
           onClick={() => setView(view === "chart" ? "table" : "chart")}
-          className="clay-quiet-button min-h-9 px-3 font-mono text-[10px] uppercase tracking-[0.14em] text-ink-2 hover:text-ink focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-focus"
+          className="nexus-quiet-button min-h-9 px-3 font-mono text-[10px] uppercase tracking-[0.14em] text-ink-2 hover:text-ink focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-focus"
         >
           {view === "chart" ? "View as table" : "View as chart"}
         </button>
@@ -56,7 +56,7 @@ export function BalanceChart({ rows, periodsPerYear }: { rows: SLedgerRow[]; per
         <AreaChartInner data={yearly} />
       ) : (
         <div className="overflow-x-auto">
-          <table className="clay-table w-full min-w-[360px] border-collapse text-left">
+          <table className="nexus-table w-full min-w-[360px] border-collapse text-left">
             <caption className="sr-only">Year-end loan balance and offset balance</caption>
             <thead>
               <tr className="border-b border-hairline font-mono text-[10px] uppercase tracking-[0.14em] text-ink-3">

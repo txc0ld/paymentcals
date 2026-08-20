@@ -180,7 +180,7 @@ export function MortgageSimulator() {
           </EmptyState>
         ) : (
           <div className="grid gap-5">
-            <div className="clay-result grid gap-6 p-6">
+            <div className="nexus-result grid gap-6 p-6">
               <div className="flex items-start justify-between gap-4">
                 <PrimaryResult
                   label={mode === "compare" ? "Scenario A · total interest" : "Total interest over the loan"}
@@ -203,7 +203,7 @@ export function MortgageSimulator() {
                       2,
                     )}
                   />
-                  <div className="grid gap-1 rounded-[inherit] border border-hairline bg-surface p-4">
+                  <div className="grid gap-1 rounded-[var(--pc-radius-control)] border border-hairline bg-surface p-4">
                     <span className="font-mono text-[10px] uppercase tracking-[0.16em] text-ink-3">Time difference</span>
                     <span className="font-mono text-xl tabular-nums text-ink">
                       {periodsToYearsLabel(Math.abs(resultA.result.periodsUsed - resultB.result.periodsUsed), PPY[scenarioA.basics.frequency])}
@@ -226,7 +226,7 @@ export function MortgageSimulator() {
       }
       explanation={
         resultA.result ? (
-          <div className="clay-panel-soft min-w-0 p-5 md:p-6">
+          <div className="nexus-panel-soft min-w-0 p-5 md:p-6">
             <ScheduleView
               result={mode === "compare" && active === "B" && resultB.result ? resultB.result : resultA.result}
               calculatorId={entry.id}

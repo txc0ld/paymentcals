@@ -127,7 +127,7 @@ export function HelpRepaymentCalculator() {
           ) : !repayment ? (
             <EmptyState>Enter your repayment income to estimate the compulsory annual repayment.</EmptyState>
           ) : (
-            <div className="clay-result grid gap-6 p-6">
+            <div className="nexus-result grid gap-6 p-6">
               <PrimaryResult
                 label="Compulsory annual repayment"
                 amount={repayment}

@@ -135,7 +135,7 @@ export function StampDutyCalculator({ variant }: { variant: "duty" | "buying_cos
         }
         results={
           unsupported ? (
-            <div className="clay-panel-soft grid gap-3 p-8 text-center">
+            <div className="nexus-panel-soft grid gap-3 p-8 text-center">
               <Badge tone="warn">{state} not yet supported</Badge>
               <p className="mx-auto max-w-md text-[14px] leading-6 text-ink-2">
                 The official {state} duty rates have not been transcribed and verified yet, so no
@@ -145,7 +145,7 @@ export function StampDutyCalculator({ variant }: { variant: "duty" | "buying_cos
           ) : !duty ? (
             <EmptyState>Enter the property value to estimate the general transfer duty.</EmptyState>
           ) : (
-            <div className="clay-result grid gap-6 p-6">
+            <div className="nexus-result grid gap-6 p-6">
               <PrimaryResult
                 label={variant === "duty" ? `Estimated ${state} transfer duty` : "Estimated upfront costs"}
                 amount={moneyFromDecimalString(

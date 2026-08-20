@@ -10,7 +10,7 @@ export function UniversalDisclosure({ financialYear }: { financialYear: string }
     <aside
       aria-label="Important information"
       data-disclosure-version={DISCLOSURE_VERSION}
-      className="clay-panel-soft p-5 text-[12px] leading-5 text-ink-3"
+      className="nexus-panel-soft p-5 text-[12px] leading-5 text-ink-3"
     >
       <p>
         Estimates only, based on the inputs and assumptions shown. This is general information and a

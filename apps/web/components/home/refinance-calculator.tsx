@@ -79,7 +79,7 @@ export function RefinanceCalculator() {
         inputMode="decimal"
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="clay-input min-h-11 bg-surface px-3 font-mono text-[15px] tabular-nums text-ink outline-none focus:border-focus"
+        className="nexus-input min-h-11 bg-surface px-3 font-mono text-[15px] tabular-nums text-ink outline-none focus:border-focus"
       />
     </div>
   );
@@ -140,7 +140,7 @@ export function RefinanceCalculator() {
                   type="date"
                   value={cashbackDate}
                   onChange={(e) => setCashbackDate(e.target.value)}
-                  className="clay-input min-h-11 bg-surface px-3 font-mono text-[14px] text-ink outline-none focus:border-focus"
+                  className="nexus-input min-h-11 bg-surface px-3 font-mono text-[14px] text-ink outline-none focus:border-focus"
                 />
                 {!cashbackDate ? (
                   <span className="text-[12px] text-warn">Enter the date or the cashback is not counted.</span>
@@ -159,7 +159,7 @@ export function RefinanceCalculator() {
             comparison never uses repayments alone.
           </EmptyState>
         ) : (
-          <div className="clay-result grid gap-6 p-6">
+          <div className="nexus-result grid gap-6 p-6">
             <PrimaryResult
               label="Break-even"
               amount={moneyFromDecimalString("AUD", result.economicAdvantageAtHorizon, 2)}

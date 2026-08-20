@@ -1,10 +1,10 @@
 import type { ReactNode } from "react";
 
-/** Microscopic uppercase editorial label — the Swiss "eyebrow". */
+/** Compact technical eyebrow label. */
 export function Eyebrow({ children, className = "" }: { children: ReactNode; className?: string }) {
   return (
     <span
-      className={`clay-chip inline-flex items-center gap-2 px-3 py-1.5 font-mono text-[10px] uppercase tracking-[0.18em] text-ink-3 before:h-2 before:w-2 before:rounded-full before:bg-positive before:content-[''] ${className}`}
+      className={`nexus-badge inline-flex items-center gap-2 px-3 py-1.5 font-mono text-[10px] uppercase tracking-[0.18em] text-ink-3 before:h-2 before:w-2 before:rounded-full before:bg-positive before:content-[''] ${className}`}
     >
       {children}
     </span>
@@ -22,11 +22,11 @@ export function Panel({
   as?: "div" | "section" | "aside" | "article";
 }) {
   return (
-    <Component className={`clay-panel ${className}`}>{children}</Component>
+    <Component className={`nexus-panel ${className}`}>{children}</Component>
   );
 }
 
-/** Editorial button with the DESIGN.md asymmetric clipped corner. */
+/** Primary and quiet actions in the shared Aether control treatment. */
 export function EditorialButton({
   children,
   onClick,
@@ -45,11 +45,11 @@ export function EditorialButton({
   ariaLabel?: string;
 }) {
   const base =
-    "btn-editorial inline-flex min-h-11 items-center justify-center gap-3 px-6 py-3 font-mono text-xs uppercase tracking-[0.14em] focus-visible:outline-3 focus-visible:outline-offset-4 focus-visible:outline-focus disabled:cursor-not-allowed disabled:opacity-40";
+    "nexus-primary inline-flex min-h-11 items-center justify-center gap-3 px-6 py-3 font-mono text-sm font-semibold uppercase tracking-[0.14em] focus-visible:outline-3 focus-visible:outline-offset-4 focus-visible:outline-focus disabled:cursor-not-allowed disabled:opacity-40";
   const look =
     variant === "primary"
       ? "bg-accent text-accent-contrast"
-      : "clay-quiet-button bg-surface text-ink hover:bg-surface-2";
+      : "nexus-quiet-button bg-surface text-ink hover:bg-surface-2";
   return (
     <button
       type={type}
@@ -80,7 +80,7 @@ export function Badge({
   };
   return (
     <span
-      className={`clay-chip inline-flex items-center gap-1.5 px-3 py-1 font-mono text-[10px] uppercase tracking-[0.14em] ${tones[tone]}`}
+      className={`nexus-badge inline-flex items-center gap-1.5 px-3 py-1 font-mono text-[10px] uppercase tracking-[0.14em] ${tones[tone]}`}
     >
       {children}
     </span>

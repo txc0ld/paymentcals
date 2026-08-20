@@ -97,7 +97,7 @@ export function LoanBasicsFields({
             value={state.ratePctRaw}
             onChange={(e) => onChange({ ratePctRaw: e.target.value })}
             aria-invalid={errors.rate ? true : undefined}
-            className="clay-input min-h-11 bg-surface px-3 font-mono text-[15px] tabular-nums text-ink outline-none focus:border-focus"
+            className="nexus-input min-h-11 bg-surface px-3 font-mono text-[15px] tabular-nums text-ink outline-none focus:border-focus"
           />
           {errors.rate ? (
             <span role="alert" className="text-[12px] text-error">
@@ -115,7 +115,7 @@ export function LoanBasicsFields({
             value={state.termYearsRaw}
             onChange={(e) => onChange({ termYearsRaw: e.target.value })}
             aria-invalid={errors.term ? true : undefined}
-            className="clay-input min-h-11 bg-surface px-3 font-mono text-[15px] tabular-nums text-ink outline-none focus:border-focus"
+            className="nexus-input min-h-11 bg-surface px-3 font-mono text-[15px] tabular-nums text-ink outline-none focus:border-focus"
           />
           {errors.term ? (
             <span role="alert" className="text-[12px] text-error">
@@ -153,7 +153,7 @@ export function LoanBasicsFields({
             value={state.ioYearsRaw}
             onChange={(e) => onChange({ ioYearsRaw: e.target.value })}
             aria-invalid={errors.io ? true : undefined}
-            className="clay-input min-h-11 w-24 bg-surface px-3 text-center font-mono text-[15px] tabular-nums text-ink outline-none focus:border-focus"
+            className="nexus-input min-h-11 w-24 bg-surface px-3 text-center font-mono text-[15px] tabular-nums text-ink outline-none focus:border-focus"
           />
           {errors.io ? (
             <span role="alert" className="text-[12px] text-error">

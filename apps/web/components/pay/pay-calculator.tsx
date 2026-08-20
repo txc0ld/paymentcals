@@ -420,7 +420,7 @@ export function PayCalculator({ variant }: { variant: PayVariant }) {
                     key={label}
                     type="button"
                     onClick={handler}
-                    className="clay-quiet-button min-h-9 px-2.5 font-mono text-[10px] uppercase tracking-[0.14em] text-ink-2 hover:text-ink focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-focus"
+                    className="nexus-quiet-button min-h-9 px-2.5 font-mono text-[10px] uppercase tracking-[0.14em] text-ink-2 hover:text-ink focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-focus"
                   >
                     {label}
                   </button>
@@ -487,7 +487,7 @@ export function PayCalculator({ variant }: { variant: PayVariant }) {
                       value={state.hoursPerWeekRaw}
                       onChange={(e) => patch({ hoursPerWeekRaw: e.target.value })}
                       aria-invalid={errors.hours ? true : undefined}
-                      className="clay-input min-h-11 bg-surface px-3 font-mono text-[15px] tabular-nums text-ink outline-none focus:border-focus"
+                      className="nexus-input min-h-11 bg-surface px-3 font-mono text-[15px] tabular-nums text-ink outline-none focus:border-focus"
                     />
                     {errors.hours ? (
                       <span role="alert" className="text-[12px] text-error">
@@ -505,7 +505,7 @@ export function PayCalculator({ variant }: { variant: PayVariant }) {
                       value={state.weeksPaidRaw}
                       onChange={(e) => patch({ weeksPaidRaw: e.target.value })}
                       aria-invalid={errors.weeks ? true : undefined}
-                      className="clay-input min-h-11 bg-surface px-3 font-mono text-[15px] tabular-nums text-ink outline-none focus:border-focus"
+                      className="nexus-input min-h-11 bg-surface px-3 font-mono text-[15px] tabular-nums text-ink outline-none focus:border-focus"
                     />
                   </div>
                 </div>
@@ -567,7 +567,7 @@ export function PayCalculator({ variant }: { variant: PayVariant }) {
                         value={state.superRateRaw}
                         onChange={(e) => patch({ superRateRaw: e.target.value })}
                         aria-invalid={errors.superRate ? true : undefined}
-                        className="clay-input min-h-11 bg-surface px-3 font-mono text-[15px] tabular-nums text-ink outline-none focus:border-focus"
+                        className="nexus-input min-h-11 bg-surface px-3 font-mono text-[15px] tabular-nums text-ink outline-none focus:border-focus"
                       />
                       {errors.superRate ? (
                         <span role="alert" className="text-[12px] text-error">
@@ -639,7 +639,7 @@ export function PayCalculator({ variant }: { variant: PayVariant }) {
                             value={state.dependantsRaw}
                             onChange={(e) => patch({ dependantsRaw: e.target.value })}
                             aria-invalid={errors.dependants ? true : undefined}
-                            className="clay-input min-h-11 w-24 bg-surface px-3 text-center font-mono text-[15px] tabular-nums text-ink outline-none focus:border-focus"
+                            className="nexus-input min-h-11 w-24 bg-surface px-3 text-center font-mono text-[15px] tabular-nums text-ink outline-none focus:border-focus"
                           />
                         </div>
                       </>
@@ -666,7 +666,7 @@ export function PayCalculator({ variant }: { variant: PayVariant }) {
             </EmptyState>
           ) : (
             <div className="grid gap-5">
-              <div className="clay-result grid gap-6 p-6">
+              <div className="nexus-result grid gap-6 p-6">
                 <PrimaryResult
                   label={
                     variant.primaryMetric === "netPerCycle"
@@ -683,7 +683,7 @@ export function PayCalculator({ variant }: { variant: PayVariant }) {
                 </div>
               </div>
 
-              <section aria-label="Annual tax position" className="clay-panel-soft grid gap-3 p-5">
+              <section aria-label="Annual tax position" className="nexus-panel-soft grid gap-3 p-5">
                 <h2 className="font-mono text-[11px] tracking-[0.16em] text-ink-2">Annual tax position (estimate)</h2>
                 <dl className="grid gap-2">
                   {(
@@ -705,7 +705,7 @@ export function PayCalculator({ variant }: { variant: PayVariant }) {
                 </dl>
               </section>
 
-              <section aria-label="Estimated employer withholding" className="clay-panel-soft grid gap-3 p-5">
+              <section aria-label="Estimated employer withholding" className="nexus-panel-soft grid gap-3 p-5">
                 <h2 className="font-mono text-[11px] tracking-[0.16em] text-ink-2">
                   Estimated employer withholding ({CYCLE_LABEL[state.payCycle]})
                 </h2>
@@ -767,7 +767,7 @@ export function PayCalculator({ variant }: { variant: PayVariant }) {
               }
               breakdown={
                 <div className="overflow-x-auto">
-                  <table className="clay-table w-full min-w-[420px] border-collapse text-left">
+                  <table className="nexus-table w-full min-w-[420px] border-collapse text-left">
                     <caption className="sr-only">Net pay at each frequency</caption>
                     <thead>
                       <tr className="border-b border-hairline font-mono text-[10px] uppercase tracking-[0.14em] text-ink-3">

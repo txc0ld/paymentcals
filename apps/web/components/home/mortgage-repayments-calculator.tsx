@@ -113,7 +113,7 @@ export function MortgageRepaymentsCalculator() {
           </EmptyState>
         ) : (
           <div className="grid gap-5">
-            <div className="clay-result grid gap-6 p-6">
+            <div className="nexus-result grid gap-6 p-6">
               <PrimaryResult
                 label={`Repayment ${CYCLE_LABEL[state.frequency]}`}
                 amount={moneyFromDecimalString("AUD", result.scheduledPaymentInitial, 2)}
@@ -122,7 +122,7 @@ export function MortgageRepaymentsCalculator() {
               <div className="grid gap-3 border-t border-hairline pt-4 sm:grid-cols-3">
                 <ResultMetric label="Total interest" amount={moneyFromDecimalString("AUD", result.totalInterest, 2)} />
                 <ResultMetric label="Total paid" amount={moneyFromDecimalString("AUD", result.totalPaid, 2)} detail={result.totalFees !== "0.00" ? `includes ${formatMajor(result.totalFees)} fees` : undefined} />
-                <div className="grid gap-1 rounded-[inherit] border border-hairline bg-surface p-4">
+                <div className="grid gap-1 rounded-[var(--pc-radius-control)] border border-hairline bg-surface p-4">
                   <span className="font-mono text-[10px] uppercase tracking-[0.16em] text-ink-3">Paid off</span>
                   <span className="font-mono text-xl tabular-nums text-ink">{result.payoffDate ?? "beyond term"}</span>
                   <span className="text-[12px] leading-4 text-ink-3">
@@ -142,7 +142,7 @@ export function MortgageRepaymentsCalculator() {
       }
       explanation={
         result ? (
-          <div className="clay-panel-soft min-w-0 p-5 md:p-6">
+          <div className="nexus-panel-soft min-w-0 p-5 md:p-6">
             <ScheduleView result={result} calculatorId="AU-HOME-001" frequency={state.frequency} />
           </div>
         ) : null

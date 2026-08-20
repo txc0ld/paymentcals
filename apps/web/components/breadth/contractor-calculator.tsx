@@ -119,7 +119,7 @@ export function ContractorCalculator() {
                 inputMode="decimal"
                 value={utilisationPctRaw}
                 onChange={(e) => setUtilisationPctRaw(e.target.value)}
-                className="clay-input min-h-11 bg-surface px-3 font-mono text-[15px] tabular-nums text-ink outline-none focus:border-focus"
+                className="nexus-input min-h-11 bg-surface px-3 font-mono text-[15px] tabular-nums text-ink outline-none focus:border-focus"
               />
             </div>
             <ToggleField
@@ -139,7 +139,7 @@ export function ContractorCalculator() {
           !result ? (
             <EmptyState>Enter a target income to see the day rate that actually covers it.</EmptyState>
           ) : (
-            <div className="clay-result grid gap-6 p-6">
+            <div className="nexus-result grid gap-6 p-6">
               <PrimaryResult
                 label="Target day rate (excluding GST)"
                 amount={moneyFromDecimalString("AUD", result.targetDayRate.toFixed(2), 2)}
@@ -159,7 +159,7 @@ export function ContractorCalculator() {
                     detail="including GST, which is not revenue"
                   />
                 ) : (
-                  <div className="grid gap-1 rounded-[inherit] border border-hairline bg-surface p-4">
+                  <div className="grid gap-1 rounded-[var(--pc-radius-control)] border border-hairline bg-surface p-4">
                     <span className="font-mono text-[10px] uppercase tracking-[0.16em] text-ink-3">GST</span>
                     <span className="text-[13px] leading-5 text-ink-2">Not registered; no GST added to the quote.</span>
                   </div>

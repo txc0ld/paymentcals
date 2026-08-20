@@ -1,6 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Montserrat, Plus_Jakarta_Sans } from "next/font/google";
-import { GeistMono } from "geist/font/mono";
+import { Inter, Space_Mono } from "next/font/google";
 import Link from "next/link";
 import Script from "next/script";
 import "./globals.css";
@@ -8,8 +7,8 @@ import { ThemeToggle } from "../components/theme-toggle";
 import { RevealObserver } from "../components/reveal-observer";
 import { PageViewTracker } from "../components/page-view-tracker";
 
-const jakarta = Plus_Jakarta_Sans({ subsets: ["latin"], variable: "--font-jakarta" });
-const montserrat = Montserrat({ subsets: ["latin"], weight: ["500"], variable: "--font-montserrat" });
+const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
+const spaceMono = Space_Mono({ subsets: ["latin"], weight: ["400", "700"], variable: "--font-space-mono" });
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://paymentcalcs.com"),
@@ -23,13 +22,14 @@ export const metadata: Metadata = {
 
 export const viewport: Viewport = {
   themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#f7f8f4" },
-    { media: "(prefers-color-scheme: dark)", color: "#050607" },
+    { media: "(prefers-color-scheme: light)", color: "#eef1f6" },
+    { media: "(prefers-color-scheme: dark)", color: "#050505" },
   ],
 };
 
-/** Runs before paint: resolves saved/system theme with no flash (§20.3). */
-const THEME_INIT = `(function(){try{var s=localStorage.getItem("pc-theme");var t=s==="light"||s==="dark"?s:(matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light");document.documentElement.setAttribute("data-theme",t);}catch(e){document.documentElement.setAttribute("data-theme","light");}})();`;
+/** Runs before paint. Dark is the design's native mode (Aether Nexus source);
+ * a stored light preference is honoured with no flash. */
+const THEME_INIT = `(function(){try{var s=localStorage.getItem("pc-theme");document.documentElement.setAttribute("data-theme",s==="light"?"light":"dark");}catch(e){document.documentElement.setAttribute("data-theme","dark");}})();`;
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -38,11 +38,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <script dangerouslySetInnerHTML={{ __html: THEME_INIT }} />
       </head>
       <body
-        className={`${jakarta.variable} ${montserrat.variable} ${GeistMono.variable} min-h-[100dvh] bg-canvas text-ink selection:bg-accent selection:text-accent-contrast`}
+        className={`${inter.variable} ${spaceMono.variable} min-h-[100dvh] bg-canvas text-ink selection:bg-accent selection:text-accent-contrast`}
       >
+        <div className="aether-atmosphere" aria-hidden="true" />
         <a
           href="#main"
-          className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:min-h-11 focus:rounded-[var(--pc-radius-control)] focus:border focus:border-hairline-strong focus:bg-surface focus:px-4 focus:py-3 focus:font-mono focus:text-xs focus:uppercase focus:tracking-[0.14em] focus:shadow-[var(--pc-shadow-panel-soft)]"
+          className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:min-h-11 focus:rounded-[var(--pc-radius-control)] focus:border focus:border-hairline-strong focus:bg-surface focus:px-4 focus:py-3 focus:font-mono focus:text-xs focus:uppercase focus:tracking-[0.14em]"
         >
           Skip to content
         </a>
@@ -50,9 +51,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <header className="no-print sticky top-0 z-40 px-3 pt-3 md:px-6">
           <nav
             aria-label="Primary"
-            className="clay-control mx-auto flex min-h-14 w-full max-w-[1280px] items-center justify-between gap-4 bg-surface/90 px-4 backdrop-blur-xl md:px-6"
+            className="nexus-control mx-auto flex min-h-14 w-full max-w-[1280px] items-center justify-between gap-4 bg-surface/90 px-4 backdrop-blur-xl md:px-6"
           >
-            <Link href="/" className="flex min-h-11 items-center gap-2.5 rounded-full px-1 text-ink focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-focus" aria-label="PaymentCalcs home">
+            <Link href="/" className="flex min-h-11 items-center gap-2.5 rounded-[var(--pc-radius-control)] px-2 text-ink focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-focus" aria-label="PaymentCalcs home">
               <svg viewBox="0 0 24 24" className="h-5 w-5" aria-hidden="true">
                 <rect x="2" y="2" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2.5" />
                 <circle cx="12" cy="12" r="4" fill="currentColor" />
@@ -62,7 +63,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             <div className="flex items-center gap-4">
               <Link
                 href="/calculators"
-                className="clay-quiet-button hidden min-h-11 items-center px-4 font-mono text-[11px] uppercase tracking-[0.16em] text-ink-2 hover:text-ink focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-focus sm:inline-flex"
+                className="nexus-quiet-button hidden min-h-11 items-center px-4 font-mono text-[11px] uppercase tracking-[0.16em] text-ink-2 hover:text-ink focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-focus sm:inline-flex"
               >
                 Calculators
               </Link>
@@ -71,10 +72,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           </nav>
         </header>
 
-        <main id="main" className="relative min-w-0">{children}</main>
+        <main id="main" className="relative z-10 min-w-0">{children}</main>
 
-        <footer className="no-print mt-20 px-4 pb-5 md:px-8">
-          <div className="clay-panel mx-auto grid w-full max-w-[1280px] gap-8 px-6 py-10 md:grid-cols-3 md:px-10">
+        <footer className="no-print relative z-10 mt-20 px-4 pb-5 md:px-8">
+          <div className="nexus-panel mx-auto grid w-full max-w-[1280px] gap-8 px-6 py-10 md:grid-cols-3 md:px-10">
             <div className="grid content-start gap-3">
               <span className="font-mono text-xs uppercase tracking-[0.2em] text-ink">PaymentCalcs</span>
               <p className="max-w-xs text-[13px] leading-5 text-ink-3">

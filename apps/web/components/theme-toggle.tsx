@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 
-/** Persists user choice locally; system preference is the first-visit default. */
+/** Persists the user choice locally; first visits use the native dark theme. */
 export function ThemeToggle() {
   const [theme, setTheme] = useState<"light" | "dark" | null>(null);
 
@@ -33,7 +33,7 @@ export function ThemeToggle() {
       type="button"
       onClick={toggle}
       aria-label={theme === "dark" ? "Switch to light theme" : "Switch to dark theme"}
-      className="clay-quiet-button flex h-11 w-11 items-center justify-center text-ink-2 hover:text-ink focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-focus"
+      className="nexus-quiet-button flex h-11 w-11 items-center justify-center text-ink-2 hover:text-ink focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-focus"
     >
       {theme === null ? (
         <span className="h-3.5 w-3.5 rounded-full border-2 border-current" aria-hidden="true" />

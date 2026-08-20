@@ -142,14 +142,14 @@ export function SavingsPresetCalculator({ variant }: { variant: SavingsVariant }
           </EmptyState>
         ) : (
           <div className="grid gap-5">
-            <div className="clay-result grid gap-6 p-6">
+            <div className="nexus-result grid gap-6 p-6">
               <PrimaryResult
                 label="Interest saved over the loan"
                 amount={moneyFromDecimalString("AUD", result.interestSaved, 2)}
                 qualifier={`Compared with the same loan and repayments but ${variant === "offset" ? "no offset balance" : "no extra repayments"}, on identical dates.`}
               />
               <div className="grid gap-3 border-t border-hairline pt-4 sm:grid-cols-3">
-                <div className="grid gap-1 rounded-[inherit] border border-hairline bg-surface p-4">
+                <div className="grid gap-1 rounded-[var(--pc-radius-control)] border border-hairline bg-surface p-4">
                   <span className="font-mono text-[10px] uppercase tracking-[0.16em] text-ink-3">Time saved</span>
                   <span className="font-mono text-xl tabular-nums text-ink">
                     {periodsToYearsLabel(result.periodsSaved, PPY[state.frequency])}
@@ -167,7 +167,7 @@ export function SavingsPresetCalculator({ variant }: { variant: SavingsVariant }
                     detail="available, not repaid"
                   />
                 ) : (
-                  <div className="grid gap-1 rounded-[inherit] border border-hairline bg-surface p-4">
+                  <div className="grid gap-1 rounded-[var(--pc-radius-control)] border border-hairline bg-surface p-4">
                     <span className="font-mono text-[10px] uppercase tracking-[0.16em] text-ink-3">Paid off</span>
                     <span className="font-mono text-xl tabular-nums text-ink">{result.scenario.payoffDate ?? "beyond term"}</span>
                   </div>
@@ -186,7 +186,7 @@ export function SavingsPresetCalculator({ variant }: { variant: SavingsVariant }
       }
       explanation={
         result ? (
-          <div className="clay-panel-soft min-w-0 p-5 md:p-6">
+          <div className="nexus-panel-soft min-w-0 p-5 md:p-6">
             <ScheduleView result={result.scenario} calculatorId={entry.id} frequency={state.frequency} />
           </div>
         ) : null
