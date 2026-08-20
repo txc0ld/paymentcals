@@ -10,7 +10,7 @@ export function UniversalDisclosure({ financialYear }: { financialYear: string }
     <aside
       aria-label="Important information"
       data-disclosure-version={DISCLOSURE_VERSION}
-      className="border-t border-hairline pt-4 text-[12px] leading-5 text-ink-3"
+      className="clay-panel-soft p-5 text-[12px] leading-5 text-ink-3"
     >
       <p>
         Estimates only, based on the inputs and assumptions shown. This is general information and a
@@ -28,7 +28,7 @@ export function DraftRulesBanner() {
   return (
     <div
       role="status"
-      className="sticky top-0 z-40 border-b border-warn bg-warn-surface px-4 py-2 text-center font-mono text-[11px] uppercase tracking-[0.16em] text-warn"
+      className="sticky top-0 z-40 border-b border-warn bg-warn-surface px-4 py-3 text-center font-mono text-[11px] uppercase tracking-[0.16em] text-warn shadow-[0_4px_18px_color-mix(in_srgb,var(--pc-mauve-300)_18%,transparent)] backdrop-blur-md"
     >
       Draft rules — not verified. Development preview only.
     </div>

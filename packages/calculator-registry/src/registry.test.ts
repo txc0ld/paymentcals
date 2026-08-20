@@ -17,6 +17,12 @@ describe("calculator registry", () => {
     expect(entry!.rulePackDependencies).toContain("gst");
   });
 
+  it("every calculator ships an advanced mode (owner directive 2026-08-20)", () => {
+    for (const entry of calculatorRegistry) {
+      expect(entry.supportedModes, entry.id).toContain("advanced");
+    }
+  });
+
   it("every entry carries a disclosure set and SEO metadata", () => {
     for (const entry of calculatorRegistry) {
       expect(entry.disclosureSet.length).toBeGreaterThan(0);

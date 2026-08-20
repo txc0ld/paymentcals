@@ -1,0 +1,30 @@
+399,509
+Implemented the full candy/clay 3D restyle across both themes while preserving all text, behavior, accessibility attributes, fonts, and validated text colors.
+
+### File summary
+
+- [tokens.css](C:/Users/tmayo/.claude/projects/paymentcalcs/packages/design-tokens/src/tokens.css) — pastel/deep surfaces, large radii, layered 3D shadows, glow accents, overshoot motion tokens.
+- [globals.css](C:/Users/tmayo/.claude/projects/paymentcalcs/apps/web/app/globals.css) — clay panels, chunky buttons, pressed states, hover lift/tilt, gradient washes, playful hero artwork, reduced-motion support.
+- [page.tsx](C:/Users/tmayo/.claude/projects/paymentcalcs/apps/web/app/page.tsx) — lively hero composition, candy calculator cards, tactile CTAs, trust and methodology sections.
+- [layout.tsx](C:/Users/tmayo/.claude/projects/paymentcalcs/apps/web/app/layout.tsx) — floating clay navigation and redesigned footer.
+- [theme-toggle.tsx](C:/Users/tmayo/.claude/projects/paymentcalcs/apps/web/components/theme-toggle.tsx) — 44px tactile theme control.
+- [gst-calculator.tsx](C:/Users/tmayo/.claude/projects/paymentcalcs/apps/web/components/gst/gst-calculator.tsx) — dimensional results, warnings, actions, and table treatment.
+- [line-items-editor.tsx](C:/Users/tmayo/.claude/projects/paymentcalcs/apps/web/components/gst/line-items-editor.tsx) — rounded line-item cards and touch-safe controls.
+- [disclosures.tsx](C:/Users/tmayo/.claude/projects/paymentcalcs/packages/calculation-ui/src/disclosures.tsx) — clay disclosure and draft-banner styling.
+- [explainability.tsx](C:/Users/tmayo/.claude/projects/paymentcalcs/packages/calculation-ui/src/explainability.tsx) — tactile tabs and rounded working/source panels.
+- [inputs.tsx](C:/Users/tmayo/.claude/projects/paymentcalcs/packages/calculation-ui/src/inputs.tsx) — dimensional inputs and 44px segmented controls.
+- [primitives.tsx](C:/Users/tmayo/.claude/projects/paymentcalcs/packages/calculation-ui/src/primitives.tsx) — unified panel, button, badge, and eyebrow styling.
+- [results.tsx](C:/Users/tmayo/.claude/projects/paymentcalcs/packages/calculation-ui/src/results.tsx) — high-depth monetary result and metric cards.
+- [shell.tsx](C:/Users/tmayo/.claude/projects/paymentcalcs/packages/calculation-ui/src/shell.tsx) — responsive calculator shell and sticky results treatment.
+- [states.tsx](C:/Users/tmayo/.claude/projects/paymentcalcs/packages/calculation-ui/src/states.tsx) — clay empty, error, and unavailable states.
+
+### Verification
+
+- `pnpm exec turbo run typecheck lint test build` — passed, 31/31 tasks.
+- `cd apps/web && pnpm exec playwright test` — passed, 11/11 tests.
+- Light/dark desktop and 390px mobile layouts visually inspected.
+- `git diff --check` passed.
+- All `--pc-text-*` values and `@theme` keys confirmed unchanged.
+- Existing unrelated changes in `PROGRESS.md`, `registry.test.ts`, and `codex-restyle-log.txt` were left untouched.
+
+Key principle: playful visual depth now lives entirely in the presentation layer; calculation meaning, legal copy, accessibility, and behavior remain unchanged.

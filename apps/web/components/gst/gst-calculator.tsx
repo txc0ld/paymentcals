@@ -347,7 +347,7 @@ export function GstCalculator() {
               />
             }
             actions={
-              <span className="no-print flex items-center gap-2">
+              <span className="no-print flex max-w-full flex-wrap items-center gap-2">
                 {savedFlash ? (
                   <span role="status" className="font-mono text-[10px] uppercase tracking-[0.14em] text-positive">
                     {savedFlash}
@@ -365,7 +365,7 @@ export function GstCalculator() {
                     key={label}
                     type="button"
                     onClick={handler}
-                    className="min-h-8 border border-hairline px-2.5 font-mono text-[10px] uppercase tracking-[0.14em] text-ink-2 transition-colors duration-[var(--pc-duration-fast)] hover:border-hairline-strong hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
+                    className="clay-quiet-button min-h-11 px-3 font-mono text-[10px] uppercase tracking-[0.14em] text-ink-2 hover:border-hairline-strong hover:text-ink focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-focus"
                   >
                     {label}
                   </button>
@@ -429,7 +429,7 @@ export function GstCalculator() {
               below the result.
             </EmptyState>
           ) : (
-            <div className="grid gap-6 border border-hairline bg-surface p-6">
+            <div className="clay-result grid min-w-0 gap-6 p-5 md:p-7">
               <PrimaryResult
                 label={output.mode === "line_items" ? "Invoice total (inc GST)" : PRIMARY_LABELS[output.mode as SimpleMode]}
                 amount={
@@ -443,15 +443,15 @@ export function GstCalculator() {
                 }
                 qualifier={`At the standard GST rate of ${formatRatePercent(output.rate)} under the resolved rule pack.`}
               />
-              <div className="grid gap-px border-t border-hairline pt-4 sm:grid-cols-3 sm:gap-3">
+              <div className="grid gap-3 sm:grid-cols-3">
                 <ResultMetric label="Excluding GST" amount={output.exclusiveAmount} />
                 <ResultMetric label="GST" amount={output.gstAmount} />
                 <ResultMetric label="Including GST" amount={output.inclusiveAmount} />
               </div>
               {result && result.warnings.length > 0 ? (
-                <ul className="grid gap-2 border-t border-hairline pt-4">
+                <ul className="grid gap-3">
                   {result.warnings.map((warning) => (
-                    <li key={warning.code} className="border-l-2 border-warn pl-3 text-[13px] leading-5 text-ink-2">
+                    <li key={warning.code} className="clay-panel-soft border-warn bg-warn-surface p-4 text-[13px] leading-5 text-ink-2">
                       {warning.message}
                     </li>
                   ))}
@@ -480,7 +480,7 @@ export function GstCalculator() {
               }
               breakdown={
                 output.lines && output.lines.length > 0 ? (
-                  <div className="overflow-x-auto">
+                  <div className="clay-table max-w-full overflow-x-auto p-4">
                     <table className="w-full min-w-[560px] border-collapse text-left">
                       <caption className="sr-only">GST breakdown per invoice line</caption>
                       <thead>
@@ -532,7 +532,7 @@ export function GstCalculator() {
                     </table>
                   </div>
                 ) : (
-                  <dl className="grid max-w-sm gap-2">
+                  <dl className="clay-table grid max-w-sm gap-2 p-4">
                     {(
                       [
                         ["Excluding GST", output.exclusiveAmount],
@@ -540,7 +540,7 @@ export function GstCalculator() {
                         ["Including GST", output.inclusiveAmount],
                       ] as const
                     ).map(([label, amount]) => (
-                      <div key={label} className="flex items-baseline justify-between gap-6 border-b border-hairline pb-2">
+                      <div key={label} className="flex items-baseline justify-between gap-6 rounded-xl bg-surface px-3 py-2">
                         <dt className="text-[13px] text-ink-2">{label}</dt>
                         <dd className="font-mono text-[14px] tabular-nums text-ink">{formatMoney(amount)}</dd>
                       </div>

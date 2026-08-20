@@ -1,6 +1,6 @@
 /*
- * PaymentCalcs design tokens — Swiss Editorial Tech (docs/DESIGN.md, owner
- * directive D-001) merged with PRD §20 functional rules.
+ * PaymentCalcs design tokens — candy-clay interface merged with PRD §20
+ * functional rules.
  *
  * Brand constants (PRD §20.2 hex values, already monochrome-leaning):
  *   ink 950/900/800 · paper 50/100 · grey 500/400 · lime accent · semantic set
@@ -26,25 +26,25 @@
   --pc-green-300: #00ff7f; /* owner-directed positive hue */
   --pc-green-700: #00753f; /* accessible light-theme variant, 5.4:1 on paper */
 
-  /* Semantic — light (Swiss print: near-black on off-white, hairlines) */
-  --pc-bg: var(--pc-paper-50);
-  --pc-surface: #ffffff;
-  --pc-surface-2: var(--pc-paper-100);
+  /* Semantic — light: bright candy washes with ink-safe content surfaces. */
+  --pc-bg: #f8f7ff;
+  --pc-surface: #fffaff;
+  --pc-surface-2: #f1f0ff;
   --pc-text: var(--pc-ink-950);
   --pc-text-secondary: #565e66;
   /* grey-500 fails WCAG AA on paper (3.4:1); darkened for small-text use. */
   --pc-text-tertiary: #5b636b;
-  --pc-hairline: rgba(11, 13, 15, 0.14);
-  --pc-hairline-strong: rgba(11, 13, 15, 0.32);
-  --pc-grid-line: rgba(11, 13, 15, 0.07);
-  --pc-accent: var(--pc-ink-950);          /* light theme: accent is ink itself */
+  --pc-hairline: rgba(88, 57, 118, 0.16);
+  --pc-hairline-strong: rgba(72, 45, 101, 0.34);
+  --pc-grid-line: rgba(109, 74, 142, 0.09);
+  --pc-accent: #1747b7;
   --pc-accent-contrast: var(--pc-paper-50);
   --pc-focus-ring: var(--pc-blue-500);
   --pc-info: #2557c9;
   --pc-warn: var(--pc-mauve-700);
-  --pc-warn-surface: rgba(224, 176, 255, 0.16);
+  --pc-warn-surface: rgba(224, 176, 255, 0.22);
   --pc-error: #c53337;
-  --pc-error-surface: rgba(229, 72, 77, 0.08);
+  --pc-error-surface: rgba(229, 72, 77, 0.1);
   --pc-positive: var(--pc-green-700);
   --pc-selection-bg: var(--pc-ink-950);
   --pc-selection-text: var(--pc-paper-50);
@@ -62,27 +62,49 @@
   --pc-tracking-tight: 0.015em; /* uppercase display needs positive tracking */
   --pc-tracking-micro: 0.18em;
 
-  /* Geometry — sharp Swiss editorial: hairlines over shadows */
-  --pc-radius: 0px;
-  --pc-radius-control: 2px;
+  /* Geometry — panels are clay-soft, controls are compact and tactile. */
+  --pc-radius: 2rem;
+  --pc-radius-control: 1.25rem;
+  --pc-radius-small: 0.875rem;
+  --pc-radius-pill: 999px;
   --pc-border: 1px solid var(--pc-hairline);
 
+  /* Layered depth: top highlight, saturated lower edge, ambient shadow. */
+  --pc-shadow-panel:
+    inset 0 2px 0 rgba(255, 255, 255, 0.92),
+    0 7px 0 rgba(153, 86, 194, 0.24),
+    0 20px 44px rgba(91, 57, 121, 0.16);
+  --pc-shadow-panel-soft:
+    inset 0 2px 0 rgba(255, 255, 255, 0.78),
+    0 4px 0 rgba(57, 119, 255, 0.18),
+    0 12px 28px rgba(91, 57, 121, 0.12);
+  --pc-shadow-control:
+    inset 0 2px 0 rgba(255, 255, 255, 0.86),
+    0 4px 0 rgba(90, 64, 121, 0.2),
+    0 10px 20px rgba(91, 57, 121, 0.12);
+  --pc-shadow-action:
+    inset 0 2px 0 rgba(255, 255, 255, 0.36),
+    0 6px 0 #092e86,
+    0 16px 28px rgba(35, 78, 181, 0.25);
+  --pc-shadow-focus: 0 0 0 4px color-mix(in srgb, var(--pc-focus-ring) 24%, transparent);
+
   /* Motion */
-  --pc-ease: cubic-bezier(0.32, 0.72, 0, 1);
-  --pc-duration: 400ms;
-  --pc-duration-fast: 180ms;
+  --pc-ease: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --pc-ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --pc-duration: 520ms;
+  --pc-duration-fast: 160ms;
 }
 
 [data-theme="dark"] {
-  --pc-bg: #050607;
-  --pc-surface: var(--pc-ink-950);
-  --pc-surface-2: var(--pc-ink-900);
+  --pc-bg: #0d0913;
+  --pc-surface: #17101f;
+  --pc-surface-2: #21172d;
   --pc-text: #f4f5f3;
   --pc-text-secondary: var(--pc-grey-400);
   --pc-text-tertiary: var(--pc-grey-500);
-  --pc-hairline: rgba(255, 255, 255, 0.12);
-  --pc-hairline-strong: rgba(255, 255, 255, 0.28);
-  --pc-grid-line: rgba(255, 255, 255, 0.06);
+  --pc-hairline: rgba(224, 176, 255, 0.2);
+  --pc-hairline-strong: rgba(224, 176, 255, 0.42);
+  --pc-grid-line: rgba(224, 176, 255, 0.09);
   --pc-accent: var(--pc-lime-500);         /* dark theme: lime primary (PRD §20.2) */
   --pc-accent-contrast: var(--pc-ink-950);
   --pc-focus-ring: var(--pc-lime-500);
@@ -94,6 +116,23 @@
   --pc-positive: var(--pc-green-300);
   --pc-selection-bg: #f4f5f3;
   --pc-selection-text: #050607;
+  --pc-shadow-panel:
+    inset 0 2px 0 rgba(255, 255, 255, 0.12),
+    0 7px 0 rgba(224, 176, 255, 0.2),
+    0 20px 48px rgba(0, 0, 0, 0.42),
+    0 0 34px rgba(0, 255, 127, 0.08);
+  --pc-shadow-panel-soft:
+    inset 0 2px 0 rgba(255, 255, 255, 0.1),
+    0 4px 0 rgba(0, 255, 127, 0.16),
+    0 14px 30px rgba(0, 0, 0, 0.34);
+  --pc-shadow-control:
+    inset 0 2px 0 rgba(255, 255, 255, 0.1),
+    0 4px 0 rgba(224, 176, 255, 0.18),
+    0 10px 24px rgba(0, 0, 0, 0.36);
+  --pc-shadow-action:
+    inset 0 2px 0 rgba(255, 255, 255, 0.42),
+    0 6px 0 #4d6410,
+    0 16px 30px rgba(0, 255, 127, 0.16);
 }
 
 ::selection {

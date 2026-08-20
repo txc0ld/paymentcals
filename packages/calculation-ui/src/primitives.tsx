@@ -4,7 +4,7 @@ import type { ReactNode } from "react";
 export function Eyebrow({ children, className = "" }: { children: ReactNode; className?: string }) {
   return (
     <span
-      className={`inline-flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.18em] text-ink-3 before:h-px before:w-6 before:bg-hairline-strong before:content-[''] ${className}`}
+      className={`clay-chip inline-flex items-center gap-2 px-3 py-1.5 font-mono text-[10px] uppercase tracking-[0.18em] text-ink-3 before:h-2 before:w-2 before:rounded-full before:bg-positive before:content-[''] ${className}`}
     >
       {children}
     </span>
@@ -22,7 +22,7 @@ export function Panel({
   as?: "div" | "section" | "aside" | "article";
 }) {
   return (
-    <Component className={`border border-hairline bg-surface ${className}`}>{children}</Component>
+    <Component className={`clay-panel ${className}`}>{children}</Component>
   );
 }
 
@@ -45,11 +45,11 @@ export function EditorialButton({
   ariaLabel?: string;
 }) {
   const base =
-    "btn-editorial inline-flex min-h-11 items-center justify-center gap-3 px-6 py-3 font-mono text-xs uppercase tracking-[0.14em] transition-[background-color,color,transform] duration-[var(--pc-duration-fast)] ease-[var(--pc-ease)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-40";
+    "btn-editorial inline-flex min-h-11 items-center justify-center gap-3 px-6 py-3 font-mono text-xs uppercase tracking-[0.14em] focus-visible:outline-3 focus-visible:outline-offset-4 focus-visible:outline-focus disabled:cursor-not-allowed disabled:opacity-40";
   const look =
     variant === "primary"
-      ? "bg-accent text-accent-contrast hover:bg-ink-2 hover:text-canvas"
-      : "border border-hairline-strong bg-transparent text-ink hover:bg-surface-2";
+      ? "bg-accent text-accent-contrast"
+      : "clay-quiet-button bg-surface text-ink hover:bg-surface-2";
   return (
     <button
       type={type}
@@ -80,7 +80,7 @@ export function Badge({
   };
   return (
     <span
-      className={`inline-flex items-center gap-1.5 border px-2 py-0.5 font-mono text-[10px] uppercase tracking-[0.14em] ${tones[tone]}`}
+      className={`clay-chip inline-flex items-center gap-1.5 px-3 py-1 font-mono text-[10px] uppercase tracking-[0.14em] ${tones[tone]}`}
     >
       {children}
     </span>

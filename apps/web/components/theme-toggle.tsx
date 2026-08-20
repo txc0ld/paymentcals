@@ -33,17 +33,17 @@ export function ThemeToggle() {
       type="button"
       onClick={toggle}
       aria-label={theme === "dark" ? "Switch to light theme" : "Switch to dark theme"}
-      className="flex h-9 w-9 items-center justify-center border border-hairline text-ink-2 transition-colors duration-[var(--pc-duration-fast)] ease-[var(--pc-ease)] hover:border-hairline-strong hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
+      className="clay-quiet-button flex h-11 w-11 items-center justify-center text-ink-2 hover:text-ink focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-focus"
     >
       {theme === null ? (
-        <span className="h-3 w-3 border border-current" aria-hidden="true" />
+        <span className="h-3.5 w-3.5 rounded-full border-2 border-current" aria-hidden="true" />
       ) : theme === "dark" ? (
-        <svg viewBox="0 0 16 16" className="h-3.5 w-3.5" fill="none" stroke="currentColor" aria-hidden="true">
+        <svg viewBox="0 0 16 16" className="h-4 w-4" fill="none" stroke="currentColor" aria-hidden="true">
           <circle cx="8" cy="8" r="3.25" strokeWidth="1.2" />
           <path strokeWidth="1.2" strokeLinecap="round" d="M8 1v1.8M8 13.2V15M15 8h-1.8M2.8 8H1M12.95 3.05l-1.27 1.27M4.32 11.68l-1.27 1.27M12.95 12.95l-1.27-1.27M4.32 4.32 3.05 3.05" />
         </svg>
       ) : (
-        <svg viewBox="0 0 16 16" className="h-3.5 w-3.5" fill="none" stroke="currentColor" aria-hidden="true">
+        <svg viewBox="0 0 16 16" className="h-4 w-4" fill="none" stroke="currentColor" aria-hidden="true">
           <path strokeWidth="1.2" strokeLinejoin="round" d="M13.5 9.5A5.5 5.5 0 0 1 6.5 2.5a5.5 5.5 0 1 0 7 7Z" />
         </svg>
       )}

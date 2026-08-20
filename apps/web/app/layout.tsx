@@ -38,21 +38,21 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <script dangerouslySetInnerHTML={{ __html: THEME_INIT }} />
       </head>
       <body
-        className={`${jakarta.variable} ${montserrat.variable} ${GeistMono.variable} min-h-[100dvh] bg-canvas text-ink`}
+        className={`${jakarta.variable} ${montserrat.variable} ${GeistMono.variable} min-h-[100dvh] bg-canvas text-ink selection:bg-accent selection:text-accent-contrast`}
       >
         <a
           href="#main"
-          className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:border focus:border-hairline-strong focus:bg-surface focus:px-4 focus:py-2 focus:font-mono focus:text-xs focus:uppercase focus:tracking-[0.14em]"
+          className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:min-h-11 focus:rounded-[var(--pc-radius-control)] focus:border focus:border-hairline-strong focus:bg-surface focus:px-4 focus:py-3 focus:font-mono focus:text-xs focus:uppercase focus:tracking-[0.14em] focus:shadow-[var(--pc-shadow-panel-soft)]"
         >
           Skip to content
         </a>
 
-        <header className="no-print sticky top-0 z-40 border-b border-hairline bg-canvas/90 backdrop-blur-sm">
+        <header className="no-print sticky top-0 z-40 px-3 pt-3 md:px-6">
           <nav
             aria-label="Primary"
-            className="mx-auto flex h-14 w-full max-w-[1360px] items-center justify-between gap-6 px-4 md:px-8"
+            className="clay-control mx-auto flex min-h-14 w-full max-w-[1280px] items-center justify-between gap-4 bg-surface/90 px-4 backdrop-blur-xl md:px-6"
           >
-            <Link href="/" className="flex items-center gap-2.5 text-ink" aria-label="PaymentCalcs home">
+            <Link href="/" className="flex min-h-11 items-center gap-2.5 rounded-full px-1 text-ink focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-focus" aria-label="PaymentCalcs home">
               <svg viewBox="0 0 24 24" className="h-5 w-5" aria-hidden="true">
                 <rect x="2" y="2" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2.5" />
                 <circle cx="12" cy="12" r="4" fill="currentColor" />
@@ -62,7 +62,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             <div className="flex items-center gap-4">
               <Link
                 href="/au/business/gst-calculator"
-                className="hidden font-mono text-[11px] uppercase tracking-[0.16em] text-ink-2 transition-colors duration-[var(--pc-duration-fast)] hover:text-ink sm:block"
+                className="clay-quiet-button hidden min-h-11 items-center px-4 font-mono text-[11px] uppercase tracking-[0.16em] text-ink-2 hover:text-ink focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-focus sm:inline-flex"
               >
                 Calculators
               </Link>
@@ -71,10 +71,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           </nav>
         </header>
 
-        <main id="main">{children}</main>
+        <main id="main" className="relative min-w-0">{children}</main>
 
-        <footer className="no-print mt-24 border-t border-hairline">
-          <div className="mx-auto grid w-full max-w-[1360px] gap-8 px-4 py-12 md:grid-cols-3 md:px-8">
+        <footer className="no-print mt-20 px-4 pb-5 md:px-8">
+          <div className="clay-panel mx-auto grid w-full max-w-[1280px] gap-8 px-6 py-10 md:grid-cols-3 md:px-10">
             <div className="grid content-start gap-3">
               <span className="font-mono text-xs uppercase tracking-[0.2em] text-ink">PaymentCalcs</span>
               <p className="max-w-xs text-[13px] leading-5 text-ink-3">

@@ -9,8 +9,8 @@ export function RuleUnavailableState({
   detail?: string;
 }) {
   return (
-    <div role="status" className="grid gap-3 border border-hairline bg-surface p-8 text-center">
-      <span className="mx-auto border border-hairline px-2 py-0.5 font-mono text-[10px] uppercase tracking-[0.16em] text-ink-2">
+    <div role="status" className="clay-panel grid gap-4 p-8 text-center">
+      <span className="clay-chip mx-auto px-3 py-1 font-mono text-[10px] uppercase tracking-[0.16em] text-ink-2">
         Temporarily unavailable
       </span>
       <h2 className="text-lg font-medium text-ink">Rules unavailable for {jurisdictionLabel}</h2>
@@ -32,7 +32,7 @@ export function EngineFailureState({
   onExportInputs?: () => void;
 }) {
   return (
-    <div role="alert" className="grid gap-3 border border-error bg-error-surface p-8 text-center">
+    <div role="alert" className="clay-panel grid gap-4 border-error bg-error-surface p-8 text-center">
       <h2 className="text-lg font-medium text-ink">This calculation could not be completed</h2>
       <p className="mx-auto max-w-md text-[14px] leading-6 text-ink-2">
         Your inputs are preserved on this device. No partial or stale result is shown.
@@ -44,7 +44,7 @@ export function EngineFailureState({
         <button
           type="button"
           onClick={onExportInputs}
-          className="mx-auto border border-hairline-strong px-4 py-2 font-mono text-[11px] uppercase tracking-[0.14em] text-ink hover:bg-surface-2"
+          className="clay-quiet-button mx-auto min-h-11 px-4 py-2 font-mono text-[11px] uppercase tracking-[0.14em] text-ink hover:bg-surface-2 focus-visible:outline-3 focus-visible:outline-offset-3 focus-visible:outline-focus"
         >
           Export my inputs as JSON
         </button>
@@ -56,7 +56,7 @@ export function EngineFailureState({
 /** §20.12 Empty — explain the minimum action; no misleading zeros. */
 export function EmptyState({ children }: { children: ReactNode }) {
   return (
-    <div className="grid place-items-center gap-2 border border-dashed border-hairline-strong p-10 text-center">
+    <div className="clay-panel-soft grid min-h-48 place-items-center gap-2 border-dashed border-hairline-strong p-8 text-center md:p-10">
       <p className="max-w-sm text-[14px] leading-6 text-ink-2">{children}</p>
     </div>
   );

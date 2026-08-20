@@ -27,14 +27,14 @@ export function CalculatorHeader({
   actions?: ReactNode;
 }) {
   return (
-    <header className="grid gap-4 border-b border-hairline pb-6">
-      <div className="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-2">
+    <header className="clay-panel grid min-w-0 gap-5 p-6 md:p-8">
+      <div className="flex min-w-0 flex-wrap items-center justify-between gap-x-6 gap-y-4">
         <h1 className="text-[length:var(--pc-text-h2)] font-medium leading-[1.05] tracking-[var(--pc-tracking-tight)] text-ink">
           {meta.title}
         </h1>
         {modeControl}
       </div>
-      <div className="flex flex-wrap items-center gap-x-4 gap-y-2 font-mono text-[11px] uppercase tracking-[0.14em] text-ink-3">
+      <div className="flex min-w-0 flex-wrap items-center gap-x-4 gap-y-3 font-mono text-[11px] uppercase tracking-[0.14em] text-ink-3">
         <span>{meta.jurisdictionLabel}</span>
         <span aria-hidden="true" className="h-3 w-px bg-hairline-strong" />
         <span>{meta.periodLabel}</span>
@@ -43,7 +43,7 @@ export function CalculatorHeader({
           {CLASS_DESCRIPTIONS[meta.calculationClass]}
         </span>
         <Badge tone={meta.ruleStatus.tone}>{meta.ruleStatus.label}</Badge>
-        {actions ? <span className="ms-auto flex items-center gap-2">{actions}</span> : null}
+        {actions ? <span className="ms-auto flex max-w-full flex-wrap items-center gap-2">{actions}</span> : null}
       </div>
     </header>
   );
@@ -67,13 +67,13 @@ export function CalculatorShell({
   disclosure: ReactNode;
 }) {
   return (
-    <div className="mx-auto grid w-full max-w-[1360px] gap-8 px-4 py-8 md:px-8 md:py-12">
+    <div className="mx-auto grid w-full max-w-[1280px] gap-8 px-4 py-8 md:gap-10 md:px-8 md:py-12">
       {header}
-      <div className="grid gap-8 lg:grid-cols-[minmax(360px,440px)_1fr] lg:items-start">
-        <section aria-label="Inputs" className="grid min-w-0 gap-6 border border-hairline bg-surface p-5 md:p-6">
+      <div className="grid min-w-0 gap-8 lg:grid-cols-[minmax(360px,440px)_1fr] lg:items-start lg:gap-10">
+        <section aria-label="Inputs" className="clay-panel grid min-w-0 gap-6 p-5 md:p-7">
           {inputs}
         </section>
-        <section aria-label="Results" className="grid min-w-0 gap-6 lg:sticky lg:top-8">
+        <section aria-label="Results" className="grid min-w-0 gap-6 lg:sticky lg:top-24">
           {results}
         </section>
       </div>

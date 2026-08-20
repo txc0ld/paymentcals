@@ -40,7 +40,7 @@ export function SegmentedControl<T extends string>({
       role="radiogroup"
       aria-label={label}
       onKeyDown={onKeyDown}
-      className="inline-flex max-w-full flex-wrap border border-hairline bg-surface"
+      className="clay-control inline-flex max-w-full flex-wrap gap-1 p-1"
     >
       {options.map((option) => {
         const selected = option.value === value;
@@ -52,11 +52,11 @@ export function SegmentedControl<T extends string>({
             tabIndex={selected ? 0 : -1}
             id={`${groupId}-${option.value}`}
             onClick={() => onChange(option.value)}
-            className={`min-h-9 border-r border-hairline px-4 font-mono text-[11px] uppercase tracking-[0.14em] transition-colors duration-[var(--pc-duration-fast)] ease-[var(--pc-ease)] last:border-r-0 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-focus ${
+            className={`clay-segment min-h-11 rounded-2xl px-4 font-mono text-[11px] uppercase tracking-[0.14em] focus-visible:outline-3 focus-visible:outline-offset-1 focus-visible:outline-focus ${
               selected
-                ? "bg-accent text-accent-contrast"
+                ? "bg-accent text-accent-contrast shadow-[inset_0_1px_0_rgba(255,255,255,0.35),0_3px_0_color-mix(in_srgb,var(--pc-accent)_72%,#0b0d0f)]"
                 : "text-ink-2 hover:bg-surface-2 hover:text-ink"
-            } ${size === "sm" ? "min-h-8 px-3 text-[10px]" : ""}`}
+            } ${size === "sm" ? "px-3 text-[10px]" : ""}`}
           >
             {option.label}
           </button>
@@ -105,13 +105,13 @@ export function MoneyField({
         </p>
       ) : null}
       <div
-        className={`flex items-stretch border bg-surface transition-colors duration-[var(--pc-duration-fast)] ${
+        className={`clay-input flex items-stretch overflow-hidden ${
           error ? "border-error" : "border-hairline-strong focus-within:border-ink"
         }`}
       >
         <span
           aria-hidden="true"
-          className="flex items-center border-r border-hairline px-3 font-mono text-sm text-ink-3"
+          className="flex items-center border-r border-hairline bg-surface-2 px-3 font-mono text-sm text-ink-3"
         >
           $
         </span>
@@ -130,9 +130,9 @@ export function MoneyField({
               .filter(Boolean)
               .join(" ") || undefined
           }
-          className="min-h-11 w-full bg-transparent px-3 font-mono text-lg tabular-nums text-ink outline-none placeholder:text-ink-3"
+          className="min-h-12 min-w-0 w-full bg-transparent px-3 font-mono text-lg tabular-nums text-ink outline-none placeholder:text-ink-3"
         />
-        <span className="flex items-center px-3 font-mono text-[10px] uppercase tracking-[0.14em] text-ink-3">
+        <span className="flex items-center bg-surface-2 px-3 font-mono text-[10px] uppercase tracking-[0.14em] text-ink-3">
           {unit}
         </span>
       </div>
@@ -147,8 +147,8 @@ export function MoneyField({
 
 export function FieldGroup({ legend, children }: { legend: string; children: ReactNode }) {
   return (
-    <fieldset className="flex flex-col gap-4 border-t border-hairline pt-5">
-      <legend className="pr-3 font-mono text-[10px] uppercase tracking-[0.18em] text-ink-3">
+    <fieldset className="clay-panel-soft flex flex-col gap-4 p-5">
+      <legend className="px-3 font-mono text-[10px] uppercase tracking-[0.18em] text-ink-3">
         {legend}
       </legend>
       {children}

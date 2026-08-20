@@ -43,7 +43,7 @@ export function LineItemsEditor({
         {items.map((item, index) => {
           const error = errors[item.id];
           return (
-            <li key={item.id} className="grid gap-3 border border-hairline bg-canvas p-4">
+            <li key={item.id} className="clay-line-item grid min-w-0 gap-4 bg-surface-2 p-4 md:p-5">
               <div className="flex items-center justify-between gap-3">
                 <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-ink-3">
                   Line {String(index + 1).padStart(2, "0")}
@@ -52,7 +52,7 @@ export function LineItemsEditor({
                   <button
                     type="button"
                     onClick={() => onChange(items.filter((other) => other.id !== item.id))}
-                    className="font-mono text-[10px] uppercase tracking-[0.14em] text-ink-3 underline decoration-hairline-strong underline-offset-2 hover:text-error"
+                    className="clay-quiet-button inline-flex min-h-11 items-center px-3 font-mono text-[10px] uppercase tracking-[0.14em] text-ink-3 underline decoration-hairline-strong underline-offset-2 hover:text-error focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-focus"
                   >
                     Remove
                   </button>
@@ -67,7 +67,7 @@ export function LineItemsEditor({
                     value={item.label}
                     onChange={(event) => update(item.id, { label: event.target.value })}
                     placeholder="e.g. Consulting"
-                    className="min-h-10 border border-hairline-strong bg-surface px-3 text-sm text-ink outline-none placeholder:text-ink-3 focus:border-ink"
+                    className="clay-input min-h-11 min-w-0 bg-surface px-3 text-sm text-ink outline-none placeholder:text-ink-3 focus:border-focus"
                   />
                 </label>
                 <label className="grid gap-1">
@@ -76,7 +76,7 @@ export function LineItemsEditor({
                     inputMode="numeric"
                     value={item.quantityRaw}
                     onChange={(event) => update(item.id, { quantityRaw: event.target.value })}
-                    className="min-h-10 w-20 border border-hairline-strong bg-surface px-3 text-center font-mono text-sm tabular-nums text-ink outline-none focus:border-ink"
+                    className="clay-input min-h-11 w-20 bg-surface px-3 text-center font-mono text-sm tabular-nums text-ink outline-none focus:border-focus"
                     aria-label={`Quantity for line ${index + 1}`}
                   />
                 </label>
@@ -86,8 +86,8 @@ export function LineItemsEditor({
                   <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-ink-2">
                     Unit amount
                   </span>
-                  <div className={`flex items-stretch border bg-surface ${error ? "border-error" : "border-hairline-strong focus-within:border-ink"}`}>
-                    <span aria-hidden="true" className="flex items-center border-r border-hairline px-2.5 font-mono text-sm text-ink-3">$</span>
+                  <div className={`clay-input flex items-stretch overflow-hidden bg-surface ${error ? "border-error" : "border-hairline-strong focus-within:border-ink"}`}>
+                    <span aria-hidden="true" className="flex items-center border-r border-hairline bg-surface-2 px-2.5 font-mono text-sm text-ink-3">$</span>
                     <input
                       inputMode="decimal"
                       value={item.amountRaw}
@@ -95,7 +95,7 @@ export function LineItemsEditor({
                       placeholder="0.00"
                       aria-label={`Unit amount for line ${index + 1}`}
                       aria-invalid={error ? true : undefined}
-                      className="min-h-10 w-full bg-transparent px-3 font-mono text-sm tabular-nums text-ink outline-none placeholder:text-ink-3"
+                      className="min-h-11 min-w-0 w-full bg-transparent px-3 font-mono text-sm tabular-nums text-ink outline-none placeholder:text-ink-3"
                     />
                   </div>
                   {error ? (
@@ -133,7 +133,7 @@ export function LineItemsEditor({
       <button
         type="button"
         onClick={() => onChange([...items, emptyLine(crypto.randomUUID())])}
-        className="justify-self-start border border-dashed border-hairline-strong px-4 py-2 font-mono text-[11px] uppercase tracking-[0.14em] text-ink-2 transition-colors duration-[var(--pc-duration-fast)] hover:border-ink hover:text-ink"
+        className="clay-quiet-button min-h-11 justify-self-start border-dashed border-hairline-strong px-4 py-2 font-mono text-[11px] uppercase tracking-[0.14em] text-ink-2 hover:border-ink hover:text-ink focus-visible:outline-3 focus-visible:outline-offset-3 focus-visible:outline-focus"
       >
         + Add line
       </button>

@@ -43,12 +43,12 @@ export function ExplainabilityTabs({
   }
 
   return (
-    <section aria-label="How this was calculated" className="min-w-0 border border-hairline bg-surface">
+    <section aria-label="How this was calculated" className="clay-panel min-w-0 overflow-hidden">
       <div
         role="tablist"
         aria-label="Explanation sections"
         onKeyDown={onKeyDown}
-        className="flex flex-wrap border-b border-hairline"
+        className="flex flex-wrap gap-1 border-b border-hairline bg-surface-2 p-2"
       >
         {TABS.map((tab) => {
           const selected = tab === active;
@@ -61,9 +61,9 @@ export function ExplainabilityTabs({
               aria-controls={`${baseId}-panel-${tab}`}
               tabIndex={selected ? 0 : -1}
               onClick={() => setActive(tab)}
-              className={`relative min-h-11 px-4 font-mono text-[11px] uppercase tracking-[0.14em] transition-colors duration-[var(--pc-duration-fast)] ease-[var(--pc-ease)] focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-focus ${
+              className={`clay-tab relative min-h-11 px-4 font-mono text-[11px] uppercase tracking-[0.14em] focus-visible:outline-3 focus-visible:outline-offset-1 focus-visible:outline-focus ${
                 selected
-                  ? "text-ink after:absolute after:inset-x-0 after:bottom-[-1px] after:h-px after:bg-ink"
+                  ? "text-accent-contrast"
                   : "text-ink-3 hover:text-ink"
               }`}
             >
@@ -77,7 +77,7 @@ export function ExplainabilityTabs({
         role="tabpanel"
         id={`${baseId}-panel-${active}`}
         aria-labelledby={`${baseId}-tab-${active}`}
-        className="p-5 md:p-6"
+        className="min-w-0 p-5 md:p-7"
       >
         {active === "Summary" ? summary : null}
         {active === "Breakdown" ? breakdown : null}
@@ -86,7 +86,7 @@ export function ExplainabilityTabs({
           result.trace && result.trace.steps.length > 0 ? (
             <ol className="flex flex-col gap-4">
               {result.trace.steps.map((step) => (
-                <li key={step.id} className="grid gap-1 border-l border-hairline-strong pl-4">
+                <li key={step.id} className="clay-panel-soft grid min-w-0 gap-1 p-4">
                   <span className="text-[13px] text-ink-2">{step.label}</span>
                   {step.expression ? (
                     <code className="font-mono text-[13px] text-ink-3">{step.expression}</code>
@@ -117,7 +117,7 @@ export function ExplainabilityTabs({
               <li key={assumption.id} className="grid gap-1 py-3 first:pt-0 last:pb-0">
                 <div className="flex flex-wrap items-baseline justify-between gap-2">
                   <span className="text-[14px] text-ink">{assumption.label}</span>
-                  <span className="border border-hairline px-1.5 py-0.5 font-mono text-[10px] uppercase tracking-[0.12em] text-ink-2">
+                  <span className="clay-chip px-2.5 py-1 font-mono text-[10px] uppercase tracking-[0.12em] text-ink-2">
                     {CATEGORY_LABELS[assumption.category]}
                   </span>
                 </div>
@@ -142,7 +142,7 @@ export function ExplainabilityTabs({
                     href={source.url}
                     rel="noopener noreferrer"
                     target="_blank"
-                    className="break-all font-mono text-[12px] text-info underline decoration-hairline-strong underline-offset-2 hover:decoration-current"
+                    className="inline-flex min-h-11 items-center break-all font-mono text-[12px] text-info underline decoration-hairline-strong underline-offset-2 hover:decoration-current focus-visible:rounded-lg focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-focus"
                   >
                     {source.url}
                   </a>
@@ -161,7 +161,7 @@ export function ExplainabilityTabs({
         {active === "Limitations" ? (
           <ul className="flex list-none flex-col gap-2">
             {limitations.map((limitation) => (
-              <li key={limitation} className="border-l border-hairline-strong pl-4 text-[13px] leading-5 text-ink-2">
+              <li key={limitation} className="clay-panel-soft p-4 text-[13px] leading-5 text-ink-2">
                 {limitation}
               </li>
             ))}
