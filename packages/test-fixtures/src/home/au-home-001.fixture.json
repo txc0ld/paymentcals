@@ -1,0 +1,33 @@
+{
+  "fixtureId": "home/au-home-001",
+  "calculatorId": "AU-HOME-001",
+  "engine": "E11",
+  "rulePackId": "none",
+  "officialSourceForExpected": "Verify repayment amounts against the Moneysmart mortgage calculator with matching frequency and rounding assumptions; record tool and date.",
+  "cases": [
+    {
+      "caseId": "500k-6pct-30y-monthly",
+      "description": "$500,000 at 6.00% p.a. over 30 years, monthly P&I",
+      "input": { "principal": "500000", "annualRatePct": "6", "termYears": 30, "frequency": "monthly", "repaymentType": "principal_and_interest" },
+      "expected": null,
+      "verifiedBy": null,
+      "verifiedAt": null
+    },
+    {
+      "caseId": "650k-5.74pct-25y-fortnightly",
+      "description": "$650,000 at 5.74% p.a. over 25 years, fortnightly P&I",
+      "input": { "principal": "650000", "annualRatePct": "5.74", "termYears": 25, "frequency": "fortnightly", "repaymentType": "principal_and_interest" },
+      "expected": null,
+      "verifiedBy": null,
+      "verifiedAt": null
+    },
+    {
+      "caseId": "400k-zero-rate-10y",
+      "description": "$400,000 at 0% over 10 years, monthly (division-by-zero guard)",
+      "input": { "principal": "400000", "annualRatePct": "0", "termYears": 10, "frequency": "monthly", "repaymentType": "principal_and_interest" },
+      "expected": null,
+      "verifiedBy": null,
+      "verifiedAt": null
+    }
+  ]
+}

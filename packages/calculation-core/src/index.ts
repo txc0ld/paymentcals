@@ -60,3 +60,4 @@ export {
   zRate,
 } from "./schemas";
 export { canonicalHash, canonicalStringify, sha256Hex } from "./canonical";
+export { Temporal, compareDates, isoDate, nthOccurrence, plainDate } from "./dates";

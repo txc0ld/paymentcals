@@ -15,6 +15,8 @@ const nextConfig: NextConfig = {
     "@paymentcalcs/engine-au-withholding",
     "@paymentcalcs/engine-business",
     "@paymentcalcs/engine-compensation",
+    "@paymentcalcs/engine-loans",
+    "@paymentcalcs/engine-mortgage-ledger",
     "@paymentcalcs/financial-solvers",
     "@paymentcalcs/rule-schema",
     "@paymentcalcs/rules-au",

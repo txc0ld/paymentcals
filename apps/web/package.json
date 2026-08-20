@@ -21,6 +21,8 @@
     "@paymentcalcs/engine-au-withholding": "workspace:*",
     "@paymentcalcs/engine-business": "workspace:*",
     "@paymentcalcs/engine-compensation": "workspace:*",
+    "@paymentcalcs/engine-loans": "workspace:*",
+    "@paymentcalcs/engine-mortgage-ledger": "workspace:*",
     "@paymentcalcs/financial-solvers": "workspace:*",
     "@paymentcalcs/rule-schema": "workspace:*",
     "@paymentcalcs/rules-au": "workspace:*",
@@ -29,6 +31,7 @@
     "next": "16.3.1",
     "react": "19.2.8",
     "react-dom": "19.2.8",
+    "recharts": "3.10.1",
     "zod": "4.4.3"
   },
   "devDependencies": {

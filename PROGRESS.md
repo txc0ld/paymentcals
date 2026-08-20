@@ -1,5 +1,14 @@
 # PROGRESS
 
+Phase: **2 — Mortgage slice (Gate 2) COMPLETE** · 2026-08-20
+
+## Phase 2 summary (all done 2026-08-20)
+
+- Engines: E11 amortising loans (closed-form §13.5–13.6, schedule recurrence §13.7 with capped final-payment adjustment, negative-amortisation detection, zero-rate guard) and E07 scheduled mortgage ledger (Merge Record #3: payment-period events — rate changes with keep/recalculate reset policies, recurring + one-off extras, offset deposits/withdrawals per §13.9, fees cash/financed, IO expiry; §12.5.8 invariants with per-period reconciliation). Refinance comparison per §13.10: cumulative cash flows with residual balances, financed-cost interest, cashback timing, sustained-crossing break-even.
+- 26 engine tests incl. MORT-AC-001 differential (ledger ≡ closed form), offset-equivalence, MORT-AC-004 withdrawal semantics, property-based reconciliation.
+- Routes live: AU-HOME-001 repayments (chart + yearly schedule + CSV export), 002 simulator (Web Worker execution, timeline editor, Compare mode cloning identical facts per MORT-AC-006), 004 extra repayments, 006 offset (cash-retained kept distinct from principal), 007 rate change, 012 refinance break-even. All badged "Scheduled model" (MORT-AC-007); §12.5.10 disclosure verbatim.
+- 24 Playwright e2e green incl. axe on chart-bearing pages; balance chart ships with a full table alternative (§20.8).
+
 Phase: **1 — Pay slice (Gate 1) COMPLETE, checkpoint pending owner verification** · 2026-08-20
 
 ## Phase 1 summary (all done 2026-08-20)
@@ -10,7 +19,9 @@ Phase: **1 — Pay slice (Gate 1) COMPLETE, checkpoint pending owner verificatio
 - Routes: all nine PAY routes live (001 flagship with Simple/Advanced, 002/003/005/006/007 variants, 004 net-to-gross solver UI, 011 schedule withholding, 013 HELP). Liability and withholding rendered as separately labelled sections with an explicit variance note (PAY-AC-002). 18 Playwright e2e green incl. axe and FY re-resolution (PAY-AC-005).
 - Known deferrals (logged): WHM withholding (Schedule 15 registration logic) surfaces an explicit unsupported reason; withholding packs for FY2024-25/2025-26 not authored (historical payroll); family Medicare reduction is a capped estimate with a warning; Compare mode arrives with the Phase 2 compare framework.
 
-Phase 0: **complete** (see below). Next: owner verification checkpoint, then Phase 2 (Mortgage slice).
+Phase 0: **complete** (see below). Phase 2 (Mortgage slice) in flight same-day.
+
+- **D-011 (2026-08-20) PRD-internal conflict flagged for counsel.** §12.5.10's required mortgage disclosure contains "should" ("Users should compare the settings…"), which §17.9 bans in result copy. Shipped the §12.5.10 text verbatim with a targeted lint exemption on the disclosure component only; result surfaces remain lint-enforced. Counsel to confirm at the §17.2 review.
 
 ## Phase 0 task breakdown
 

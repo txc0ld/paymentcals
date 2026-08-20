@@ -34,7 +34,89 @@ const payEntry = (partial: {
     ownership: { owner: "tmayorx@gmail.com", reviewCadence: "annual + pre-1-July watch" },
   });
 
+const homeEntry = (partial: {
+  id: string;
+  slug: string;
+  displayName: string;
+  calculationClass?: "A" | "B";
+  engines: string[];
+  title: string;
+  description: string;
+}) =>
+  zRegistryEntry.parse({
+    id: partial.id,
+    slug: partial.slug,
+    displayName: partial.displayName,
+    category: "property-mortgage",
+    jurisdictionScope: "au",
+    releasePriority: "P0",
+    calculationClass: partial.calculationClass ?? "B",
+    engineDependencies: partial.engines,
+    rulePackDependencies: [],
+    supportedModes: ["simple", "advanced", "compare"],
+    inputSchemaVersion: "1",
+    resultSchemaVersion: "1",
+    disclosureSet: ["universal-footer-v2.0", "mortgage-model-v2.0"],
+    sourceSet: [],
+    seo: { title: partial.title, description: partial.description },
+    ownership: { owner: "tmayorx@gmail.com", reviewCadence: "annual" },
+  });
+
 const entries: RegistryEntry[] = [
+  homeEntry({
+    id: "AU-HOME-001",
+    slug: "mortgage-repayment-calculator",
+    displayName: "Mortgage Repayment Calculator",
+    engines: ["E11"],
+    title: "Mortgage Repayment Calculator Australia",
+    description:
+      "Estimate mortgage repayments with a full amortisation schedule, interest totals, payoff date and every assumption shown, at weekly, fortnightly or monthly frequency.",
+  }),
+  homeEntry({
+    id: "AU-HOME-002",
+    slug: "mortgage-simulator",
+    displayName: "Mortgage Simulator",
+    engines: ["E07"],
+    title: "Mortgage Simulator: Rates, Offsets and Extra Repayments",
+    description:
+      "Simulate a mortgage through dated rate changes, extra repayments, offset balances and fees on a scheduled ledger, with reconciliation on every period.",
+  }),
+  homeEntry({
+    id: "AU-HOME-004",
+    slug: "extra-repayments-calculator",
+    displayName: "Extra Repayments Calculator",
+    engines: ["E07"],
+    title: "Extra Mortgage Repayments Calculator Australia",
+    description:
+      "See the interest and years saved by regular or one-off extra mortgage repayments, computed on a dated schedule rather than a shortcut formula.",
+  }),
+  homeEntry({
+    id: "AU-HOME-006",
+    slug: "offset-account-calculator",
+    displayName: "Offset Account Calculator",
+    engines: ["E07"],
+    title: "Offset Account Calculator Australia",
+    description:
+      "Model an offset balance and regular deposits against your mortgage: interest saved, time saved and the cash that stays available, kept distinct from principal.",
+  }),
+  homeEntry({
+    id: "AU-HOME-007",
+    slug: "rate-change-calculator",
+    displayName: "Rate Change Calculator",
+    engines: ["E07"],
+    title: "Interest Rate Change Calculator: Mortgage Repayments",
+    description:
+      "See how a rate rise or cut changes your mortgage repayment and lifetime interest, under keep-repayment or recalculate-to-term policies.",
+  }),
+  homeEntry({
+    id: "AU-HOME-012",
+    slug: "refinance-calculator",
+    displayName: "Refinance Break-Even Calculator",
+    engines: ["E07", "E11"],
+    title: "Refinance Break-Even Calculator Australia",
+    description:
+      "Compare your current loan with a refinance offer on cumulative cash flows including switching costs, cashback timing and residual balances, never repayments alone.",
+  }),
   payEntry({
     id: "AU-PAY-001",
     slug: "pay-calculator",

@@ -2,7 +2,7 @@ import Link from "next/link";
 import { calculatorRegistry, routePath } from "@paymentcalcs/calculator-registry";
 
 const ROADMAP: Array<{ group: string; count: number; detail: string }> = [
-  { group: "Property & Mortgage", count: 11, detail: "Repayments, simulator, stamp duty, LVR" },
+  { group: "Property costs", count: 5, detail: "Stamp duty, buying costs, deposit, LVR, affordability" },
   { group: "Loans & Debt", count: 3, detail: "Loans, car loans, credit-card payoff" },
   { group: "Savings", count: 2, detail: "Compound interest, savings goals" },
   { group: "Business", count: 1, detail: "Contractor day rate" },

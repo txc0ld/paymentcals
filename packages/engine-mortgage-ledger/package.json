@@ -1,5 +1,5 @@
 {
-  "name": "@paymentcalcs/calculation-core",
+  "name": "@paymentcalcs/engine-mortgage-ledger",
   "version": "0.1.0",
   "private": true,
   "type": "module",
@@ -12,8 +12,8 @@
     "lint": "eslint src"
   },
   "dependencies": {
-    "@js-temporal/polyfill": "0.5.1",
-    "decimal.js": "10.6.0",
+    "@paymentcalcs/calculation-core": "workspace:*",
+    "@paymentcalcs/engine-loans": "workspace:*",
     "zod": "4.4.3"
   }
 }

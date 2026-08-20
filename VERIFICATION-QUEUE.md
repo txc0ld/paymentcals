@@ -65,3 +65,4 @@ Pack: `au-payg-withholding-2026-27` (in_review)
 
 - [ ] `packages/test-fixtures/src/gst/au-biz-001.fixture.json` — fill `expected` values from the official ATO examples or a verified manual calculation.
 - [ ] `packages/test-fixtures/src/pay/au-pay-001.fixture.json` — 6 cases across FY2024-25/2025-26/2026-27; fill `expected` from the ATO simple tax calculator / Moneysmart and record the tool + date. (The engine already reproduces the ATO worked examples for STSL, Medicare reduction and MLS as unit tests.)
+- [ ] `packages/test-fixtures/src/home/au-home-001.fixture.json` — 3 mortgage repayment cases; fill `expected` from the Moneysmart mortgage calculator. (The engine differential-tests the schedule against the closed form internally.)
