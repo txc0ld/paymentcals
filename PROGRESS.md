@@ -6,9 +6,9 @@ Phase: **3 — Breadth + launch surface (Gate 3) COMPLETE · Phase 4 handoff wri
 
 - 3a: E14 savings (closed-form + simulation cross-check, goal solving), E12 revolving credit (statement cycles, promo expiry, min-payment rules), E19 contractor economics. Routes: compound interest, savings goal, personal/car loans (balloon via §13.6), credit-card payoff, deposit, LVR, Class C affordability range (editable floors, no approval language), contractor day rate (GST from pack, never revenue).
 - 3b: E08 duty engine (part-thereof per-$100) + eight per-state packs. NSW/QLD/TAS fully sourced (engine reproduces QRO's and Revenue NSW's own worked examples); VIC (403-blocked), WA (404), SA/ACT (client-rendered), NT (formula shape) authored null → routes render "not yet supported" per Gate 3. Stamp duty + complete buying costs routes live.
-- 3c: category indexes, /calculators, per-route /methodology (28 pages from the registry), /sources (auto-generated from packs with hashes), /changelog, llms.txt, robots.txt with AI-crawler allowances, sitemap.xml. Homepage curates 9 featured calculators + full directory link.
+- 3c: category indexes, /calculators, per-route /methodology (27 pages from the registry), /sources (auto-generated from packs with hashes), /changelog, llms.txt, robots.txt with AI-crawler allowances, sitemap.xml. Homepage curates 9 featured calculators + full directory link.
 - Phase 4: `LAUNCH-READINESS.md` written — §35 checklist with automated-pass vs needs-human markers and the 30-minute activation path.
-- Totals: **28 routes, 22 rule packs (in_review), 58 CI tasks green, 33 e2e green (axe both themes + mobile), 13 golden cases queued.**
+- Totals: **27 routes (the full §5 set), 22 rule packs (in_review), 58 CI tasks green, 33 e2e green (axe both themes + mobile), 13 golden cases queued.**
 
 Phase: **2 — Mortgage slice (Gate 2) COMPLETE** · 2026-08-20
 

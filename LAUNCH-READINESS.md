@@ -4,7 +4,7 @@ Status at 2026-08-21. ✅ = automated check passing in this repo. 🧑 = require
 
 ## Product and scope (§35.1)
 
-- ✅ 28 P0 routes live across the §5 route set (pay ×9, home loans ×6, property costs ×4 incl. affordability, stamp duty ×2, debt ×3, savings ×2, business ×2), each with a registry entry, Simple/Advanced modes, and distinct copy/metadata.
+- ✅ 27 P0 routes live — the complete §5 route set (pay ×9, home loans ×6, property costs ×4 incl. affordability, stamp duty ×2, debt ×3, savings ×2, business ×2), each with a registry entry, Simple/Advanced modes, and distinct copy/metadata.
 - ✅ No super/retirement routes scaffolded.
 - 🧑 Final route-set sign-off by owner.
 

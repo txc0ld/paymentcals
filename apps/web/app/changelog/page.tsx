@@ -11,8 +11,8 @@ const ENTRIES = [
     date: "2026-08-21",
     title: "P0 preview build",
     items: [
-      "28 calculators live across pay & tax, property & mortgage, loans & debt, savings and business.",
-      "14 statutory rule packs authored from same-day official sources (ATO, QRO, Revenue NSW, SRO Tasmania), all pending human verification before production activation.",
+      "27 calculators live across pay & tax, property & mortgage, loans & debt, savings and business.",
+      "22 rule packs authored from same-day official sources (ATO, QRO, Revenue NSW, SRO Tasmania), all pending human verification before production activation.",
       "Stamp duty for VIC, WA, SA, ACT and NT is intentionally blocked pending transcription of official rates.",
       "Every schedule-producing engine reconciles each period; solver-backed calculators verify their answers through the forward calculation.",
     ],
