@@ -13,7 +13,7 @@ import {
   formatMoney,
 } from "@paymentcalcs/calculation-ui";
 import { getRegistryEntry } from "@paymentcalcs/calculator-registry";
-import { moneyFromDecimalString, moneyToDecimalString } from "@paymentcalcs/calculation-core";
+import { Dec, moneyFromDecimalString, moneyToDecimalString } from "@paymentcalcs/calculation-core";
 import {
   requiredContribution,
   simulateSavings,
@@ -54,7 +54,10 @@ export function SavingsCalculator({ variant }: { variant: "compound" | "goal" })
     if (!settings) return null;
     if (variant === "goal") {
       if (!target.ok) return null;
-      const needed = requiredContribution(moneyToDecimalString(target.money), settings);
+      // Round the required deposit UP to the next cent so the cent-rounded
+      // simulation can never finish below the stated target.
+      const needed = requiredContribution(moneyToDecimalString(target.money), settings)
+        .toDecimalPlaces(2, Dec.ROUND_UP);
       return simulateSavings({ ...settings, contribution: needed.toFixed(2) });
     }
     if (!contribution.ok && contributionRaw.trim() !== "") return null;
@@ -66,7 +69,10 @@ export function SavingsCalculator({ variant }: { variant: "compound" | "goal" })
 
   const perPeriodNeeded = useMemo(() => {
     if (variant !== "goal" || !settings || !target.ok) return null;
-    return requiredContribution(moneyToDecimalString(target.money), settings);
+    return requiredContribution(moneyToDecimalString(target.money), settings).toDecimalPlaces(
+      2,
+      Dec.ROUND_UP,
+    );
   }, [variant, settings, target]);
 
   return (

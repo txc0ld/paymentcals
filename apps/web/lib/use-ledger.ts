@@ -48,7 +48,9 @@ export function useLedgerJob<TResult>(job: Job | null): {
       return;
     }
     const id = ++idRef.current;
-    setState((s) => ({ ...s, running: true, error: null }));
+    // A changed job invalidates the previous result immediately — a stale
+    // result must never render against new inputs.
+    setState({ result: null, running: true, error: null });
 
     const worker = workerRef.current;
     if (worker) {

@@ -43,6 +43,7 @@ Packs: `au-stsl-2024-25` / `-2025-26` / `-2026-27` (in_review)
 - [ ] 2025-26 marginal: nil ≤ $67,000 · 15c to $125,000 · $8,700 + 17c to $179,285 · 10% of total over
 - [ ] 2024-25 whole-income table (18 bands, 1%–10%, nil below $54,435)
 - [ ] **Source anomaly:** the ATO page's Example 4 prints "$99,736 × 5.5% = $5,485.52", but the arithmetic gives $5,485.48. The engine computes exactly; confirm the intended figure with the ATO calculator.
+- [ ] **Rounded published bases (review finding #12):** the ATO prints the 2026-27 STSL band base as $9,028 (continuity computes $9,028.35) and Revenue NSW prints $1,662 (computes $1,662.50). The packs transcribe the sources verbatim; confirm whether the authorities intend the printed rounded base or the exact continuation, and note the choice on the pack.
 
 ## ATO — Super guarantee
 

@@ -20,8 +20,10 @@ describe("refinance break-even (§12.7, §13.10)", () => {
       { upfrontCash: "1100", financedCosts: "0", cashback: "0" },
     );
     expect(result.repaymentDifference.greaterThan(0)).toBe(true);
+    // Cash-only break-even (§13.10): ~$290/month saving against $1,100 costs
+    // crosses within the first several payments.
     expect(result.breakEvenDate).not.toBeNull();
-    expect(result.breakEvenDate!.slice(0, 4)).toBe("2026");
+    expect(result.breakEvenDate! <= "2027-06-01").toBe(true);
     expect(result.economicAdvantageAtHorizon.greaterThan(0)).toBe(true);
     expect(result.reversalsAfterBreakEven).toBe(0);
   });

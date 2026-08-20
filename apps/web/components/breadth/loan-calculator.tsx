@@ -12,7 +12,7 @@ import {
 } from "@paymentcalcs/calculation-ui";
 import { getRegistryEntry } from "@paymentcalcs/calculator-registry";
 import { Dec, moneyFromDecimalString, type DecimalValue } from "@paymentcalcs/calculation-core";
-import { amortisingPayment } from "@paymentcalcs/engine-loans";
+import { buildLoanSchedule } from "@paymentcalcs/engine-loans";
 import { formatMajor, periodsToYearsLabel } from "../../lib/format-major";
 import type { SLedgerResult } from "../../lib/ledger-serialize";
 import { parseMoneyInput } from "../../lib/money-input";
@@ -55,23 +55,26 @@ export function LoanCalculator({ variant }: { variant: "personal" | "car" }) {
 
   const { result } = useLedgerJob<SLedgerResult>(job);
 
-  // The balloon variant uses the E11 §13.6 closed form on exact decimals.
+  // The balloon variant runs the full §13.6-aware E11 schedule so every
+  // displayed metric (repayment, interest, total, payoff) reflects the balloon.
   const balloonInfo = useMemo(() => {
-    if (variant !== "car" || !balloonRaw.trim() || !balloon.ok || !parsed.ok || !result) return null;
-    const ppy = PPY[parsed.frequency];
+    if (variant !== "car" || !balloonRaw.trim() || !balloon.ok || !parsed.ok) return null;
     const principal = new Dec(parsed.principal) as DecimalValue;
     const balloonAmount = new Dec(balloonRaw.replace(/,/g, "")) as DecimalValue;
     if (balloonAmount.greaterThanOrEqualTo(principal)) {
-      return { payment: null, balloon: null, error: "The balloon must be smaller than the loan amount." };
+      return { schedule: null, balloon: null, error: "The balloon must be smaller than the loan amount." };
     }
-    const payment = amortisingPayment(
+    const schedule = buildLoanSchedule({
       principal,
-      new Dec(parsed.annualRate).div(ppy) as DecimalValue,
-      parsed.termPeriods,
-      balloonAmount,
-    );
-    return { payment: payment.toFixed(2), balloon: balloonAmount.toFixed(2), error: null };
-  }, [variant, balloonRaw, balloon, parsed, result]);
+      annualRate: new Dec(parsed.annualRate) as DecimalValue,
+      termPeriods: parsed.termPeriods,
+      frequency: parsed.frequency,
+      firstPaymentDate: "2026-10-01",
+      repaymentType: "principal_and_interest",
+      balloon: balloonAmount,
+    });
+    return { schedule, balloon: balloonAmount.toFixed(2), error: null };
+  }, [variant, balloonRaw, balloon, parsed]);
 
   return (
     <CalculatorShell
@@ -116,7 +119,9 @@ export function LoanCalculator({ variant }: { variant: "personal" | "car" }) {
               label={`Repayment per ${state.frequency === "monthly" ? "month" : state.frequency === "fortnightly" ? "fortnight" : "week"}`}
               amount={moneyFromDecimalString(
                 "AUD",
-                balloonInfo && balloonInfo.error === null ? balloonInfo.payment! : result.scheduledPaymentInitial,
+                balloonInfo && balloonInfo.error === null
+                  ? balloonInfo.schedule!.scheduledPayment.toFixed(2)
+                  : result.scheduledPaymentInitial,
                 2,
               )}
               qualifier={
@@ -126,12 +131,40 @@ export function LoanCalculator({ variant }: { variant: "personal" | "car" }) {
               }
             />
             <div className="grid gap-3 border-t border-hairline pt-4 sm:grid-cols-3">
-              <ResultMetric label="Total interest" amount={moneyFromDecimalString("AUD", result.totalInterest, 2)} detail={balloonInfo && balloonInfo.error === null ? "excluding balloon financing" : undefined} />
-              <ResultMetric label="Total paid" amount={moneyFromDecimalString("AUD", result.totalPaid, 2)} />
+              <ResultMetric
+                label="Total interest"
+                amount={moneyFromDecimalString(
+                  "AUD",
+                  balloonInfo && balloonInfo.error === null
+                    ? balloonInfo.schedule!.totalInterest.toFixed(2)
+                    : result.totalInterest,
+                  2,
+                )}
+              />
+              <ResultMetric
+                label="Total paid"
+                amount={moneyFromDecimalString(
+                  "AUD",
+                  balloonInfo && balloonInfo.error === null
+                    ? balloonInfo.schedule!.totalPaid.toFixed(2)
+                    : result.totalPaid,
+                  2,
+                )}
+                detail={balloonInfo && balloonInfo.error === null ? "including the balloon at term end" : undefined}
+              />
               <div className="grid gap-1 rounded-[inherit] border border-hairline bg-surface p-4">
                 <span className="font-mono text-[10px] uppercase tracking-[0.16em] text-ink-3">Paid off</span>
-                <span className="font-mono text-xl tabular-nums text-ink">{result.payoffDate ?? "beyond term"}</span>
-                <span className="text-[12px] leading-4 text-ink-3">{periodsToYearsLabel(result.periodsUsed, PPY[state.frequency])}</span>
+                <span className="font-mono text-xl tabular-nums text-ink">
+                  {balloonInfo && balloonInfo.error === null
+                    ? (balloonInfo.schedule!.payoffDate ?? "at term with balloon")
+                    : (result.payoffDate ?? "beyond term")}
+                </span>
+                <span className="text-[12px] leading-4 text-ink-3">
+                  {periodsToYearsLabel(
+                    balloonInfo && balloonInfo.error === null ? balloonInfo.schedule!.rows.length : result.periodsUsed,
+                    PPY[state.frequency],
+                  )}
+                </span>
               </div>
             </div>
           </div>

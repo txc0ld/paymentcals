@@ -68,11 +68,9 @@ export function compareRefinance(
       newCum = newCum.minus(cashback) as DecimalValue;
       cashbackApplied = true;
     }
-    // Residual balances make the comparison economic, not cash-flow-only.
-    const delta = oldCum
-      .plus(oldRow.closingBalance)
-      .minus(newCum)
-      .minus(newRow.closingBalance) as DecimalValue;
+    // §13.10: break-even runs on cumulative cash flows; residual balances
+    // enter only at the common horizon (added after this loop).
+    const delta = oldCum.minus(newCum) as DecimalValue;
     cumulativeDelta.push({ date: newRow.date, delta });
   }
 
@@ -98,6 +96,14 @@ export function compareRefinance(
   }
 
   const lastDelta = cumulativeDelta.length > 0 ? cumulativeDelta[cumulativeDelta.length - 1]! : null;
+  // Economic position at the common horizon: cash advantage plus the residual
+  // balance difference (old still owed minus new still owed).
+  const economicAtHorizon =
+    lastDelta === null || horizon === 0
+      ? d(0)
+      : (lastDelta.delta
+          .plus(oldLoan.rows[horizon - 1]!.closingBalance)
+          .minus(newLoan.rows[horizon - 1]!.closingBalance) as DecimalValue);
 
   return {
     oldLoan,
@@ -108,6 +114,6 @@ export function compareRefinance(
     breakEvenDate,
     reversalsAfterBreakEven: reversals,
     horizonDate: lastDelta?.date ?? null,
-    economicAdvantageAtHorizon: lastDelta?.delta ?? d(0),
+    economicAdvantageAtHorizon: economicAtHorizon,
   };
 }

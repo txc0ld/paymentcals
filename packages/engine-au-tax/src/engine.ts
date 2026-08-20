@@ -189,8 +189,27 @@ export function computeAuPay(input: AuPayInput, resolution: AuPayResolution): Li
         "The family Medicare levy reduction is an estimate: apportionment between spouses is not modelled.",
     });
   }
+  if (
+    input.taxpayer.residency === "resident" &&
+    input.taxpayer.medicare.status !== "full_exemption" &&
+    resolution.medicare.pack.rules.lowIncomeSingle === null &&
+    // Display-only envelope: recent upper thresholds sit near $35k; warn with
+    // generous headroom so no plausibly-affected income misses the caveat.
+    taxableIncome.lessThanOrEqualTo(60_000)
+  ) {
+    warnings.push({
+      code: "PC-CALC-0202",
+      severity: "warning",
+      message: `The low-income Medicare levy reduction thresholds for ${input.financialYear} are not loaded, so the full levy is shown; at low incomes the true levy may be lower.`,
+    });
+  }
 
   const rfb = moneyDec(adj.reportableFringeBenefits);
+  const netInvestmentLosses = moneyDec(adj.netInvestmentLosses);
+  const exemptForeign = moneyDec(adj.exemptForeignEmploymentIncome);
+  // MLS income adds RFB, reportable super and net investment losses to
+  // taxable income (ATO income-for-surcharge-purposes definition).
+  const surchargeExtras = rfb.plus(salarySacrifice).plus(netInvestmentLosses) as DecimalValue;
   const mls =
     input.taxpayer.residency === "resident"
       ? medicareLevySurcharge(taxableIncome, resolution.medicare.pack.rules, {
@@ -198,7 +217,7 @@ export function computeAuPay(input: AuPayInput, resolution: AuPayResolution): Li
           familyStatus: input.taxpayer.medicare.familyStatus,
           dependants: input.taxpayer.medicare.dependants,
           spouseIncome: medicareContext.spouseIncome,
-          reportableFringeBenefits: rfb,
+          reportableFringeBenefits: surchargeExtras,
         })
       : zero();
 
@@ -210,9 +229,13 @@ export function computeAuPay(input: AuPayInput, resolution: AuPayResolution): Li
       );
     }
     // Repayment income = taxable income + reportable fringe benefits +
-    // reportable super contributions (salary sacrifice) — §13.17, per the
-    // ATO definition on the thresholds page.
-    const repaymentIncome = taxableIncome.plus(rfb).plus(salarySacrifice) as DecimalValue;
+    // reportable super + net investment losses + exempt foreign employment
+    // income — §13.17, per the ATO definition on the thresholds page.
+    const repaymentIncome = taxableIncome
+      .plus(rfb)
+      .plus(salarySacrifice)
+      .plus(netInvestmentLosses)
+      .plus(exemptForeign) as DecimalValue;
     stsl = stslRepayment(repaymentIncome, resolution.stsl.pack.rules);
     trace.push({
       id: "stsl",
@@ -251,12 +274,15 @@ export function computeAuPay(input: AuPayInput, resolution: AuPayResolution): Li
           familyStatus: input.taxpayer.medicare.familyStatus,
           dependants: input.taxpayer.medicare.dependants,
           spouseIncome: medicareContext.spouseIncome,
-          reportableFringeBenefits: rfb,
+          reportableFringeBenefits: surchargeExtras,
         })
       : zero();
   let bumpStsl = zero();
   if (input.studyLoans.enabled && resolution.stsl) {
-    bumpStsl = stslRepayment(bumpTaxable.plus(rfb).plus(salarySacrifice) as DecimalValue, resolution.stsl.pack.rules);
+    bumpStsl = stslRepayment(
+      bumpTaxable.plus(rfb).plus(salarySacrifice).plus(netInvestmentLosses).plus(exemptForeign) as DecimalValue,
+      resolution.stsl.pack.rules,
+    );
   }
   const bumpLiability = bumpTax.minus(bumpLito).plus(bumpLevy).plus(bumpMls).plus(bumpStsl) as DecimalValue;
   const nextThousandNet = new Dec(1000).minus(bumpLiability.minus(totalLiability)) as DecimalValue;
@@ -274,7 +300,18 @@ export function computeAuPay(input: AuPayInput, resolution: AuPayResolution): Li
   } else if (!resolution.payg) {
     withholdingUnavailableReason = `The official PAYG withholding schedule for ${input.financialYear} is not available in this build; the annual liability estimate above is unaffected.`;
   } else {
-    const periodEarnings = grossCash.minus(preTax).div(periods) as DecimalValue;
+    // Schedule 1 applies to ordinary period earnings only. Bonuses and other
+    // non-payroll income withhold under separate schedules not yet modelled,
+    // so they are excluded here and flagged below.
+    const periodEarnings = baseSalary.minus(preTax).div(periods) as DecimalValue;
+    if (moneyDec(adj.bonus).greaterThan(0) || moneyDec(adj.otherAssessableIncome).greaterThan(0)) {
+      warnings.push({
+        code: "PC-CALC-0203",
+        severity: "info",
+        message:
+          "Bonuses and other assessable income are included in the annual position but excluded from the per-pay withholding estimate; employers withhold on such payments under separate ATO schedules.",
+      });
+    }
     const computation = computeWithholding(resolution.payg.pack.rules, {
       periodEarnings,
       cycle,

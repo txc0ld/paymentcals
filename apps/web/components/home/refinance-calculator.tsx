@@ -35,6 +35,7 @@ export function RefinanceCalculator() {
   const [upfrontRaw, setUpfrontRaw] = useState("");
   const [financedRaw, setFinancedRaw] = useState("");
   const [cashbackRaw, setCashbackRaw] = useState("");
+  const [cashbackDate, setCashbackDate] = useState("");
 
   const balance = useMemo(() => parseMoneyInput(balanceRaw), [balanceRaw]);
 
@@ -59,10 +60,12 @@ export function RefinanceCalculator() {
       costs: {
         upfrontCash: clean(upfrontRaw, "0"),
         financedCosts: clean(financedRaw, "0"),
-        cashback: clean(cashbackRaw, "0"),
+        // A cashback only counts once its receipt date is entered (§12.7 AC).
+        cashback: cashbackDate ? clean(cashbackRaw, "0") : "0",
+        ...(cashbackDate ? { cashbackDate } : {}),
       },
     };
-  }, [balance, balanceRaw, oldRateRaw, newRateRaw, remainingYearsRaw, newTermYearsRaw, upfrontRaw, financedRaw, cashbackRaw]);
+  }, [balance, balanceRaw, oldRateRaw, newRateRaw, remainingYearsRaw, newTermYearsRaw, upfrontRaw, financedRaw, cashbackRaw, cashbackDate]);
 
   const { result, error } = useLedgerJob<SRefinanceResult>(job);
 
@@ -120,7 +123,30 @@ export function RefinanceCalculator() {
               value={financedRaw}
               onChange={setFinancedRaw}
             />
-            <MoneyField id="ref-cashback" label="Cashback" value={cashbackRaw} onChange={setCashbackRaw} />
+            <MoneyField
+              id="ref-cashback"
+              label="Cashback"
+              description="Counted only from its receipt date; review the lender's conditions yourself."
+              value={cashbackRaw}
+              onChange={setCashbackRaw}
+            />
+            {cashbackRaw.trim() ? (
+              <div className="grid gap-1.5">
+                <label htmlFor="ref-cashback-date" className="font-mono text-[11px] uppercase tracking-[0.14em] text-ink-2">
+                  Cashback received on
+                </label>
+                <input
+                  id="ref-cashback-date"
+                  type="date"
+                  value={cashbackDate}
+                  onChange={(e) => setCashbackDate(e.target.value)}
+                  className="clay-input min-h-11 bg-surface px-3 font-mono text-[14px] text-ink outline-none focus:border-focus"
+                />
+                {!cashbackDate ? (
+                  <span className="text-[12px] text-warn">Enter the date or the cashback is not counted.</span>
+                ) : null}
+              </div>
+            ) : null}
           </FieldGroup>
         </div>
       }

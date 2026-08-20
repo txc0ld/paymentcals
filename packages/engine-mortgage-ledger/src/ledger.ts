@@ -88,7 +88,21 @@ export function runLedger(input: LedgerInput): LedgerResult {
   const start = plainDate(input.firstRepaymentDate);
   const ppy = PPY[input.repaymentFrequency];
   const events = input.events ?? [];
-  const effectiveness = d(input.offsetEffectiveness ?? "1");
+  // Effectiveness is a 0..1 contract assumption; out-of-range values are
+  // clamped rather than allowed to invert the §13.9 interest-base floor.
+  const effectiveness = (Dec.min(
+    d(1),
+    Dec.max(zero, d(input.offsetEffectiveness ?? "1")),
+  ) as DecimalValue);
+  if (d(input.offsetOpeningBalance ?? "0").lessThan(0)) {
+    throw new RangeError("Offset opening balance cannot be negative.");
+  }
+  for (const event of events) {
+    const amount = "amount" in event ? d(event.amount) : null;
+    if (amount !== null && amount.lessThan(0)) {
+      throw new RangeError(`Event amounts cannot be negative (${event.type}).`);
+    }
+  }
   const ioPeriods =
     input.repaymentType === "interest_only"
       ? (input.interestOnlyPeriods ?? input.termPeriods)

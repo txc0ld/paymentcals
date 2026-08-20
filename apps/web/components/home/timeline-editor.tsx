@@ -42,8 +42,9 @@ export function TimelineEditor({
   return (
     <div className="grid gap-4">
       <p className="text-[13px] leading-5 text-ink-3">
-        Events apply on their dates in chronological order: rate changes first, then offset
-        movements, repayments and fees.
+        Scheduled model: each event takes effect from the first repayment date on or after its date,
+        in order — rate changes first, then offset movements, repayments and fees. Mid-period timing
+        is not modelled.
       </p>
       <ol className="grid gap-3">
         {sorted.map((event) => (

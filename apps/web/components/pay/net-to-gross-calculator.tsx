@@ -200,6 +200,11 @@ export function NetToGrossCalculator() {
                   target is shown rather than an exact match.
                 </p>
               ) : null}
+              <p className="text-[12px] leading-5 text-ink-3">
+                Near Medicare levy surcharge thresholds (without hospital cover), more than one gross
+                can produce the same net; the answer shown is verified by the forward calculation but
+                may not be the only one.
+              </p>
             </div>
           )
         }

@@ -52,6 +52,9 @@ export const zAuPayInput = z.object({
       postTaxDeductions: zMoney.optional(),
       workRelatedDeductions: zMoney.optional(),
       reportableFringeBenefits: zMoney.optional(),
+      /** Income-test components (STSL repayment income, MLS income). */
+      netInvestmentLosses: zMoney.optional(),
+      exemptForeignEmploymentIncome: zMoney.optional(),
     })
     .default({}),
   studyLoans: z.object({ enabled: z.boolean().default(false) }).default({ enabled: false }),
