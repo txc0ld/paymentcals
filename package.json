@@ -1,0 +1,24 @@
+{
+  "name": "paymentcalcs",
+  "private": true,
+  "version": "0.0.0",
+  "packageManager": "pnpm@10.28.2",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "build": "turbo run build",
+    "dev": "turbo run dev",
+    "typecheck": "turbo run typecheck",
+    "lint": "turbo run lint",
+    "test": "turbo run test",
+    "test:browser": "turbo run test:browser",
+    "verify": "turbo run typecheck lint test build"
+  },
+  "devDependencies": {
+    "fast-check": "4.9.0",
+    "turbo": "2.10.11",
+    "typescript": "~5.9.3",
+    "vitest": "4.1.11"
+  }
+}
