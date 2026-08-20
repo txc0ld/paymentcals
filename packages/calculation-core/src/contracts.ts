@@ -1,6 +1,6 @@
-import type { DecimalString } from "./decimal.js";
-import type { Frequency } from "./frequency.js";
-import type { Money } from "./money.js";
+import type { DecimalString } from "./decimal";
+import type { Frequency } from "./frequency";
+import type { Money } from "./money";
 
 /** §14.1 primitive aliases. */
 export type ISODate = string; // YYYY-MM-DD, validated at schema boundary

@@ -1,0 +1,105 @@
+/*
+ * PaymentCalcs design tokens — Swiss Editorial Tech (docs/DESIGN.md, owner
+ * directive D-001) merged with PRD §20 functional rules.
+ *
+ * Brand constants (PRD §20.2 hex values, already monochrome-leaning):
+ *   ink 950/900/800 · paper 50/100 · grey 500/400 · lime accent · semantic set
+ *
+ * Semantic layer below is what components consume. Light is default;
+ * [data-theme="dark"] overrides. No component references raw hex.
+ */
+
+:root {
+  /* Brand primitives */
+  --pc-ink-950: #0b0d0f;
+  --pc-ink-900: #121519;
+  --pc-ink-800: #1b2025;
+  --pc-paper-50: #f7f8f4;
+  --pc-paper-100: #f1f3ee;
+  --pc-grey-500: #7f8790;
+  --pc-grey-400: #a7adb3;
+  --pc-lime-500: #ccff00;
+  --pc-blue-500: #3977ff;
+  --pc-amber-500: #f3a712;
+  --pc-red-500: #e5484d;
+  --pc-green-600: #18794e;
+
+  /* Semantic — light (Swiss print: near-black on off-white, hairlines) */
+  --pc-bg: var(--pc-paper-50);
+  --pc-surface: #ffffff;
+  --pc-surface-2: var(--pc-paper-100);
+  --pc-text: var(--pc-ink-950);
+  --pc-text-secondary: #565e66;
+  /* grey-500 fails WCAG AA on paper (3.4:1); darkened for small-text use. */
+  --pc-text-tertiary: #5b636b;
+  --pc-hairline: rgba(11, 13, 15, 0.14);
+  --pc-hairline-strong: rgba(11, 13, 15, 0.32);
+  --pc-grid-line: rgba(11, 13, 15, 0.07);
+  --pc-accent: var(--pc-ink-950);          /* light theme: accent is ink itself */
+  --pc-accent-contrast: var(--pc-paper-50);
+  --pc-focus-ring: var(--pc-blue-500);
+  --pc-info: #2557c9;
+  --pc-warn: #8a5f08;
+  --pc-warn-surface: rgba(243, 167, 18, 0.1);
+  --pc-error: #c53337;
+  --pc-error-surface: rgba(229, 72, 77, 0.08);
+  --pc-positive: var(--pc-green-600);
+  --pc-selection-bg: var(--pc-ink-950);
+  --pc-selection-text: var(--pc-paper-50);
+
+  /* Type — Geist wired by the app via next/font variables */
+  --pc-font-sans: var(--font-geist-sans, ui-sans-serif, system-ui, sans-serif);
+  --pc-font-mono: var(--font-geist-mono, ui-monospace, "Cascadia Mono", monospace);
+  --pc-text-h1: clamp(2.5rem, 6vw, 5.5rem);
+  --pc-text-h2: clamp(1.9rem, 3.6vw, 3.25rem);
+  --pc-text-h3: clamp(1.25rem, 1.8vw, 1.5rem);
+  --pc-text-result-xl: clamp(2.5rem, 5vw, 3.5rem);
+  --pc-text-body: clamp(1rem, 1.1vw, 1.0625rem);
+  --pc-tracking-tight: -0.035em;
+  --pc-tracking-micro: 0.18em;
+
+  /* Geometry — sharp Swiss editorial: hairlines over shadows */
+  --pc-radius: 0px;
+  --pc-radius-control: 2px;
+  --pc-border: 1px solid var(--pc-hairline);
+
+  /* Motion */
+  --pc-ease: cubic-bezier(0.32, 0.72, 0, 1);
+  --pc-duration: 400ms;
+  --pc-duration-fast: 180ms;
+}
+
+[data-theme="dark"] {
+  --pc-bg: #050607;
+  --pc-surface: var(--pc-ink-950);
+  --pc-surface-2: var(--pc-ink-900);
+  --pc-text: #f4f5f3;
+  --pc-text-secondary: var(--pc-grey-400);
+  --pc-text-tertiary: var(--pc-grey-500);
+  --pc-hairline: rgba(255, 255, 255, 0.12);
+  --pc-hairline-strong: rgba(255, 255, 255, 0.28);
+  --pc-grid-line: rgba(255, 255, 255, 0.06);
+  --pc-accent: var(--pc-lime-500);         /* dark theme: lime primary (PRD §20.2) */
+  --pc-accent-contrast: var(--pc-ink-950);
+  --pc-focus-ring: var(--pc-lime-500);
+  --pc-info: #6d9bff;
+  --pc-warn: var(--pc-amber-500);
+  --pc-warn-surface: rgba(243, 167, 18, 0.12);
+  --pc-error: #ff6b6f;
+  --pc-error-surface: rgba(229, 72, 77, 0.14);
+  --pc-positive: #3dd68c;
+  --pc-selection-bg: #f4f5f3;
+  --pc-selection-text: #050607;
+}
+
+::selection {
+  background: var(--pc-selection-bg);
+  color: var(--pc-selection-text);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --pc-duration: 0ms;
+    --pc-duration-fast: 0ms;
+  }
+}

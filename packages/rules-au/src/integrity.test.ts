@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { computePackHash, manifestKey, resolveRulePack } from "@paymentcalcs/rule-schema";
-import { allAuRulePacks, auIntegrityManifest, gstPack } from "./index.js";
+import { allAuRulePacks, auIntegrityManifest, gstPack } from "./index";
 
 describe("pack governance invariants", () => {
   it("no agent-authored pack is ever active or verified", () => {

@@ -6,8 +6,8 @@ export {
   computeGst,
   type GstEngineContext,
   type GstResolution,
-} from "./gst/engine.js";
-export { GST_FORMULAS, type GstFormulaId } from "./gst/formulas.js";
+} from "./gst/engine";
+export { GST_FORMULAS, type GstFormulaId } from "./gst/formulas";
 export {
   GST_TREATMENTS,
   zGstInput,
@@ -17,4 +17,4 @@ export {
   type GstLineResult,
   type GstOutput,
   type GstTreatment,
-} from "./gst/schema.js";
+} from "./gst/schema";

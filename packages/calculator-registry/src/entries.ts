@@ -1,4 +1,4 @@
-import { zRegistryEntry, type RegistryEntry } from "./schema.js";
+import { zRegistryEntry, type RegistryEntry } from "./schema";
 
 /**
  * P0 registry. Routes are added here as their phase ships; the §5 route set

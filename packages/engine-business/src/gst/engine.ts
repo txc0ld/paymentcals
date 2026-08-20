@@ -24,7 +24,7 @@ import {
   type TraceStep,
 } from "@paymentcalcs/calculation-core";
 import type { GstRulePack } from "@paymentcalcs/rules-au";
-import { zGstInput, type GstInput, type GstLineResult, type GstOutput } from "./schema.js";
+import { zGstInput, type GstInput, type GstLineResult, type GstOutput } from "./schema";
 
 export const GST_ENGINE_ID = "E20";
 export const GST_ENGINE_VERSION = "0.1.0";

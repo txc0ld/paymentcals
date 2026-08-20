@@ -1,4 +1,4 @@
-import { redactEvent, type AllowedValue, type RejectedEvent } from "./redaction.js";
+import { redactEvent, type AllowedValue, type RejectedEvent } from "./redaction";
 
 export interface AnalyticsProvider {
   send(event: string, props: Record<string, AllowedValue>): void;

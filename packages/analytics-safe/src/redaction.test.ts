@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { createAnalytics, type AnalyticsProvider } from "./analytics.js";
-import { redactEvent } from "./redaction.js";
+import { createAnalytics, type AnalyticsProvider } from "./analytics";
+import { redactEvent } from "./redaction";
 
 function expectRejected(event: string, props: Record<string, unknown>, key?: string) {
   const outcome = redactEvent(event, props);

@@ -7,11 +7,11 @@ export {
   zSourceRecordV1,
   type RulePackStatus,
   type RulePackV1,
-} from "./schema.js";
+} from "./schema";
 export {
   computePackHash,
   manifestKey,
   verifyPackIntegrity,
   type IntegrityManifest,
-} from "./integrity.js";
-export { resolveRulePack, type ResolveOutcome, type ResolveQuery } from "./resolver.js";
+} from "./integrity";
+export { resolveRulePack, type ResolveOutcome, type ResolveQuery } from "./resolver";

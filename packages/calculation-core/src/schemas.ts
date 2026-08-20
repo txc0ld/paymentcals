@@ -1,8 +1,8 @@
 import { z } from "zod";
-import { isDecimalString } from "./decimal.js";
-import type { Frequency } from "./frequency.js";
-import type { Money } from "./money.js";
-import { moneyFromMinorUnits } from "./money.js";
+import { isDecimalString } from "./decimal";
+import type { Frequency } from "./frequency";
+import type { Money } from "./money";
+import { moneyFromMinorUnits } from "./money";
 
 export const zDecimalString = z
   .string()

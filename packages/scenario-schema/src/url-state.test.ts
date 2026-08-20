@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { decodeUrlState, encodeUrlState } from "./url-state.js";
-import { zScenarioDocumentV1 } from "./scenario.js";
+import { decodeUrlState, encodeUrlState } from "./url-state";
+import { zScenarioDocumentV1 } from "./scenario";
 
 describe("url state codec", () => {
   it("round-trips input state including unicode", () => {

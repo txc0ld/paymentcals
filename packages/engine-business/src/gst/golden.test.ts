@@ -3,8 +3,8 @@ import { moneyFromMinorUnits, type CalculationRequestV1 } from "@paymentcalcs/ca
 import { splitGoldenCases, zGoldenFixture } from "@paymentcalcs/test-fixtures";
 import fixtureJson from "@paymentcalcs/test-fixtures/gst" with { type: "json" };
 import { gstPack } from "@paymentcalcs/rules-au";
-import { computeGst, type GstResolution } from "./engine.js";
-import type { GstInput } from "./schema.js";
+import { computeGst, type GstResolution } from "./engine";
+import type { GstInput } from "./schema";
 
 const fixture = zGoldenFixture.parse(fixtureJson);
 const { verified, unverified } = splitGoldenCases(fixture);

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { calculatorRegistry, getRegistryEntry, routePath } from "./index.js";
+import { calculatorRegistry, getRegistryEntry, routePath } from "./index";
 
 describe("calculator registry", () => {
   it("has unique IDs and unique category/slug pairs", () => {

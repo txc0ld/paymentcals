@@ -1,10 +1,10 @@
-export { Dec, dec, isDecimalString, type DecimalString, type DecimalValue } from "./decimal.js";
+export { Dec, dec, isDecimalString, type DecimalString, type DecimalValue } from "./decimal";
 export {
   roundTo,
   toDecimalRounding,
   type RoundingMode,
   type RoundingProfile,
-} from "./rounding.js";
+} from "./rounding";
 export {
   MoneyDomainError,
   absMoney,
@@ -23,8 +23,8 @@ export {
   zeroMoney,
   type CurrencyCode,
   type Money,
-} from "./money.js";
-export { periodsPerYear, type Frequency } from "./frequency.js";
+} from "./money";
+export { periodsPerYear, type Frequency } from "./frequency";
 export type {
   AssumptionCategory,
   AssumptionRecord,
@@ -46,7 +46,7 @@ export type {
   SourceRef,
   TimelineEventV1,
   TraceStep,
-} from "./contracts.js";
+} from "./contracts";
 export {
   zAssumptionRecord,
   zCalculationMessage,
@@ -58,5 +58,5 @@ export {
   zJurisdiction,
   zMoney,
   zRate,
-} from "./schemas.js";
-export { canonicalHash, canonicalStringify, sha256Hex } from "./canonical.js";
+} from "./schemas";
+export { canonicalHash, canonicalStringify, sha256Hex } from "./canonical";

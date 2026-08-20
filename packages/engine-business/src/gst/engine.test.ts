@@ -7,8 +7,8 @@ import {
   type CalculationRequestV1,
 } from "@paymentcalcs/calculation-core";
 import { gstPack } from "@paymentcalcs/rules-au";
-import { calculateGst, computeGst, type GstResolution } from "./engine.js";
-import type { GstInput } from "./schema.js";
+import { calculateGst, computeGst, type GstResolution } from "./engine";
+import type { GstInput } from "./schema";
 
 const aud = (minor: string) => moneyFromMinorUnits("AUD", minor, 2);
 

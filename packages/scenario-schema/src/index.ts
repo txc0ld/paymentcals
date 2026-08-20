@@ -3,10 +3,10 @@ export {
   zWorkspaceValueLink,
   type ScenarioDocumentV1,
   type WorkspaceValueLink,
-} from "./scenario.js";
+} from "./scenario";
 export {
   decodeUrlState,
   encodeUrlState,
   type UrlScenarioStateV1,
   type UrlStateDecodeResult,
-} from "./url-state.js";
+} from "./url-state";

@@ -4,5 +4,5 @@ export {
   routePath,
   zRegistryEntry,
   type RegistryEntry,
-} from "./schema.js";
-export { calculatorRegistry, getRegistryEntry, getRegistryEntryBySlug } from "./entries.js";
+} from "./schema";
+export { calculatorRegistry, getRegistryEntry, getRegistryEntryBySlug } from "./entries";

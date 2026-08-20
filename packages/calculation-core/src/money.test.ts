@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { dec } from "./decimal.js";
+import { dec } from "./decimal";
 import {
   MoneyDomainError,
   addMoney,
@@ -11,8 +11,8 @@ import {
   negateMoney,
   subtractMoney,
   sumMoney,
-} from "./money.js";
-import { roundTo } from "./rounding.js";
+} from "./money";
+import { roundTo } from "./rounding";
 
 const aud = (minor: string) => moneyFromMinorUnits("AUD", minor, 2);
 

@@ -1,5 +1,5 @@
-import { Dec, dec, type DecimalString, type DecimalValue } from "./decimal.js";
-import { roundTo, type RoundingMode } from "./rounding.js";
+import { Dec, dec, type DecimalString, type DecimalValue } from "./decimal";
+import { roundTo, type RoundingMode } from "./rounding";
 
 export type CurrencyCode = string;
 

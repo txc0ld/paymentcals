@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { canonicalHash, canonicalStringify } from "./canonical.js";
+import { canonicalHash, canonicalStringify } from "./canonical";
 
 describe("canonical serialisation", () => {
   it("is key-order independent, recursively", async () => {

@@ -1,5 +1,5 @@
 import Decimal from "decimal.js";
-import type { DecimalValue } from "./decimal.js";
+import type { DecimalValue } from "./decimal";
 
 /** §13.27 — every engine declares its rounding profile explicitly. */
 export interface RoundingProfile {

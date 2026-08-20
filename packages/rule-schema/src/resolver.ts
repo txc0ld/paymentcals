@@ -1,11 +1,11 @@
 import type { ISODate, RulePackManifestRef } from "@paymentcalcs/calculation-core";
-import { verifyPackIntegrity, type IntegrityManifest } from "./integrity.js";
+import { verifyPackIntegrity, type IntegrityManifest } from "./integrity";
 import {
   DRAFT_RUNNABLE_STATUSES,
   RUNNABLE_STATUSES,
   type RulePackStatus,
   type RulePackV1,
-} from "./schema.js";
+} from "./schema";
 
 export interface ResolveQuery {
   domain: string;

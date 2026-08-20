@@ -1,5 +1,5 @@
 import { canonicalHash } from "@paymentcalcs/calculation-core";
-import type { RulePackV1 } from "./schema.js";
+import type { RulePackV1 } from "./schema";
 
 /**
  * Integrity manifest: pack ID + rules version → pinned sha256 of the pack's

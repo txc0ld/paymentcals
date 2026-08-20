@@ -1,4 +1,4 @@
-import { Dec, type DecimalValue } from "./decimal.js";
+import { Dec, type DecimalValue } from "./decimal";
 
 /** §14.1 — payment/compounding frequency. */
 export type Frequency =
