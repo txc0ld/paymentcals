@@ -1,0 +1,50 @@
+{
+  "fixtureId": "gst/au-biz-001",
+  "calculatorId": "AU-BIZ-001",
+  "engine": "E20",
+  "rulePackId": "au-gst-standard",
+  "officialSourceForExpected": "Verify against the ATO GST worked examples or a manual check of inclusive = exclusive × 1.1 at https://www.ato.gov.au/businesses-and-organisations/gst-excise-and-indirect-taxes/gst/how-gst-works",
+  "cases": [
+    {
+      "caseId": "add-100",
+      "description": "Add GST to a $100.00 GST-exclusive amount",
+      "input": { "mode": "add", "amount": { "currency": "AUD", "minorUnits": "10000", "scale": 2 } },
+      "expected": null,
+      "verifiedBy": null,
+      "verifiedAt": null
+    },
+    {
+      "caseId": "split-110",
+      "description": "Split a $110.00 GST-inclusive amount into exclusive and GST components",
+      "input": { "mode": "split", "amount": { "currency": "AUD", "minorUnits": "11000", "scale": 2 } },
+      "expected": null,
+      "verifiedBy": null,
+      "verifiedAt": null
+    },
+    {
+      "caseId": "remove-99-99",
+      "description": "Remove GST from a $99.99 GST-inclusive amount (non-divisible boundary)",
+      "input": { "mode": "remove", "amount": { "currency": "AUD", "minorUnits": "9999", "scale": 2 } },
+      "expected": null,
+      "verifiedBy": null,
+      "verifiedAt": null
+    },
+    {
+      "caseId": "invoice-mixed-treatments",
+      "description": "Invoice with taxable, GST-free and input-taxed lines, rounded at invoice total",
+      "input": {
+        "mode": "line_items",
+        "roundingLevel": "invoice_total",
+        "items": [
+          { "id": "l1", "label": "Consulting", "amount": { "currency": "AUD", "minorUnits": "150033", "scale": 2 }, "amountIs": "exclusive", "treatment": "taxable", "quantity": 3 },
+          { "id": "l2", "label": "Basic food", "amount": { "currency": "AUD", "minorUnits": "4550", "scale": 2 }, "amountIs": "exclusive", "treatment": "gst_free", "quantity": 1 },
+          { "id": "l3", "label": "Financial supply", "amount": { "currency": "AUD", "minorUnits": "120000", "scale": 2 }, "amountIs": "exclusive", "treatment": "input_taxed", "quantity": 1 },
+          { "id": "l4", "label": "Hardware", "amount": { "currency": "AUD", "minorUnits": "8749", "scale": 2 }, "amountIs": "inclusive", "treatment": "taxable", "quantity": 7 }
+        ]
+      },
+      "expected": null,
+      "verifiedBy": null,
+      "verifiedAt": null
+    }
+  ]
+}

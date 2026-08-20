@@ -1,0 +1,34 @@
+{
+  "rulePackId": "au-gst-standard",
+  "jurisdiction": "AU",
+  "subdivision": null,
+  "domain": "gst",
+  "effectiveFrom": "2000-07-01",
+  "effectiveTo": null,
+  "status": "in_review",
+  "schemaVersion": 1,
+  "rulesVersion": "0.1.0",
+  "sources": [
+    {
+      "sourceId": "ato-how-gst-works-2026-08-20",
+      "authority": "Australian Taxation Office",
+      "title": "How GST works",
+      "url": "https://www.ato.gov.au/businesses-and-organisations/gst-excise-and-indirect-taxes/gst/how-gst-works",
+      "jurisdiction": "AU",
+      "domain": "gst",
+      "retrievedAt": "2026-08-20T00:00:00+08:00",
+      "archivedSnapshotRef": "compliance-archive/sources/ato/how-gst-works.2026-08-20.html",
+      "contentHash": "644a6039f3679c839f4c0fda6c65ed87fd26a266b7f6bef03f3dc657fbd5bb8f",
+      "notes": "Page states: 'Goods and services tax (GST) is a broad-based tax of 10% on most goods, services and other items sold or consumed in Australia.' effectiveFrom (2000-07-01) is NOT stated on this page and requires human verification."
+    }
+  ],
+  "review": {
+    "preparedBy": "claude-build-agent",
+    "approvedBy": null,
+    "approvedAt": null
+  },
+  "verifiedAt": null,
+  "rules": {
+    "standardRate": "0.10"
+  }
+}

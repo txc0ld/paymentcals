@@ -1,0 +1,23 @@
+{
+  "name": "@paymentcalcs/engine-business",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "lint": "eslint src"
+  },
+  "dependencies": {
+    "@paymentcalcs/calculation-core": "workspace:*",
+    "@paymentcalcs/rule-schema": "workspace:*",
+    "@paymentcalcs/rules-au": "workspace:*",
+    "zod": "4.4.3"
+  },
+  "devDependencies": {
+    "@paymentcalcs/test-fixtures": "workspace:*"
+  }
+}

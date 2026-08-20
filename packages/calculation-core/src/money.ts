@@ -103,6 +103,16 @@ export function sumMoney(currency: CurrencyCode, scale: number, items: readonly 
   return total;
 }
 
+/** Round an exact minor-unit decimal (e.g. 123.456 cents) into Money. */
+export function moneyFromDecimalMinorUnits(
+  currency: CurrencyCode,
+  scale: number,
+  exactMinorUnits: DecimalValue,
+  mode: RoundingMode,
+): Money {
+  return moneyFromMinorUnits(currency, roundTo(exactMinorUnits, 0, mode).toFixed(0), scale);
+}
+
 /** Multiply by an exact decimal factor, rounding minor units with the given mode. */
 export function multiplyMoney(a: Money, factor: DecimalValue, mode: RoundingMode): Money {
   const product = roundTo(dec(a.minorUnits).times(factor) as DecimalValue, 0, mode);

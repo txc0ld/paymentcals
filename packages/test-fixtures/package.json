@@ -1,0 +1,17 @@
+{
+  "name": "@paymentcalcs/test-fixtures",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./gst": "./src/gst/au-biz-001.fixture.json"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint src"
+  },
+  "dependencies": {
+    "zod": "4.4.3"
+  }
+}

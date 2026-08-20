@@ -1,0 +1,13 @@
+{
+  "name": "@paymentcalcs/eslint-config",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.mjs"
+  },
+  "dependencies": {
+    "eslint": "10.8.1",
+    "typescript-eslint": "8.67.0"
+  }
+}

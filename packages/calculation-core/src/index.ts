@@ -11,6 +11,7 @@ export {
   addMoney,
   compareMoney,
   isZeroMoney,
+  moneyFromDecimalMinorUnits,
   moneyFromDecimalString,
   moneyFromMinorUnits,
   moneyToDecimal,

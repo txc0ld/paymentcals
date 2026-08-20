@@ -1,0 +1,20 @@
+{
+  "name": "@paymentcalcs/rules-au",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "lint": "eslint src",
+    "rules:hash": "node scripts/generate-integrity-manifest.mjs"
+  },
+  "dependencies": {
+    "@paymentcalcs/calculation-core": "workspace:*",
+    "@paymentcalcs/rule-schema": "workspace:*",
+    "zod": "4.4.3"
+  }
+}
