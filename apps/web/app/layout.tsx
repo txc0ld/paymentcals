@@ -61,7 +61,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             </Link>
             <div className="flex items-center gap-4">
               <Link
-                href="/au/business/gst-calculator"
+                href="/calculators"
                 className="clay-quiet-button hidden min-h-11 items-center px-4 font-mono text-[11px] uppercase tracking-[0.16em] text-ink-2 hover:text-ink focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-focus sm:inline-flex"
               >
                 Calculators
@@ -84,7 +84,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             </div>
             <div className="grid content-start gap-2 font-mono text-[11px] uppercase tracking-[0.14em] text-ink-3">
               <span className="text-ink-2">Trust</span>
-              <span>Rules from official sources, versioned</span>
+              <Link href="/sources" className="hover:text-ink">Sources &amp; rule packs</Link>
+              <Link href="/changelog" className="hover:text-ink">Changelog</Link>
               <span>Your numbers stay on your device</span>
               <span>No accounts. No cookies. No ads.</span>
             </div>

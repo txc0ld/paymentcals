@@ -1,12 +1,17 @@
 import Link from "next/link";
 import { calculatorRegistry, routePath } from "@paymentcalcs/calculator-registry";
 
-const ROADMAP: Array<{ group: string; count: number; detail: string }> = [
-  { group: "Property costs", count: 5, detail: "Stamp duty, buying costs, deposit, LVR, affordability" },
-  { group: "Loans & Debt", count: 3, detail: "Loans, car loans, credit-card payoff" },
-  { group: "Savings", count: 2, detail: "Compound interest, savings goals" },
-  { group: "Business", count: 1, detail: "Contractor day rate" },
-];
+const FEATURED_IDS = [
+  "AU-PAY-001",
+  "AU-HOME-001",
+  "AU-HOME-002",
+  "AU-HOME-017",
+  "AU-PAY-004",
+  "AU-DEBT-012",
+  "GL-SAVE-002",
+  "AU-BIZ-006",
+  "AU-PAY-013",
+] as const;
 
 export default function HomePage() {
   return (
@@ -69,7 +74,7 @@ export default function HomePage() {
           </span>
         </div>
         <div className="swiss-grid reveal-up sm:grid-cols-2 lg:grid-cols-3">
-          {calculatorRegistry.map((entry) => (
+          {FEATURED_IDS.map((id) => calculatorRegistry.find((entry) => entry.id === id)!).map((entry) => (
             <Link
               key={entry.id}
               href={routePath(entry)}
@@ -92,18 +97,15 @@ export default function HomePage() {
               </div>
             </Link>
           ))}
-          {ROADMAP.map((item) => (
-            <div key={item.group} className="grid min-h-52 content-between gap-8 p-7 opacity-80">
-              <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-ink-3">
-                In build · {item.count} routes
-              </span>
-              <div className="grid gap-1.5">
-                <span className="text-xl font-semibold text-ink-2">{item.group}</span>
-                <span className="text-[13px] leading-5 text-ink-3">{item.detail}</span>
-              </div>
-            </div>
-          ))}
         </div>
+        <p className="reveal-up mt-8">
+          <Link
+            href="/calculators"
+            className="clay-quiet-button inline-flex min-h-11 items-center gap-2 px-5 font-mono text-[11px] uppercase tracking-[0.16em] text-ink-2 hover:text-ink focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-focus"
+          >
+            Browse all {calculatorRegistry.length} calculators <span aria-hidden="true">↗</span>
+          </Link>
+        </p>
       </section>
 
       {/* METHOD BAND */}
