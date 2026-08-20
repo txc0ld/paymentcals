@@ -36,9 +36,15 @@ Phase: **0 — Foundation (Gate 0)** · Started 2026-08-20
 
 ## Done
 
+- Phase 0 complete (2026-08-20): all 9 foundation tasks. 31 turbo tasks green (typecheck/lint/test/build), 11 Playwright e2e green incl. axe scans in both themes and a 390px mobile suite. 4 golden-fixture cases queued for owner verification.
+- Codex (GPT-5.6) cross-review round 1 done and findings fixed; codex also executed the D-008 bubbly-3D restyle under a constrained brief (reviews archived in `docs/reviews/`).
+- Deployed: GitHub `txc0ld/paymentcals` (main) · Vercel production https://paymentcals.vercel.app (fail-closed calculator pending pack verification) · working preview with DRAFT banner (draft rules enabled for the preview env only).
 - Git repo initialised (`main`); root configs (pnpm workspace, turbo, tsconfig base); governing docs written.
 - ATO GST source captured + archived; VERIFICATION-QUEUE.md seeded.
 
-## Blocked / decisions needed from owner
+## Blocked / decisions needed from owner (Phase 0 → Phase 1 checkpoint)
 
-- None currently.
+1. **Verify the GST rule pack** (VERIFICATION-QUEUE.md): confirm the 10% rate against the cited ATO page, set `status` to `active` + `verifiedAt`, run `pnpm --filter @paymentcalcs/rules-au rules:hash`, redeploy. This turns the production calculator on.
+2. **Fill golden-fixture expected values** in `packages/test-fixtures/src/gst/au-biz-001.fixture.json` (4 cases).
+3. **Veto point D-006**: draft rules run on Vercel *preview* deployments behind a persistent banner. Codex review flagged this against the strict reading of non-negotiable #12; it stands as your explicit "deploy working calculators" instruction.
+4. Approve shell + GST route to unlock Phase 1 (Pay slice: E01–E04, E24, nine PAY routes, FY rule packs).
