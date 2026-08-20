@@ -1,0 +1,52 @@
+{
+  "rulePackId": "au-stsl-2026-27",
+  "jurisdiction": "AU",
+  "subdivision": null,
+  "domain": "stsl",
+  "effectiveFrom": "2026-07-01",
+  "effectiveTo": "2027-06-30",
+  "status": "in_review",
+  "schemaVersion": 1,
+  "rulesVersion": "0.1.0",
+  "sources": [
+    {
+      "sourceId": "ato-stsl-thresholds-2026-08-20",
+      "authority": "Australian Taxation Office",
+      "title": "Study and training support loans rates and repayment thresholds",
+      "url": "https://www.ato.gov.au/tax-rates-and-codes/study-and-training-support-loans-rates-and-repayment-thresholds",
+      "jurisdiction": "AU",
+      "domain": "tax",
+      "retrievedAt": "2026-08-20T21:30:00+08:00",
+      "archivedSnapshotRef": "compliance-archive/sources/ato/stsl-thresholds.2026-08-20.html",
+      "contentHash": "41e7225925f4ba8fb0595e56383cc0b321418eb8f177a1fe7d1a196baa0e7055"
+    }
+  ],
+  "review": {
+    "preparedBy": "claude-build-agent",
+    "approvedBy": null,
+    "approvedAt": null
+  },
+  "verifiedAt": null,
+  "rules": {
+    "system": "marginal",
+    "threshold": "69528",
+    "bands": [
+      {
+        "over": "69528",
+        "upTo": "129717",
+        "rate": "0.15",
+        "baseAmount": "0"
+      },
+      {
+        "over": "129717",
+        "upTo": "186050",
+        "rate": "0.17",
+        "baseAmount": "9028"
+      }
+    ],
+    "highIncome": {
+      "over": "186050",
+      "rateOfTotal": "0.10"
+    }
+  }
+}

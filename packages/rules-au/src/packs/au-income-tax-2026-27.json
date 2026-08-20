@@ -1,0 +1,120 @@
+{
+  "rulePackId": "au-income-tax-2026-27",
+  "jurisdiction": "AU",
+  "subdivision": null,
+  "domain": "income-tax",
+  "effectiveFrom": "2026-07-01",
+  "effectiveTo": "2027-06-30",
+  "status": "in_review",
+  "schemaVersion": 1,
+  "rulesVersion": "0.1.0",
+  "sources": [
+    {
+      "sourceId": "ato-resident-rates-2026-08-20",
+      "authority": "Australian Taxation Office",
+      "title": "Tax rates - Australian residents",
+      "url": "https://www.ato.gov.au/tax-rates-and-codes/tax-rates-australian-residents",
+      "jurisdiction": "AU",
+      "domain": "tax",
+      "retrievedAt": "2026-08-20T21:30:00+08:00",
+      "archivedSnapshotRef": "compliance-archive/sources/ato/resident-rates.2026-08-20.html",
+      "contentHash": "43f19b929706165331a9956f14710e06fb680dce2b94d3983a601687b6507841"
+    },
+    {
+      "sourceId": "ato-whm-schedule15-2026-08-20",
+      "authority": "Australian Taxation Office",
+      "title": "Schedule 15 - Tax table for working holiday makers",
+      "url": "https://www.ato.gov.au/tax-rates-and-codes/schedule-15-tax-table-for-working-holiday-makers",
+      "jurisdiction": "AU",
+      "domain": "tax",
+      "retrievedAt": "2026-08-20T21:30:00+08:00",
+      "archivedSnapshotRef": "compliance-archive/sources/ato/whm.2026-08-20.html",
+      "contentHash": "4384d2696d1ea7062f705219b192d5fbabeb359d272b8c8db0d872adfcfa3538"
+    },
+    {
+      "sourceId": "ato-lito-2026-08-20",
+      "authority": "Australian Taxation Office",
+      "title": "Low income tax offset",
+      "url": "https://www.ato.gov.au/individuals-and-families/income-deductions-offsets-and-records/tax-offsets/low-income-tax-offset",
+      "jurisdiction": "AU",
+      "domain": "tax",
+      "retrievedAt": "2026-08-20T21:30:00+08:00",
+      "archivedSnapshotRef": "compliance-archive/sources/ato/lito.2026-08-20.html",
+      "contentHash": "6b57242f38597c7b7504844148b1d64fd6313215cbb2aee2ae3b06e1c495c1bb",
+      "notes": "Page states current values without a financial-year label; per-FY applicability requires human verification."
+    }
+  ],
+  "review": {
+    "preparedBy": "claude-build-agent",
+    "approvedBy": null,
+    "approvedAt": null
+  },
+  "verifiedAt": null,
+  "rules": {
+    "resident": [
+      {
+        "over": "0",
+        "upTo": "18200",
+        "rate": "0"
+      },
+      {
+        "over": "18200",
+        "upTo": "45000",
+        "rate": "0.15"
+      },
+      {
+        "over": "45000",
+        "upTo": "135000",
+        "rate": "0.30"
+      },
+      {
+        "over": "135000",
+        "upTo": "190000",
+        "rate": "0.37"
+      },
+      {
+        "over": "190000",
+        "upTo": null,
+        "rate": "0.45"
+      }
+    ],
+    "foreignResident": null,
+    "workingHolidayMaker": [
+      {
+        "over": "0",
+        "upTo": "45000",
+        "rate": "0.15"
+      },
+      {
+        "over": "45000",
+        "upTo": "135000",
+        "rate": "0.30"
+      },
+      {
+        "over": "135000",
+        "upTo": "190000",
+        "rate": "0.37"
+      },
+      {
+        "over": "190000",
+        "upTo": null,
+        "rate": "0.45"
+      }
+    ],
+    "lito": {
+      "maxOffset": "700",
+      "fullUpTo": "37500",
+      "taper1": {
+        "over": "37500",
+        "upTo": "45000",
+        "reductionPerDollar": "0.05"
+      },
+      "taper2": {
+        "over": "45000",
+        "upTo": "66667",
+        "startingOffset": "325",
+        "reductionPerDollar": "0.015"
+      }
+    }
+  }
+}

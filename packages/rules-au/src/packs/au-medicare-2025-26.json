@@ -1,0 +1,116 @@
+{
+  "rulePackId": "au-medicare-2025-26",
+  "jurisdiction": "AU",
+  "subdivision": null,
+  "domain": "medicare",
+  "effectiveFrom": "2025-07-01",
+  "effectiveTo": "2026-06-30",
+  "status": "in_review",
+  "schemaVersion": 1,
+  "rulesVersion": "0.1.0",
+  "sources": [
+    {
+      "sourceId": "ato-mls-thresholds-2026-08-20",
+      "authority": "Australian Taxation Office",
+      "title": "Medicare levy surcharge income, thresholds and rates",
+      "url": "https://www.ato.gov.au/individuals-and-families/medicare-and-private-health-insurance/medicare-levy-surcharge/medicare-levy-surcharge-income-thresholds-and-rates",
+      "jurisdiction": "AU",
+      "domain": "tax",
+      "retrievedAt": "2026-08-20T21:30:00+08:00",
+      "archivedSnapshotRef": "compliance-archive/sources/ato/mls.2026-08-20.html",
+      "contentHash": "7e5cad9e27fb81819d3f6b25239bc38c0299ce974789f1c917af5d7325d91264"
+    },
+    {
+      "sourceId": "ato-medicare-low-income-2026-08-20",
+      "authority": "Australian Taxation Office",
+      "title": "Medicare levy reduction for low income earners",
+      "url": "https://www.ato.gov.au/individuals-and-families/medicare-and-private-health-insurance/medicare-levy/medicare-levy-reduction/medicare-levy-reduction-for-low-income-earners",
+      "jurisdiction": "AU",
+      "domain": "tax",
+      "retrievedAt": "2026-08-20T21:30:00+08:00",
+      "archivedSnapshotRef": "compliance-archive/sources/ato/medicare-low-income.2026-08-20.html",
+      "contentHash": "4db74ea01f66a8bb652d45064f9a0675c6df31fe2649e04160c16755b91400aa",
+      "notes": "Phase-in rate 0.10 corroborated by the page's own worked example ($29,000 taxable -> $98.90 levy)."
+    },
+    {
+      "sourceId": "ato-medicare-family-2026-08-20",
+      "authority": "Australian Taxation Office",
+      "title": "Medicare levy reduction - family income",
+      "url": "https://www.ato.gov.au/individuals-and-families/medicare-and-private-health-insurance/medicare-levy/medicare-levy-reduction/medicare-levy-reduction-family-income",
+      "jurisdiction": "AU",
+      "domain": "tax",
+      "retrievedAt": "2026-08-20T21:30:00+08:00",
+      "archivedSnapshotRef": "compliance-archive/sources/ato/medicare-family.2026-08-20.html",
+      "contentHash": "ae00038c6685b433979c1bad800ba51c304ce5c0aec0de8337c5273a8cc9c18e",
+      "notes": "Page states 2025-26 values."
+    },
+    {
+      "sourceId": "ato-resident-rates-2026-08-20",
+      "authority": "Australian Taxation Office",
+      "title": "Tax rates - Australian residents",
+      "url": "https://www.ato.gov.au/tax-rates-and-codes/tax-rates-australian-residents",
+      "jurisdiction": "AU",
+      "domain": "tax",
+      "retrievedAt": "2026-08-20T21:30:00+08:00",
+      "archivedSnapshotRef": "compliance-archive/sources/ato/resident-rates.2026-08-20.html",
+      "contentHash": "43f19b929706165331a9956f14710e06fb680dce2b94d3983a601687b6507841"
+    }
+  ],
+  "review": {
+    "preparedBy": "claude-build-agent",
+    "approvedBy": null,
+    "approvedAt": null
+  },
+  "verifiedAt": null,
+  "rules": {
+    "levyRate": "0.02",
+    "lowIncomeSingle": {
+      "lower": "28011",
+      "upper": "35013",
+      "phaseInRate": "0.10",
+      "saptoLower": "44268",
+      "saptoUpper": "55335"
+    },
+    "lowIncomeFamily": {
+      "lower": "47238",
+      "upper": "59047",
+      "saptoLower": "61623",
+      "saptoUpper": "77028",
+      "perDependentChildLowerIncrease": "4338",
+      "perDependentChildUpperIncrease": "5423"
+    },
+    "mls": {
+      "tiers": [
+        {
+          "singleOver": "0",
+          "singleUpTo": "101000",
+          "familyOver": "0",
+          "familyUpTo": "202000",
+          "rate": "0"
+        },
+        {
+          "singleOver": "101000",
+          "singleUpTo": "118000",
+          "familyOver": "202000",
+          "familyUpTo": "236000",
+          "rate": "0.01"
+        },
+        {
+          "singleOver": "118000",
+          "singleUpTo": "158000",
+          "familyOver": "236000",
+          "familyUpTo": "316000",
+          "rate": "0.0125"
+        },
+        {
+          "singleOver": "158000",
+          "singleUpTo": null,
+          "familyOver": "316000",
+          "familyUpTo": null,
+          "rate": "0.015"
+        }
+      ],
+      "familyPerChildIncrease": "1500"
+    }
+  }
+}

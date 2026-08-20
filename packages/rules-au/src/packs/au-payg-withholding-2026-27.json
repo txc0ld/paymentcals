@@ -1,0 +1,287 @@
+{
+  "rulePackId": "au-payg-withholding-2026-27",
+  "jurisdiction": "AU",
+  "subdivision": null,
+  "domain": "payg-withholding",
+  "effectiveFrom": "2026-07-01",
+  "effectiveTo": "2027-06-30",
+  "status": "in_review",
+  "schemaVersion": 1,
+  "rulesVersion": "0.1.0",
+  "sources": [
+    {
+      "sourceId": "ato-schedule1-coefficients-2026-08-20",
+      "authority": "Australian Taxation Office",
+      "title": "Schedule 1 - Coefficients for withholding from weekly payments (from 1 July 2026)",
+      "url": "https://www.ato.gov.au/tax-rates-and-codes/payg-withholding-schedule-1-statement-of-formulas-for-calculating-amounts-to-be-withheld/coefficients-to-use-in-formulas-for-withholding-from-weekly-payments",
+      "jurisdiction": "AU",
+      "domain": "tax",
+      "retrievedAt": "2026-08-20T21:30:00+08:00",
+      "archivedSnapshotRef": "compliance-archive/sources/ato/schedule1-coefficients.2026-08-20.html",
+      "contentHash": "64b736de0a42eba11d4e17491097c4418e43e723cd69ddae6eaea543514f40c6"
+    },
+    {
+      "sourceId": "ato-schedule8-2026-08-20",
+      "authority": "Australian Taxation Office",
+      "title": "Schedule 8 - Statement of formulas for calculating STSL components",
+      "url": "https://www.ato.gov.au/tax-rates-and-codes/schedule-8-statement-of-formulas-for-calculating-study-and-training-support-loans-components",
+      "jurisdiction": "AU",
+      "domain": "tax",
+      "retrievedAt": "2026-08-20T21:30:00+08:00",
+      "archivedSnapshotRef": "compliance-archive/sources/ato/schedule8.2026-08-20.html",
+      "contentHash": "377996d2f98bfe2e42b3f0b7eabfbf62e76eca70c74d2ff4d937bd8bd9d1018a"
+    }
+  ],
+  "review": {
+    "preparedBy": "claude-build-agent",
+    "approvedBy": null,
+    "approvedAt": null
+  },
+  "verifiedAt": null,
+  "rules": {
+    "earningsInput": "floor_dollars_plus_99_cents",
+    "resultRounding": "nearest_dollar",
+    "periodConversion": {
+      "fortnightly": "halve_floor_add_99c",
+      "monthly": "cents_33_add_1c_times_3_div_13_floor_add_99c",
+      "quarterly": "div_13_floor_add_99c"
+    },
+    "scales": {
+      "scale1NoTaxFreeThreshold": [
+        {
+          "lessThan": "188",
+          "a": "0.1500",
+          "b": "0.1500"
+        },
+        {
+          "lessThan": "371",
+          "a": "0.2084",
+          "b": "11.0185"
+        },
+        {
+          "lessThan": "515",
+          "a": "0.1790",
+          "b": "0.1066"
+        },
+        {
+          "lessThan": "932",
+          "a": "0.3227",
+          "b": "74.1674"
+        },
+        {
+          "lessThan": "2246",
+          "a": "0.3200",
+          "b": "71.6508"
+        },
+        {
+          "lessThan": "3303",
+          "a": "0.3900",
+          "b": "228.8816"
+        },
+        {
+          "andOver": "3303",
+          "a": "0.4700",
+          "b": "493.1893"
+        }
+      ],
+      "scale2TaxFreeThreshold": [
+        {
+          "lessThan": "362",
+          "a": "0",
+          "b": "0"
+        },
+        {
+          "lessThan": "538",
+          "a": "0.1500",
+          "b": "54.3462"
+        },
+        {
+          "lessThan": "673",
+          "a": "0.2500",
+          "b": "108.2135"
+        },
+        {
+          "lessThan": "721",
+          "a": "0.1700",
+          "b": "54.3473"
+        },
+        {
+          "lessThan": "865",
+          "a": "0.1790",
+          "b": "60.8377"
+        },
+        {
+          "lessThan": "1282",
+          "a": "0.3227",
+          "b": "185.1935"
+        },
+        {
+          "lessThan": "2596",
+          "a": "0.3200",
+          "b": "181.7319"
+        },
+        {
+          "lessThan": "3653",
+          "a": "0.3900",
+          "b": "363.4627"
+        },
+        {
+          "andOver": "3653",
+          "a": "0.4700",
+          "b": "655.7704"
+        }
+      ],
+      "scale3ForeignResident": [
+        {
+          "lessThan": "2596",
+          "a": "0.3000",
+          "b": "0.3000"
+        },
+        {
+          "lessThan": "3653",
+          "a": "0.3700",
+          "b": "181.7308"
+        },
+        {
+          "andOver": "3653",
+          "a": "0.4500",
+          "b": "474.0385"
+        }
+      ],
+      "scale5FullMedicareExemption": [
+        {
+          "lessThan": "362",
+          "a": "0",
+          "b": "0"
+        },
+        {
+          "lessThan": "721",
+          "a": "0.1500",
+          "b": "54.3462"
+        },
+        {
+          "lessThan": "865",
+          "a": "0.1590",
+          "b": "60.8365"
+        },
+        {
+          "lessThan": "1282",
+          "a": "0.3027",
+          "b": "185.1923"
+        },
+        {
+          "lessThan": "2596",
+          "a": "0.3000",
+          "b": "181.7308"
+        },
+        {
+          "lessThan": "3653",
+          "a": "0.3700",
+          "b": "363.4615"
+        },
+        {
+          "andOver": "3653",
+          "a": "0.4500",
+          "b": "655.7692"
+        }
+      ],
+      "scale6HalfMedicareExemption": [
+        {
+          "lessThan": "362",
+          "a": "0",
+          "b": "0"
+        },
+        {
+          "lessThan": "721",
+          "a": "0.1500",
+          "b": "54.3462"
+        },
+        {
+          "lessThan": "865",
+          "a": "0.1590",
+          "b": "60.8365"
+        },
+        {
+          "lessThan": "908",
+          "a": "0.3027",
+          "b": "185.1923"
+        },
+        {
+          "lessThan": "1135",
+          "a": "0.3527",
+          "b": "230.6135"
+        },
+        {
+          "lessThan": "1282",
+          "a": "0.3127",
+          "b": "185.1923"
+        },
+        {
+          "lessThan": "2596",
+          "a": "0.3100",
+          "b": "181.7308"
+        },
+        {
+          "lessThan": "3653",
+          "a": "0.3800",
+          "b": "363.4615"
+        },
+        {
+          "andOver": "3653",
+          "a": "0.4600",
+          "b": "655.7692"
+        }
+      ]
+    },
+    "scale4NoTfn": {
+      "resident": "0.47",
+      "foreignResident": "0.45"
+    },
+    "stslComponents": {
+      "taxFreeThresholdOrForeign": [
+        {
+          "lessThan": "1337",
+          "a": "0.00",
+          "b": "0.0000"
+        },
+        {
+          "lessThan": "2494",
+          "a": "0.15",
+          "b": "200.5615"
+        },
+        {
+          "lessThan": "3577",
+          "a": "0.17",
+          "b": "250.4527"
+        },
+        {
+          "andOver": "3577",
+          "a": "0.10",
+          "b": "0.0000"
+        }
+      ],
+      "noTaxFreeThreshold": [
+        {
+          "lessThan": "987",
+          "a": "0.00",
+          "b": "0.0000"
+        },
+        {
+          "lessThan": "2144",
+          "a": "0.15",
+          "b": "148.0615"
+        },
+        {
+          "lessThan": "2727",
+          "a": "0.17",
+          "b": "190.9527"
+        },
+        {
+          "andOver": "2727",
+          "a": "0.10",
+          "b": "0.0000"
+        }
+      ]
+    }
+  }
+}

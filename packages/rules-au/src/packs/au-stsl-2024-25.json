@@ -1,0 +1,126 @@
+{
+  "rulePackId": "au-stsl-2024-25",
+  "jurisdiction": "AU",
+  "subdivision": null,
+  "domain": "stsl",
+  "effectiveFrom": "2024-07-01",
+  "effectiveTo": "2025-06-30",
+  "status": "in_review",
+  "schemaVersion": 1,
+  "rulesVersion": "0.1.0",
+  "sources": [
+    {
+      "sourceId": "ato-stsl-thresholds-2026-08-20",
+      "authority": "Australian Taxation Office",
+      "title": "Study and training support loans rates and repayment thresholds",
+      "url": "https://www.ato.gov.au/tax-rates-and-codes/study-and-training-support-loans-rates-and-repayment-thresholds",
+      "jurisdiction": "AU",
+      "domain": "tax",
+      "retrievedAt": "2026-08-20T21:30:00+08:00",
+      "archivedSnapshotRef": "compliance-archive/sources/ato/stsl-thresholds.2026-08-20.html",
+      "contentHash": "41e7225925f4ba8fb0595e56383cc0b321418eb8f177a1fe7d1a196baa0e7055"
+    }
+  ],
+  "review": {
+    "preparedBy": "claude-build-agent",
+    "approvedBy": null,
+    "approvedAt": null
+  },
+  "verifiedAt": null,
+  "rules": {
+    "system": "whole_income_rate",
+    "threshold": "54434",
+    "rateTable": [
+      {
+        "over": "54434",
+        "upTo": "62850",
+        "rateOfTotal": "0.01"
+      },
+      {
+        "over": "62850",
+        "upTo": "66620",
+        "rateOfTotal": "0.02"
+      },
+      {
+        "over": "66620",
+        "upTo": "70618",
+        "rateOfTotal": "0.025"
+      },
+      {
+        "over": "70618",
+        "upTo": "74855",
+        "rateOfTotal": "0.03"
+      },
+      {
+        "over": "74855",
+        "upTo": "79346",
+        "rateOfTotal": "0.035"
+      },
+      {
+        "over": "79346",
+        "upTo": "84107",
+        "rateOfTotal": "0.04"
+      },
+      {
+        "over": "84107",
+        "upTo": "89154",
+        "rateOfTotal": "0.045"
+      },
+      {
+        "over": "89154",
+        "upTo": "94503",
+        "rateOfTotal": "0.05"
+      },
+      {
+        "over": "94503",
+        "upTo": "100174",
+        "rateOfTotal": "0.055"
+      },
+      {
+        "over": "100174",
+        "upTo": "106185",
+        "rateOfTotal": "0.06"
+      },
+      {
+        "over": "106185",
+        "upTo": "112556",
+        "rateOfTotal": "0.065"
+      },
+      {
+        "over": "112556",
+        "upTo": "119309",
+        "rateOfTotal": "0.07"
+      },
+      {
+        "over": "119309",
+        "upTo": "126467",
+        "rateOfTotal": "0.075"
+      },
+      {
+        "over": "126467",
+        "upTo": "134056",
+        "rateOfTotal": "0.08"
+      },
+      {
+        "over": "134056",
+        "upTo": "142100",
+        "rateOfTotal": "0.085"
+      },
+      {
+        "over": "142100",
+        "upTo": "150626",
+        "rateOfTotal": "0.09"
+      },
+      {
+        "over": "150626",
+        "upTo": "159663",
+        "rateOfTotal": "0.095"
+      },
+      {
+        "over": "159663",
+        "upTo": null,
+        "rateOfTotal": "0.10"
+      }
+    ]
+  }
+}
