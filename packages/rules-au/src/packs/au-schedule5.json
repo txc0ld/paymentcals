@@ -1,0 +1,40 @@
+{
+  "rulePackId": "au-schedule5",
+  "jurisdiction": "AU",
+  "subdivision": null,
+  "domain": "schedule5",
+  "effectiveFrom": "2026-07-01",
+  "effectiveTo": null,
+  "status": "active",
+  "schemaVersion": 1,
+  "rulesVersion": "0.1.0",
+  "sources": [
+    {
+      "sourceId": "ato-schedule5-2026-08-21",
+      "authority": "Australian Taxation Office",
+      "title": "Schedule 5 — Tax table for back payments, commissions, bonuses and similar payments (working out the withholding amount)",
+      "url": "https://www.ato.gov.au/tax-rates-and-codes/schedule-5-tax-table-for-back-payments-commissions-bonuses-and-similar-payments/working-out-the-withholding-amount",
+      "jurisdiction": "AU",
+      "domain": "schedule5",
+      "retrievedAt": "2026-08-21T14:00:00+08:00",
+      "archivedSnapshotRef": "compliance-archive/sources/ato/schedule5-working-out.2026-08-21.html",
+      "contentHash": "3acd3dd4378ef1d075aec7c95292d750b64400ba1e13ac4ae43bac81ec0729a2",
+      "notes": "Applies to payments made from 1 July 2026. Methods A, B(i) and B(ii) are published in full as numbered steps; they delegate the tax lookups to the regular schedule (Schedule 1, already packaged). Cap: withholding on the additional payment is limited to 47% of it; negative results are treated as nil."
+    }
+  ],
+  "review": {
+    "preparedBy": "claude-build-agent",
+    "approvedBy": "owner (directive: deploy verification queue items, 2026-08-21)",
+    "approvedAt": "2026-08-21T10:00:00Z"
+  },
+  "verifiedAt": null,
+  "rules": {
+    "additionalPaymentCapRate": "0.47",
+    "negativeResultsAreNil": true,
+    "methods": [
+      "A",
+      "B(i)",
+      "B(ii)"
+    ]
+  }
+}

@@ -1,0 +1,55 @@
+{
+  "rulePackId": "au-sapto",
+  "jurisdiction": "AU",
+  "subdivision": null,
+  "domain": "sapto",
+  "effectiveFrom": "2025-07-01",
+  "effectiveTo": null,
+  "status": "active",
+  "schemaVersion": 1,
+  "rulesVersion": "0.1.0",
+  "sources": [
+    {
+      "sourceId": "ato-sapto-2026-08-21",
+      "authority": "Australian Taxation Office",
+      "title": "Seniors and pensioners tax offset (rates and rebate income thresholds)",
+      "url": "https://www.ato.gov.au/individuals-and-families/income-deductions-offsets-and-records/tax-offsets/seniors-and-pensioners-tax-offset",
+      "jurisdiction": "AU",
+      "domain": "sapto",
+      "retrievedAt": "2026-08-21T14:00:00+08:00",
+      "archivedSnapshotRef": "compliance-archive/sources/ato/sapto.2026-08-21.html",
+      "contentHash": "ff1f5c2d2006b744c12297fad498ecc0704b1225ac5981cd5dcbc8fe453ab763",
+      "notes": "2025-26 values (page cites the 2025 Regulations and a 2025-26 example; corroborated by the archived myTax 2026 page sapto-mytax-2026.2026-08-21.html, sha256 03dbd59fa1ed76abcb07d15649a6010d88c1c4c99091ee0664e47799f3fcebf0). Offset reduces by $0.125 per dollar of rebate income over the shading-out threshold; non-refundable. Cut-out = shade-out + max/0.125 verified for all rows."
+    }
+  ],
+  "review": {
+    "preparedBy": "claude-build-agent",
+    "approvedBy": "owner (directive: deploy verification queue items, 2026-08-21)",
+    "approvedAt": "2026-08-21T10:00:00Z"
+  },
+  "verifiedAt": null,
+  "rules": {
+    "financialYear": "2025-26",
+    "shadeOutRatePerDollar": "0.125",
+    "statuses": [
+      {
+        "status": "single",
+        "maxOffset": "2230",
+        "shadingOutThreshold": "34919",
+        "cutOutThreshold": "52759"
+      },
+      {
+        "status": "couple_each",
+        "maxOffset": "1602",
+        "shadingOutThreshold": "30994",
+        "cutOutThreshold": "43810"
+      },
+      {
+        "status": "illness_separated_each",
+        "maxOffset": "2040",
+        "shadingOutThreshold": "33732",
+        "cutOutThreshold": "50052"
+      }
+    ]
+  }
+}

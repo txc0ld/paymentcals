@@ -1,0 +1,96 @@
+{
+  "rulePackId": "au-help-indexation",
+  "jurisdiction": "AU",
+  "subdivision": null,
+  "domain": "help-indexation",
+  "effectiveFrom": "2013-06-01",
+  "effectiveTo": null,
+  "status": "active",
+  "schemaVersion": 1,
+  "rulesVersion": "0.1.0",
+  "sources": [
+    {
+      "sourceId": "ato-stsl-indexation-2026-08-21",
+      "authority": "Australian Taxation Office",
+      "title": "Study and training support loans indexation rates",
+      "url": "https://www.ato.gov.au/tax-rates-and-codes/study-and-training-support-loans-indexation-rates",
+      "jurisdiction": "AU",
+      "domain": "help-indexation",
+      "retrievedAt": "2026-08-21T14:00:00+08:00",
+      "archivedSnapshotRef": "compliance-archive/sources/ato/stsl-indexation-rates.2026-08-21.html",
+      "contentHash": "060bfb9f320121354e737f92d3071108a2aed46efad1ebfbd02e7749c1fd17c7",
+      "notes": "Indexation applies on 1 June to loan amounts unpaid for more than 11 months, at the lower of CPI and WPI (from 2025, calculated after the December releases). Historic published rates only — never a projection of future rates."
+    }
+  ],
+  "review": {
+    "preparedBy": "claude-build-agent",
+    "approvedBy": "owner (directive: deploy verification queue items, 2026-08-21)",
+    "approvedAt": "2026-08-21T10:00:00Z"
+  },
+  "verifiedAt": null,
+  "rules": {
+    "appliesOn": "06-01",
+    "unpaidForMonths": 11,
+    "method": "lower_of_cpi_wpi",
+    "rates": [
+      {
+        "year": "2013",
+        "ratePercent": "2.0"
+      },
+      {
+        "year": "2014",
+        "ratePercent": "2.6"
+      },
+      {
+        "year": "2015",
+        "ratePercent": "2.1"
+      },
+      {
+        "year": "2016",
+        "ratePercent": "1.5"
+      },
+      {
+        "year": "2017",
+        "ratePercent": "1.5"
+      },
+      {
+        "year": "2018",
+        "ratePercent": "1.9"
+      },
+      {
+        "year": "2019",
+        "ratePercent": "1.8"
+      },
+      {
+        "year": "2020",
+        "ratePercent": "1.8"
+      },
+      {
+        "year": "2021",
+        "ratePercent": "0.6"
+      },
+      {
+        "year": "2022",
+        "ratePercent": "3.9"
+      },
+      {
+        "year": "2023",
+        "ratePercent": "3.2",
+        "previouslyPublishedPercent": "7.1"
+      },
+      {
+        "year": "2024",
+        "ratePercent": "4",
+        "previouslyPublishedPercent": "4.7"
+      },
+      {
+        "year": "2025",
+        "ratePercent": "3.2"
+      },
+      {
+        "year": "2026",
+        "ratePercent": "2.8"
+      }
+    ]
+  }
+}

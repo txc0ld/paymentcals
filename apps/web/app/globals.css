@@ -159,6 +159,12 @@ body {
   background: var(--pc-surface);
 }
 
+/* Bordered tables breathe: edge cells never sit flush against the frame. */
+.nexus-table th:first-child,
+.nexus-table td:first-child { padding-inline-start: 1rem; }
+.nexus-table th:last-child,
+.nexus-table td:last-child { padding-inline-end: 1rem; }
+
 .nexus-tab {
   position: relative;
   border-radius: 0;

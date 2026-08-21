@@ -17,6 +17,7 @@ import {
   type TraceStep,
 } from "@paymentcalcs/calculation-core";
 import type {
+  SaptoRulePack,
   IncomeTaxRulePack,
   MedicareRulePack,
   PaygWithholdingRulePack,
@@ -44,6 +45,8 @@ export interface AuPayResolution {
   superGuarantee: { pack: SuperGuaranteeRulePack; manifestRef: RulePackManifestRef };
   stsl: { pack: StslRulePack; manifestRef: RulePackManifestRef } | null;
   payg: { pack: PaygWithholdingRulePack; manifestRef: RulePackManifestRef } | null;
+  /** Optional: SAPTO thresholds; required only when the input claims SAPTO. */
+  sapto?: { pack: SaptoRulePack; manifestRef: RulePackManifestRef } | null;
 }
 
 export interface AuPayContext {
@@ -210,6 +213,46 @@ export function computeAuPay(input: AuPayInput, resolution: AuPayResolution): Li
   // MLS income adds RFB, reportable super and net investment losses to
   // taxable income (ATO income-for-surcharge-purposes definition).
   const surchargeExtras = rfb.plus(salarySacrifice).plus(netInvestmentLosses) as DecimalValue;
+
+  /* SAPTO (seniors and pensioners tax offset), non-refundable against income
+   * tax after LITO. Rebate income is approximated with the same components
+   * as the surcharge income tests; the exact statutory definition also
+   * includes reportable super beyond salary sacrifice. */
+  let sapto = zero();
+  const saptoClaim = input.taxpayer.sapto;
+  if (saptoClaim?.eligible && input.taxpayer.residency === "resident") {
+    if (!resolution.sapto) {
+      throw new RulesUnavailableError(
+        `SAPTO rules are not available for ${input.financialYear}.`,
+      );
+    }
+    const saptoRules = resolution.sapto.pack.rules;
+    const row = saptoRules.statuses.find((s) => s.status === saptoClaim.status);
+    if (!row) {
+      throw new RulesUnavailableError(`SAPTO status ${saptoClaim.status} is not in the resolved pack.`);
+    }
+    const rebateIncome = taxableIncome.plus(surchargeExtras) as DecimalValue;
+    const excess = Dec.max(zero(), rebateIncome.minus(new Dec(row.shadingOutThreshold))) as DecimalValue;
+    const raw = new Dec(row.maxOffset).minus(excess.times(new Dec(saptoRules.shadeOutRatePerDollar)));
+    // The page: "We round up the amount to the nearest whole dollar."
+    const entitlement = Dec.max(zero(), raw.toDecimalPlaces(0, Dec.ROUND_CEIL)) as DecimalValue;
+    sapto = Dec.min(entitlement, Dec.max(zero(), grossTax.minus(lito)) as DecimalValue) as DecimalValue;
+    warnings.push({
+      code: "PC-CALC-0204",
+      severity: "info",
+      message:
+        "SAPTO uses rebate income approximated as taxable income plus reportable fringe benefits, salary-sacrificed super and net investment losses; the pack carries the latest published (2025-26) thresholds.",
+    });
+    trace.push({
+      id: "sapto",
+      formulaId: "F-TAX-006",
+      label: "Seniors and pensioners tax offset",
+      expression: "offset = max(0, ceil(max − 0.125 × max(0, rebate − shadeOut)))",
+      substitution: `sapto(${rebateIncome.toFixed(2)})`,
+      value: sapto.toFixed(2),
+      unit: "AUD",
+    });
+  }
   const mls =
     input.taxpayer.residency === "resident"
       ? medicareLevySurcharge(taxableIncome, resolution.medicare.pack.rules, {
@@ -248,7 +291,7 @@ export function computeAuPay(input: AuPayInput, resolution: AuPayResolution): Li
     });
   }
 
-  const totalLiability = grossTax.minus(lito).plus(levyResult.levy).plus(mls).plus(stsl) as DecimalValue;
+  const totalLiability = grossTax.minus(lito).minus(sapto).plus(levyResult.levy).plus(mls).plus(stsl) as DecimalValue;
   const postTax = moneyDec(adj.postTaxDeductions);
   const netAnnual = grossCash.minus(preTax).minus(totalLiability).minus(postTax) as DecimalValue;
 
@@ -284,7 +327,19 @@ export function computeAuPay(input: AuPayInput, resolution: AuPayResolution): Li
       resolution.stsl.pack.rules,
     );
   }
-  const bumpLiability = bumpTax.minus(bumpLito).plus(bumpLevy).plus(bumpMls).plus(bumpStsl) as DecimalValue;
+  let bumpSapto = zero();
+  if (saptoClaim?.eligible && input.taxpayer.residency === "resident" && resolution.sapto) {
+    const saptoRules = resolution.sapto.pack.rules;
+    const row = saptoRules.statuses.find((s) => s.status === saptoClaim.status);
+    if (row) {
+      const bumpRebate = bumpTaxable.plus(surchargeExtras) as DecimalValue;
+      const bumpExcess = Dec.max(zero(), bumpRebate.minus(new Dec(row.shadingOutThreshold))) as DecimalValue;
+      const bumpRaw = new Dec(row.maxOffset).minus(bumpExcess.times(new Dec(saptoRules.shadeOutRatePerDollar)));
+      const bumpEntitlement = Dec.max(zero(), bumpRaw.toDecimalPlaces(0, Dec.ROUND_CEIL)) as DecimalValue;
+      bumpSapto = Dec.min(bumpEntitlement, Dec.max(zero(), bumpTax.minus(bumpLito)) as DecimalValue) as DecimalValue;
+    }
+  }
+  const bumpLiability = bumpTax.minus(bumpLito).minus(bumpSapto).plus(bumpLevy).plus(bumpMls).plus(bumpStsl) as DecimalValue;
   const nextThousandNet = new Dec(1000).minus(bumpLiability.minus(totalLiability)) as DecimalValue;
 
   // Withholding (E03) — separate engine, separate labelling (PAY-AC-002).
@@ -352,6 +407,7 @@ export function computeAuPay(input: AuPayInput, resolution: AuPayResolution): Li
       taxableIncome: aud(taxableIncome),
       grossIncomeTax: aud(grossTax),
       litoOffset: aud(lito),
+      saptoOffset: aud(sapto),
       medicareLevy: aud(levyResult.levy),
       medicareLevySurcharge: aud(mls),
       studyLoanRepayment: aud(stsl),

@@ -28,6 +28,13 @@ export const zAuPayInput = z.object({
   taxpayer: z.object({
     residency: z.enum(["resident", "foreign_resident", "working_holiday_maker"]),
     claimsTaxFreeThreshold: z.boolean().default(true),
+    /** Seniors and pensioners tax offset. Optional: absent = not claimed. */
+    sapto: z
+      .object({
+        eligible: z.boolean(),
+        status: z.enum(["single", "couple_each", "illness_separated_each"]),
+      })
+      .optional(),
     medicare: z
       .object({
         status: z.enum(["standard", "half_exemption", "full_exemption"]).default("standard"),
@@ -72,6 +79,8 @@ export interface AuAnnualLiability {
   taxableIncome: Money;
   grossIncomeTax: Money;
   litoOffset: Money;
+  /** Seniors and pensioners tax offset actually applied (non-refundable). */
+  saptoOffset: Money;
   medicareLevy: Money;
   medicareLevySurcharge: Money;
   studyLoanRepayment: Money;

@@ -1,0 +1,90 @@
+{
+  "rulePackId": "au-duty-concessions-act",
+  "jurisdiction": "AU",
+  "subdivision": "ACT",
+  "domain": "stamp-duty-concessions",
+  "effectiveFrom": "2026-07-01",
+  "effectiveTo": null,
+  "status": "active",
+  "schemaVersion": 1,
+  "rulesVersion": "0.1.0",
+  "sources": [
+    {
+      "sourceId": "actro-owner-occupier-2026-08-21",
+      "authority": "ACT Revenue Office",
+      "title": "Conveyance duty for non-commercial property — eligible owner occupier (Table 1)",
+      "url": "https://www.revenue.act.gov.au/rates-and-property-charges/conveyance-duty-stamp-duty/conveyance-duty-for-non-commercial-property",
+      "jurisdiction": "AU",
+      "domain": "stamp-duty-concessions",
+      "retrievedAt": "2026-08-21T14:30:00+08:00",
+      "archivedSnapshotRef": "compliance-archive/sources/state-revenue/act-conveyance-duty-non-commercial-property.2026-08-21.html",
+      "contentHash": "00c5c8eb6218ba3cb485b2d8ba3faa5081e1a25cc85bf4bf0f16ff9dede5a677",
+      "notes": "Eligible owner-occupier rates for transactions on or after 1 July 2025, unchanged for FY2026-27 per determination DI2026-155 (archived). Occupancy conditions (live in for 1 year, starting within 12 months) are the buyer's own assessment; the top band is a flat $4.54 per $100 of the total value."
+    }
+  ],
+  "review": {
+    "preparedBy": "claude-build-agent",
+    "approvedBy": "owner (directive: deploy verification queue items, 2026-08-21)",
+    "approvedAt": "2026-08-21T10:30:00Z"
+  },
+  "verifiedAt": null,
+  "rules": {
+    "nswFhbas": null,
+    "qldHome": null,
+    "vicPpr": null,
+    "actOwnerOccupier": {
+      "brackets": [
+        {
+          "over": "0",
+          "upTo": "260000",
+          "baseAmount": "0",
+          "ratePer100": "0.28",
+          "appliesTo": "excess"
+        },
+        {
+          "over": "260000",
+          "upTo": "300000",
+          "baseAmount": "728",
+          "ratePer100": "2.20",
+          "appliesTo": "excess"
+        },
+        {
+          "over": "300000",
+          "upTo": "500000",
+          "baseAmount": "1608",
+          "ratePer100": "3.40",
+          "appliesTo": "excess"
+        },
+        {
+          "over": "500000",
+          "upTo": "750000",
+          "baseAmount": "8408",
+          "ratePer100": "4.32",
+          "appliesTo": "excess"
+        },
+        {
+          "over": "750000",
+          "upTo": "1000000",
+          "baseAmount": "19208",
+          "ratePer100": "5.90",
+          "appliesTo": "excess"
+        },
+        {
+          "over": "1000000",
+          "upTo": "1455000",
+          "baseAmount": "33958",
+          "ratePer100": "6.40",
+          "appliesTo": "excess"
+        },
+        {
+          "over": "1455000",
+          "upTo": null,
+          "baseAmount": "0",
+          "ratePer100": "4.54",
+          "appliesTo": "total"
+        }
+      ],
+      "per100Rounding": "part_thereof_up"
+    }
+  }
+}

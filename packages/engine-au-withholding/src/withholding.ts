@@ -136,6 +136,89 @@ export function computeWithholding(
   };
 }
 
+export type MethodACycle = "weekly" | "fortnightly" | "monthly";
+
+const PERIODS_PER_YEAR: Record<MethodACycle, number> = { weekly: 52, fortnightly: 26, monthly: 12 };
+
+export interface MethodAComputation {
+  /** Step 2 — withholding on ordinary gross earnings alone. */
+  periodOnEarnings: DecimalValue;
+  /** Step 9 — withholding on the additional payment (capped, cents ignored). */
+  periodOnAdditional: DecimalValue;
+  /** Step 10 — total for the pay period. */
+  periodTotal: DecimalValue;
+  /** True when the 47% cap (step 8) was the lesser amount at step 9. */
+  capApplied: boolean;
+  /** Pay periods used to apportion the additional payment at step 3. */
+  apportionPeriods: number;
+  steps: { step3: string; step6: string; step7: string; step8: string };
+}
+
+/**
+ * Schedule 5, Method A — withholding on back payments, commissions, bonuses
+ * and similar payments. The ten published steps, verbatim: apportion the
+ * additional payment across the year's pay periods, difference the regular
+ * schedule at the marginal average, cap at the pack's rate (47%), negatives
+ * are nil. Delegates every tax-table lookup to Schedule 1 (`computeWithholding`).
+ */
+export function computeMethodAWithholding(
+  rules: PaygWithholdingRules,
+  schedule5: { additionalPaymentCapRate: string; negativeResultsAreNil: boolean },
+  options: {
+    /** Gross earnings for the current pay period, excluding the additional payment. */
+    periodEarnings: DecimalValue;
+    additionalPayment: DecimalValue;
+    cycle: MethodACycle;
+    scale: WithholdingScaleId;
+    stslEnabled: boolean;
+    /**
+     * Step 3 override: for a payment relating to a defined period of less than
+     * 12 months, the number of pay periods it relates to. Defaults to the
+     * periods in a financial year (52 / 26 / 12).
+     */
+    apportionPeriods?: number;
+  },
+): MethodAComputation {
+  if (options.additionalPayment.lessThan(0)) throw new RangeError("Additional payment cannot be negative.");
+  const zero = new Dec(0) as DecimalValue;
+  const periods = options.apportionPeriods ?? PERIODS_PER_YEAR[options.cycle];
+  if (!Number.isInteger(periods) || periods < 1) throw new RangeError("apportionPeriods must be a positive integer.");
+
+  // Step 1: gross earnings excluding additional payments, cents ignored.
+  const step1 = options.periodEarnings.floor() as DecimalValue;
+  const lookup = (earnings: DecimalValue) =>
+    computeWithholding(rules, {
+      periodEarnings: earnings,
+      cycle: options.cycle,
+      scale: options.scale,
+      stslEnabled: options.stslEnabled,
+    }).periodTotal;
+  // Step 2: withholding on step 1 from the relevant tax table.
+  const step2 = lookup(step1);
+  // Step 3: additional payment ÷ pay periods, cents ignored.
+  const step3 = options.additionalPayment.div(periods).floor() as DecimalValue;
+  // Steps 4–5: withholding at step 1 + step 3.
+  const step5 = lookup(step1.plus(step3) as DecimalValue);
+  // Steps 6–7: the difference, scaled back up.
+  const step6 = step5.minus(step2) as DecimalValue;
+  const step7 = step6.times(periods) as DecimalValue;
+  // Step 8: cap at the pack's rate on the additional payment itself.
+  const step8 = options.additionalPayment.times(dec(schedule5.additionalPaymentCapRate)) as DecimalValue;
+  // Step 9: the lesser of steps 7 and 8, cents ignored; negatives are nil.
+  let step9 = (Dec.min(step7, step8) as DecimalValue).floor() as DecimalValue;
+  if (schedule5.negativeResultsAreNil && step9.lessThan(0)) step9 = zero;
+  const capApplied = step8.lessThan(step7);
+
+  return {
+    periodOnEarnings: step2,
+    periodOnAdditional: step9,
+    periodTotal: step2.plus(step9) as DecimalValue,
+    capApplied,
+    apportionPeriods: periods,
+    steps: { step3: step3.toFixed(0), step6: step6.toFixed(2), step7: step7.toFixed(2), step8: step8.toFixed(2) },
+  };
+}
+
 /** Route residency + declarations to the applicable schedule scale. */
 export function selectScale(taxpayer: {
   residency: "resident" | "foreign_resident" | "working_holiday_maker";

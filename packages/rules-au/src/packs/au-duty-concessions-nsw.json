@@ -1,0 +1,60 @@
+{
+  "rulePackId": "au-duty-concessions-nsw",
+  "jurisdiction": "AU",
+  "subdivision": "NSW",
+  "domain": "stamp-duty-concessions",
+  "effectiveFrom": "2026-07-01",
+  "effectiveTo": null,
+  "status": "active",
+  "schemaVersion": 1,
+  "rulesVersion": "0.1.0",
+  "sources": [
+    {
+      "sourceId": "nsw-fhbas-2026-08-21",
+      "authority": "Revenue NSW",
+      "title": "First Home Buyers Assistance Scheme",
+      "url": "https://www.revenue.nsw.gov.au/grants-schemes/assistance-scheme",
+      "jurisdiction": "AU",
+      "domain": "stamp-duty-concessions",
+      "retrievedAt": "2026-08-21T14:30:00+08:00",
+      "archivedSnapshotRef": "compliance-archive/sources/state-revenue/nsw-first-home-buyers-assistance-scheme.2026-08-21.html",
+      "contentHash": "d412f2404add527b26acae43223e6b569b04964ed42056dd703e49be0fc6b50c",
+      "notes": "Full exemption to $800,000 (homes) / $350,000 (vacant land); concessional to <$1,000,000 / <$450,000, on-or-after 1 July 2023 table. The page publishes thresholds only, not the formula."
+    },
+    {
+      "sourceId": "nsw-duties-act-s78a-2026-08-21",
+      "authority": "New South Wales legislation (Duties Act 1997 s78A)",
+      "title": "Duties Act 1997 No 123, s78A concessional rates (as at 14 June 2026)",
+      "url": "https://legislation.nsw.gov.au/view/whole/html/inforce/current/act-1997-123",
+      "jurisdiction": "AU",
+      "domain": "stamp-duty-concessions",
+      "retrievedAt": "2026-08-21T14:30:00+08:00",
+      "archivedSnapshotRef": "compliance-archive/sources/state-revenue/nsw-duties-act-1997-whole.2026-08-21.html",
+      "contentHash": "2e6842637505912585e3dfc5c88c7eff803687b0d9371135a1821f6447a2d65e",
+      "notes": "Statutory sliding formula duty = N − ((cap − V) ÷ divisor × D), N = general duty at V, D = general duty at the exemption cap (formula images archived: nsw-duties-act-s78A-2-formula sha256 e3f61b9100b49fae86575cd9068c538dddc3cc21f3811b4e741ff0645ee60a09, s78A-2A sha256 737e17cd06bd1b0ffdc446e9374f6c363fd7bcfecd6923bb7b467f1fe451401b). The formula is additionally forced by its endpoints: duty 0 at the exemption cap and full general duty at the upper cap, both stated in plain text."
+    }
+  ],
+  "review": {
+    "preparedBy": "claude-build-agent",
+    "approvedBy": "owner (directive: deploy verification queue items, 2026-08-21)",
+    "approvedAt": "2026-08-21T10:30:00Z"
+  },
+  "verifiedAt": null,
+  "rules": {
+    "nswFhbas": {
+      "homes": {
+        "exemptUpTo": "800000",
+        "capValue": "1000000",
+        "divisor": "200000"
+      },
+      "vacantLand": {
+        "exemptUpTo": "350000",
+        "capValue": "450000",
+        "divisor": "100000"
+      }
+    },
+    "qldHome": null,
+    "vicPpr": null,
+    "actOwnerOccupier": null
+  }
+}

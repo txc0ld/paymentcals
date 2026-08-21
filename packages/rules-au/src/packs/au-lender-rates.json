@@ -1,0 +1,67 @@
+{
+  "rulePackId": "au-lender-rates",
+  "jurisdiction": "AU",
+  "subdivision": null,
+  "domain": "lender-rates",
+  "effectiveFrom": "2026-07-31",
+  "effectiveTo": null,
+  "status": "active",
+  "schemaVersion": 1,
+  "rulesVersion": "0.1.0",
+  "sources": [
+    {
+      "sourceId": "rba-f5-2026-08-21",
+      "authority": "Reserve Bank of Australia",
+      "title": "Statistical table F5 — Indicator Lending Rates (banks' housing loans)",
+      "url": "https://www.rba.gov.au/statistics/tables/csv/f5-data.csv",
+      "jurisdiction": "AU",
+      "domain": "lender-rates",
+      "retrievedAt": "2026-08-21T14:00:00+08:00",
+      "archivedSnapshotRef": "compliance-archive/sources/rba/f5-data.2026-08-21.csv",
+      "contentHash": "8a954f82b5db857b12c40ed8f1779801d22f707689bdc7d6f0a9bbcb9a2001ac",
+      "notes": "Published monthly indicator rates (per cent per annum), latest observation 31 July 2026, RBA publication date 10 Aug 2026. These are published averages of advertised rates — reference values, never offers or recommendations."
+    }
+  ],
+  "review": {
+    "preparedBy": "claude-build-agent",
+    "approvedBy": "owner (directive: deploy verification queue items, 2026-08-21)",
+    "approvedAt": "2026-08-21T10:00:00Z"
+  },
+  "verifiedAt": null,
+  "rules": {
+    "observationDate": "2026-07-31",
+    "unit": "percent_per_annum",
+    "series": [
+      {
+        "seriesId": "FILRHLBVS",
+        "label": "Owner-occupier · variable · standard",
+        "ratePercent": "8.77"
+      },
+      {
+        "seriesId": "FILRHLBVD",
+        "label": "Owner-occupier · variable · discounted",
+        "ratePercent": "6.80"
+      },
+      {
+        "seriesId": "FILRHL3YF",
+        "label": "Owner-occupier · 3-year fixed",
+        "ratePercent": "6.74"
+      },
+      {
+        "seriesId": "FILRHLBVSI",
+        "label": "Investor · variable · standard",
+        "ratePercent": "9.35"
+      },
+      {
+        "seriesId": "FILRHLBVDI",
+        "label": "Investor · variable · discounted",
+        "ratePercent": "7.13"
+      },
+      {
+        "seriesId": "FILRHL3YFI",
+        "label": "Investor · 3-year fixed",
+        "ratePercent": "6.82"
+      }
+    ]
+  }
+}

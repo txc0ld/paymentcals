@@ -1,14 +1,23 @@
 {
   "au-cpi-quarterly@0.1.0": "4ea914ac7be5aab08f7c63ae5bd8a7ff38aee40ca67a579dcb5281bce2a55b60",
+  "au-duty-concessions-act@0.1.0": "bbfc911c6b126cac616d5af6e5e161682944e4b05295eac1bc1a6bf03002f6ca",
+  "au-duty-concessions-nsw@0.1.0": "db5d1f24a1b3cb759755296a479353590cbc5cd364301db9ab821965361ea334",
+  "au-duty-concessions-qld@0.1.0": "59f66f843aeff1d1d0fcdc189d3743ec7ced069d4f55d3d26d4fc4526660e4c8",
+  "au-duty-concessions-vic@0.1.0": "77bf0ff28e6c4f2120caee47748806d42382c79ec3110c761786e83c300d3be7",
+  "au-gst-registration@0.1.0": "62a090b6b006e0f59e4e5f47936e5dd4a65ef93593b48d39427cfd73e7a5cd0c",
   "au-gst-standard@0.1.0": "3052257fd9f9e34f4c9a07ff8c0ee90e9a5e9758323e9dc7274e9a7c230c2eaa",
+  "au-help-indexation@0.1.0": "d7183509bfecc40207f0ac4bc410ee72eff5bc6a24fc12bfc5a4254a9d0d44fb",
   "au-income-percentiles@0.1.0": "d88fe4bda0ad9f898ce3eb8e7a89e54964726b7fbdb22f6b4078f007ac8bee0f",
   "au-income-tax-2024-25@0.1.0": "6fa4523a8d8dcebc31f88575eff7e34f965d73b52c9f5caea70bb47ca81cabba",
   "au-income-tax-2025-26@0.1.0": "540976818c6878e2a4ec1625f92180096b5b4839e030ca4a7db16bf2b565ce8b",
   "au-income-tax-2026-27@0.1.0": "80b4c39cadfb15f79cd1343178966e604aca7212c0ba5bff8066311a299acd27",
+  "au-lender-rates@0.1.0": "fa8181a8098568c37f5bc6eeff6157e900190fefb0dfcd7a1f2b52aaa7ab2a92",
   "au-medicare-2024-25@0.1.0": "6850828b9e914e37c6e7c96805a5cd63e182aac8309f8363cfd7b548395d2169",
   "au-medicare-2025-26@0.1.0": "8eb3bd9f671638e866efb30fc0a0792873ae01c52af1e93f72bad2a047e902d3",
   "au-medicare-2026-27@0.1.0": "e4843a5da415eaac57d85b7eed303edb1e241b9499a1292a69a78634cba2821a",
   "au-payg-withholding-2026-27@0.1.0": "55e57c3dbcfef13121564ab7293b8432abe7499e3f18e9dc1cbaf9bb046e488f",
+  "au-sapto@0.1.0": "428cbaa183bd28735841f27228a1a81a14ad34ec378cac4ca4c270c1586d65c6",
+  "au-schedule5@0.1.0": "a2387c22d19af49d5bb40299b11d3b82cad4fafb1fd78d83f164d61ce16d7669",
   "au-stamp-duty-act@0.1.0": "f3da07f26a1db56c14ad39d6d7b1e4855521ed0c36b92f77a50d0416b07bdd88",
   "au-stamp-duty-nsw@0.1.0": "fe4da88e2ec14bbdeb1ff63054389486d654d258e8d556118de0e6aae98cec6f",
   "au-stamp-duty-nt@0.1.0": "d4eaaa0cd0bbf06f77e5b77e22b5eb6b242b37ea75f9fcc772a7c922b3107674",
@@ -24,5 +33,6 @@
   "au-super-guarantee-2024-25@0.1.0": "2ff729a5d106d81d95a727bac29b1af5faef7a98eb0e9a39e2701c2b1e5672b9",
   "au-super-guarantee-2025-26@0.1.0": "05e52822d6bc96ee3673bc886ab65b6bfa6e2f925d9dfa79f3510549f4f340eb",
   "au-super-guarantee-2026-27@0.1.0": "377dea45b5427b294f9204f2e4d6230f824bd030c99177ac2d678e3440a0d1c2",
-  "au-super-thresholds@0.1.0": "5b9db0becd4ba68b56789f7f59dfce053022fa97f4c919c0a98a7b6c1ce0ac3e"
+  "au-super-thresholds@0.1.0": "5b9db0becd4ba68b56789f7f59dfce053022fa97f4c919c0a98a7b6c1ce0ac3e",
+  "au-wpi-quarterly@0.1.0": "46bc5dbcd7868ee55aa85b89ea0b6755574e0357d856cc055ec49d6f58c51f6c"
 }

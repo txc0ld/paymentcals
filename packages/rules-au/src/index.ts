@@ -11,6 +11,16 @@ import auCpiQuarterly from "./packs/au-cpi-quarterly.json" with { type: "json" }
 import auIncomePercentiles from "./packs/au-income-percentiles.json" with { type: "json" };
 import auSuperBalanceByAge from "./packs/au-super-balance-by-age.json" with { type: "json" };
 import auSuperThresholds from "./packs/au-super-thresholds.json" with { type: "json" };
+import auWpiQuarterly from "./packs/au-wpi-quarterly.json" with { type: "json" };
+import auLenderRates from "./packs/au-lender-rates.json" with { type: "json" };
+import auSapto from "./packs/au-sapto.json" with { type: "json" };
+import auHelpIndexation from "./packs/au-help-indexation.json" with { type: "json" };
+import auGstRegistration from "./packs/au-gst-registration.json" with { type: "json" };
+import auSchedule5 from "./packs/au-schedule5.json" with { type: "json" };
+import auDutyConcNsw from "./packs/au-duty-concessions-nsw.json" with { type: "json" };
+import auDutyConcQld from "./packs/au-duty-concessions-qld.json" with { type: "json" };
+import auDutyConcVic from "./packs/au-duty-concessions-vic.json" with { type: "json" };
+import auDutyConcAct from "./packs/au-duty-concessions-act.json" with { type: "json" };
 import incomeTax2425 from "./packs/au-income-tax-2024-25.json" with { type: "json" };
 import incomeTax2526 from "./packs/au-income-tax-2025-26.json" with { type: "json" };
 import incomeTax2627 from "./packs/au-income-tax-2026-27.json" with { type: "json" };
@@ -43,6 +53,21 @@ import {
   type SuperStatisticsRulePack,
   type SuperThresholdsRulePack,
 } from "./domains/statistics";
+import {
+  zGstRegistrationRulePack,
+  zHelpIndexationRulePack,
+  zLenderRatesRulePack,
+  zSaptoRulePack,
+  zSchedule5RulePack,
+  zWpiRulePack,
+  type GstRegistrationRulePack,
+  type HelpIndexationRulePack,
+  type LenderRatesRulePack,
+  type SaptoRulePack,
+  type Schedule5RulePack,
+  type WpiRulePack,
+} from "./domains/queue-packs";
+import { zDutyConcessionRulePack, type DutyConcessionRulePack } from "./domains/duty-concessions";
 
 /** Every pack is validated at module load — a malformed pack can never resolve. */
 export const gstPack: GstRulePack = zGstRulePack.parse(auGstStandard);
@@ -50,6 +75,15 @@ export const cpiPack: CpiRulePack = zCpiRulePack.parse(auCpiQuarterly);
 export const incomePercentilesPack: IncomePercentilesRulePack = zIncomePercentilesRulePack.parse(auIncomePercentiles);
 export const superBalanceByAgePack: SuperStatisticsRulePack = zSuperStatisticsRulePack.parse(auSuperBalanceByAge);
 export const superThresholdsPack: SuperThresholdsRulePack = zSuperThresholdsRulePack.parse(auSuperThresholds);
+export const wpiPack: WpiRulePack = zWpiRulePack.parse(auWpiQuarterly);
+export const lenderRatesPack: LenderRatesRulePack = zLenderRatesRulePack.parse(auLenderRates);
+export const saptoPack: SaptoRulePack = zSaptoRulePack.parse(auSapto);
+export const helpIndexationPack: HelpIndexationRulePack = zHelpIndexationRulePack.parse(auHelpIndexation);
+export const gstRegistrationPack: GstRegistrationRulePack = zGstRegistrationRulePack.parse(auGstRegistration);
+export const schedule5Pack: Schedule5RulePack = zSchedule5RulePack.parse(auSchedule5);
+export const dutyConcessionPacks: DutyConcessionRulePack[] = [auDutyConcNsw, auDutyConcQld, auDutyConcVic, auDutyConcAct].map(
+  (p) => zDutyConcessionRulePack.parse(p),
+);
 
 export const incomeTaxPacks: IncomeTaxRulePack[] = [incomeTax2425, incomeTax2526, incomeTax2627].map(
   (p) => zIncomeTaxRulePack.parse(p),
@@ -76,6 +110,13 @@ export const allAuRulePacks: readonly RulePackV1[] = [
   incomePercentilesPack,
   superBalanceByAgePack,
   superThresholdsPack,
+  wpiPack,
+  lenderRatesPack,
+  saptoPack,
+  helpIndexationPack,
+  gstRegistrationPack,
+  schedule5Pack,
+  ...dutyConcessionPacks,
   ...incomeTaxPacks,
   ...medicarePacks,
   ...stslPacks,
@@ -136,3 +177,32 @@ export {
   type SuperThresholdsRulePack,
   type SuperThresholdsRules,
 } from "./domains/statistics";
+export {
+  zGstRegistrationRules,
+  zHelpIndexationRules,
+  zLenderRatesRules,
+  zSaptoRules,
+  zSchedule5Rules,
+  zWpiRules,
+  type GstRegistrationRules,
+  type HelpIndexationRules,
+  type LenderRatesRules,
+  type SaptoRules,
+  type Schedule5Rules,
+  type WpiRules,
+} from "./domains/queue-packs";
+export type {
+  GstRegistrationRulePack,
+  HelpIndexationRulePack,
+  LenderRatesRulePack,
+  SaptoRulePack,
+  Schedule5RulePack,
+  WpiRulePack,
+} from "./domains/queue-packs";
+export {
+  zDutyConcessionRules,
+  zDutyConcessionRulePack,
+  type DutyConcessionRules,
+  type DutyConcessionRulePack,
+  type QldFirstHomeBand,
+} from "./domains/duty-concessions";

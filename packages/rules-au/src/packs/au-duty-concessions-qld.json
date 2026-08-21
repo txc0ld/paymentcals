@@ -1,0 +1,136 @@
+{
+  "rulePackId": "au-duty-concessions-qld",
+  "jurisdiction": "AU",
+  "subdivision": "QLD",
+  "domain": "stamp-duty-concessions",
+  "effectiveFrom": "2026-07-01",
+  "effectiveTo": null,
+  "status": "active",
+  "schemaVersion": 1,
+  "rulesVersion": "0.1.0",
+  "sources": [
+    {
+      "sourceId": "qro-home-concession-rates-2026-08-21",
+      "authority": "Queensland Revenue Office",
+      "title": "Concession rates — home and first home (transfer duty)",
+      "url": "https://qro.qld.gov.au/duties/transfer-duty/calculate/concession-rates/",
+      "jurisdiction": "AU",
+      "domain": "stamp-duty-concessions",
+      "retrievedAt": "2026-08-21T14:30:00+08:00",
+      "archivedSnapshotRef": "compliance-archive/sources/state-revenue/qld-home-concession-rates.2026-08-21.html",
+      "contentHash": "245696322442165fbe8b2b470a018c00b0400a794dbbba317939939afeffc448",
+      "notes": "Home-concession per-$100 table and the on-or-after-9-June-2024 first-home deduction bands ('calculate the first home concession… home concession rate and then subtract the first home concession amount'). Page last updated 31 July 2026; QRO's own worked examples ($950,000 → $28,600 home; $795,000 → $19,890 first home) are reproduced in the engine tests. First-home concession unavailable at $800,000 or more. From 1 Aug 2026 an additional citizenship/residency eligibility condition applies (not modelled — eligibility is the buyer's own assessment)."
+    },
+    {
+      "sourceId": "qro-first-home-page-2026-08-21",
+      "authority": "Queensland Revenue Office",
+      "title": "First home concession",
+      "url": "https://qro.qld.gov.au/duties/transfer-duty/concessions/homes/first-home/",
+      "jurisdiction": "AU",
+      "domain": "stamp-duty-concessions",
+      "retrievedAt": "2026-08-21T14:30:00+08:00",
+      "archivedSnapshotRef": "compliance-archive/sources/state-revenue/qld-first-home-concession.2026-08-21.html",
+      "contentHash": "5851cc3aded1cf6486a5c6d9f5d4408b4325ff20018c1d993b5211ff7837bb1d",
+      "notes": "Corroborates the method and carries the $650,000 → $0, $730,000 → $6,555 and $850,000 → $24,100 worked examples reproduced in the engine tests."
+    }
+  ],
+  "review": {
+    "preparedBy": "claude-build-agent",
+    "approvedBy": "owner (directive: deploy verification queue items, 2026-08-21)",
+    "approvedAt": "2026-08-21T10:30:00Z"
+  },
+  "verifiedAt": null,
+  "rules": {
+    "nswFhbas": null,
+    "qldHome": {
+      "brackets": [
+        {
+          "over": "0",
+          "upTo": "350000",
+          "baseAmount": "0",
+          "ratePer100": "1.00",
+          "appliesTo": "excess"
+        },
+        {
+          "over": "350000",
+          "upTo": "540000",
+          "baseAmount": "3500",
+          "ratePer100": "3.50",
+          "appliesTo": "excess"
+        },
+        {
+          "over": "540000",
+          "upTo": "1000000",
+          "baseAmount": "10150",
+          "ratePer100": "4.50",
+          "appliesTo": "excess"
+        },
+        {
+          "over": "1000000",
+          "upTo": null,
+          "baseAmount": "30850",
+          "ratePer100": "5.75",
+          "appliesTo": "excess"
+        }
+      ],
+      "per100Rounding": "part_thereof_up",
+      "firstHome": {
+        "bands": [
+          {
+            "over": "0",
+            "upToExclusive": "710000",
+            "deduction": "17350"
+          },
+          {
+            "over": "710000",
+            "upToExclusive": "720000",
+            "deduction": "15615"
+          },
+          {
+            "over": "720000",
+            "upToExclusive": "730000",
+            "deduction": "13880"
+          },
+          {
+            "over": "730000",
+            "upToExclusive": "740000",
+            "deduction": "12145"
+          },
+          {
+            "over": "740000",
+            "upToExclusive": "750000",
+            "deduction": "10410"
+          },
+          {
+            "over": "750000",
+            "upToExclusive": "760000",
+            "deduction": "8675"
+          },
+          {
+            "over": "760000",
+            "upToExclusive": "770000",
+            "deduction": "6940"
+          },
+          {
+            "over": "770000",
+            "upToExclusive": "780000",
+            "deduction": "5205"
+          },
+          {
+            "over": "780000",
+            "upToExclusive": "790000",
+            "deduction": "3470"
+          },
+          {
+            "over": "790000",
+            "upToExclusive": "800000",
+            "deduction": "1735"
+          }
+        ],
+        "capValue": "800000"
+      }
+    },
+    "vicPpr": null,
+    "actOwnerOccupier": null
+  }
+}

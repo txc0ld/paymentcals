@@ -1,0 +1,70 @@
+{
+  "rulePackId": "au-duty-concessions-vic",
+  "jurisdiction": "AU",
+  "subdivision": "VIC",
+  "domain": "stamp-duty-concessions",
+  "effectiveFrom": "2026-07-01",
+  "effectiveTo": null,
+  "status": "active",
+  "schemaVersion": 1,
+  "rulesVersion": "0.1.0",
+  "sources": [
+    {
+      "sourceId": "srovic-ppr-rates-2026-08-21",
+      "authority": "State Revenue Office Victoria",
+      "title": "Land transfer duty — principal place of residence (concessional) current rates",
+      "url": "https://www.sro.vic.gov.au/about-us/rates-and-statistics/current-rates/land-transfer-duty-principal-place-residence-current-rates",
+      "jurisdiction": "AU",
+      "domain": "stamp-duty-concessions",
+      "retrievedAt": "2026-08-21T14:30:00+08:00",
+      "archivedSnapshotRef": "compliance-archive/sources/state-revenue/vic-land-transfer-duty-ppr-current-rates.2026-08-21.html",
+      "contentHash": "4fe3acd0eb1b9d378e2de7b0c725b8fdc51397a34116667fe5a85e07b96dafdc",
+      "notes": "PPR concessional rates for contracts on or after 6 May 2008; above $550,000 the concession does not apply and general rates take over. Marginal continuity exact on all rows."
+    }
+  ],
+  "review": {
+    "preparedBy": "claude-build-agent",
+    "approvedBy": "owner (directive: deploy verification queue items, 2026-08-21)",
+    "approvedAt": "2026-08-21T10:30:00Z"
+  },
+  "verifiedAt": null,
+  "rules": {
+    "nswFhbas": null,
+    "qldHome": null,
+    "vicPpr": {
+      "brackets": [
+        {
+          "over": "0",
+          "upTo": "25000",
+          "baseAmount": "0",
+          "percent": "0.014",
+          "appliesTo": "excess"
+        },
+        {
+          "over": "25000",
+          "upTo": "130000",
+          "baseAmount": "350",
+          "percent": "0.024",
+          "appliesTo": "excess"
+        },
+        {
+          "over": "130000",
+          "upTo": "440000",
+          "baseAmount": "2870",
+          "percent": "0.05",
+          "appliesTo": "excess"
+        },
+        {
+          "over": "440000",
+          "upTo": "550000",
+          "baseAmount": "18370",
+          "percent": "0.06",
+          "appliesTo": "excess"
+        }
+      ],
+      "rounding": "half_up_cents",
+      "appliesUpTo": "550000"
+    },
+    "actOwnerOccupier": null
+  }
+}

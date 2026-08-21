@@ -122,3 +122,23 @@ super-caps + super-div293 pages (ato.gov.au); sha256 in each pack's source recor
 - [ ] Spot-check three cells of `au-super-balance-by-age` against Table 23A (median/average/count)
 - [ ] Confirm concessional caps ($30,000 / $32,500 from 1 July 2026) and the $250,000 Division 293 threshold against the archived pages
 - [ ] D-020: confirm the no-projections boundary for super remains acceptable (ASIC calculator-relief conditions)
+
+## Update 2026-08-21 (D-022): verification-queue build-out — 10 new packs authored and activated
+
+Owner directive: "yes deploy verification queue items" + "we need all of the latest most updated
+versions". All packs authored by self-checking scripts (`packages/rules-au/scripts/
+author_queue_packs_2026_08_21.py`, `author_duty_concessions_2026_08_21.py`); every source
+archived with sha256 in `compliance-archive/sources/`. Engines: SAPTO in E02 (engine-au-tax),
+Schedule 5 Method A (engine-au-withholding), concessional duty (engine-property, reproduces
+QRO's six published worked examples). Owner spot-checks:
+
+- [ ] **au-sapto** (ATO SAPTO page + myTax 2026 worksheet; latest published FY2025-26): single $2,230 / shade-out $34,919 / cut-out $52,759; couple-each $1,602 / $30,994 / $43,810; illness-separated $2,040 / $33,732 / $50,052; 12.5c/$ shade-out
+- [ ] **au-help-indexation** (ATO STSL indexation rates): 2026 rate 2.8%; method lower-of-CPI-and-WPI; applies 1 June to debt unpaid 11+ months
+- [ ] **au-gst-registration** (ATO registering for GST): $75,000 standard / $150,000 non-profit / taxi-ride-sourcing regardless of turnover / 21 days to register
+- [ ] **au-schedule5** (ATO Schedule 5 working-out page): Method A ten steps; 47% cap on the additional payment; negatives nil
+- [ ] **au-lender-rates** (RBA F5): six housing series, data month 2026-07-31 — spot-check two rates against the published table
+- [ ] **au-wpi-quarterly** (ABS 6345.0 Table 1, A2603609J): 116 quarters; base 2008-09 = 100.0 verified in-script
+- [ ] **au-duty-concessions-nsw** (Revenue NSW FHBAS + Duties Act 1997 s78A): home exempt ≤ $800k, sliding to $1.0m; vacant land ≤ $350k sliding to $450k
+- [ ] **au-duty-concessions-qld** (QRO home + first-home concession pages): engine reproduces QRO's own worked examples ($550k→$10,600; $950k→$28,600; first home $650k→$0, $730k→$6,555, $795k→$19,890, $850k→$24,100)
+- [ ] **au-duty-concessions-vic** (SRO PPR rates ≤ $550k): e.g. $130k–$440k band = $2,870 + 5% of the excess over $130k — confirm the bracket table against the page
+- [ ] **au-duty-concessions-act** (ACT Revenue Table 1 owner-occupier, DI2026-155): continuity identities verified in-script

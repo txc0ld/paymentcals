@@ -4,6 +4,7 @@ import {
   incomeTaxPacks,
   medicarePacks,
   paygWithholdingPacks,
+  saptoPack,
   stslPacks,
   superGuaranteePacks,
 } from "@paymentcalcs/rules-au";
@@ -237,5 +238,52 @@ describe("net-to-gross (AU-PAY-004, §12.2)", () => {
     expect(solved.status).toBe("unattainable");
     expect(solved.grossAnnual).toBeNull();
     expect(solved.reason).toContain("not attainable");
+  });
+});
+
+describe("SAPTO (F-TAX-006)", () => {
+  const saptoResolution: AuPayResolution = {
+    ...resolutionFor("2026-27"),
+    sapto: { pack: saptoPack, manifestRef: ref(saptoPack) },
+  };
+  const saptoInput = (income: string, status: "single" | "couple_each" | "illness_separated_each" = "single") =>
+    zAuPayInput.parse({
+      financialYear: "2026-27",
+      income: { amount: aud(income), frequency: "annually" },
+      package: { treatment: "base_plus_super" },
+      taxpayer: { residency: "resident", sapto: { eligible: true, status } },
+    });
+
+  it("applies the full offset below the shading-out threshold, capped at tax after LITO", () => {
+    const { output } = computeAuPay(saptoInput("34000"), saptoResolution);
+    // Pack: single max $2,230, shade-out from $34,919 — full entitlement here,
+    // limited to the income tax remaining after LITO.
+    const grossTax = Number(output.liability.grossIncomeTax.minorUnits);
+    const lito = Number(output.liability.litoOffset.minorUnits);
+    const sapto = Number(output.liability.saptoOffset.minorUnits);
+    expect(sapto).toBe(Math.min(223000, grossTax - lito));
+    expect(sapto).toBeGreaterThan(0);
+  });
+
+  it("shades out at 12.5c per dollar with ceiling rounding: $40,000 → $1,595", () => {
+    const { output } = computeAuPay(saptoInput("40000"), saptoResolution);
+    // 2,230 − 0.125 × (40,000 − 34,919) = 1,594.875 → whole-dollar ceiling 1,595.
+    expect(output.liability.saptoOffset.minorUnits).toBe("159500");
+  });
+
+  it("cuts out at the published single threshold ($52,759)", () => {
+    const { output } = computeAuPay(saptoInput("52759"), saptoResolution);
+    expect(output.liability.saptoOffset.minorUnits).toBe("0");
+  });
+
+  it("is non-refundable: never exceeds gross tax minus LITO", () => {
+    const { output } = computeAuPay(saptoInput("20000"), saptoResolution);
+    const grossTax = Number(output.liability.grossIncomeTax.minorUnits);
+    const lito = Number(output.liability.litoOffset.minorUnits);
+    expect(Number(output.liability.saptoOffset.minorUnits)).toBe(Math.max(0, grossTax - lito));
+  });
+
+  it("fails closed when SAPTO is claimed but no pack resolves", () => {
+    expect(() => computeAuPay(saptoInput("40000"), { ...saptoResolution, sapto: null })).toThrow();
   });
 });
