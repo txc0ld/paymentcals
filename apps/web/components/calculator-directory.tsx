@@ -22,7 +22,7 @@ export function CalculatorGrid({ entries }: { entries: readonly RegistryEntry[] 
           className={`reveal-up group grid min-h-56 content-between gap-10 p-6 focus-visible:outline-3 focus-visible:outline-offset-[-3px] focus-visible:outline-focus md:p-8 ${index % 7 === 0 ? "lg:col-span-2" : ""} ${index < 4 ? `reveal-delay-${index + 1}` : ""}`}
         >
           <div className="flex items-start justify-between gap-4">
-            <span className="nexus-badge px-2.5 py-1 font-mono text-[10px] uppercase tracking-[0.18em] text-ink-3">
+            <span className="nexus-badge px-2.5 py-1 font-mono text-[10px] uppercase tracking-[0.18em] text-[var(--pc-accent-text)]">
               {entry.id}
             </span>
             <span aria-hidden="true" className="nexus-arrow grid h-11 w-11 place-items-center font-mono text-sm">

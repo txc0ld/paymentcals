@@ -46,7 +46,7 @@ export default function Page() {
             <a
               key={category}
               href={`#${category}`}
-              className="font-mono text-[11px] uppercase tracking-[0.16em] text-ink-3 transition-colors duration-500 hover:text-ink"
+              className="font-mono text-[11px] uppercase tracking-[0.16em] text-[var(--pc-accent-text)] transition-colors duration-500 hover:text-ink"
             >
               {CATEGORY_LABELS[category]}
             </a>
