@@ -87,3 +87,14 @@ Packs: `au-stamp-duty-{nsw,vic,qld,wa,sa,tas,act,nt}` (in_review) · snapshots i
 - [ ] `packages/test-fixtures/src/gst/au-biz-001.fixture.json` — fill `expected` values from the official ATO examples or a verified manual calculation.
 - [ ] `packages/test-fixtures/src/pay/au-pay-001.fixture.json` — 6 cases across FY2024-25/2025-26/2026-27; fill `expected` from the ATO simple tax calculator / Moneysmart and record the tool + date. (The engine already reproduces the ATO worked examples for STSL, Medicare reduction and MLS as unit tests.)
 - [ ] `packages/test-fixtures/src/home/au-home-001.fixture.json` — 3 mortgage repayment cases; fill `expected` from the Moneysmart mortgage calculator. (The engine differential-tests the schedule against the closed form internally.)
+
+## RBA — Statistical table G1 (Consumer Price Inflation)
+
+Source: https://www.rba.gov.au/statistics/tables/csv/g1-data.csv
+Retrieved: 2026-08-21 · content sha256 `c0e8846641eae45a22bca9ede5bbafde11403b608d5ef2e7ab0d38d6be6a8300`
+Archived: `compliance-archive/sources/rba/g1-data.2026-08-21.csv`
+
+Pack: `au-cpi-quarterly` (activated on owner directive 2026-08-21; series GCPIAG machine-parsed, 106 quarters 2000-03-31 → 2026-06-30, index reference "September 2025 month = 100")
+
+- [ ] Spot-check three quarters against the RBA/ABS published table (suggest first, 2021-12-31 and last)
+- [ ] Confirm the pack refresh cadence note (quarterly, after each ABS CPI release) and re-run the authoring script on refresh

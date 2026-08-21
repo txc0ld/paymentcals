@@ -350,6 +350,37 @@ const entries: RegistryEntry[] = [
       "Estimate your compulsory HELP or study-loan repayment from repayment income under the marginal repayment system, with thresholds from official sources.",
   }),
   zRegistryEntry.parse({
+    id: "AU-PAY-015",
+    slug: "inflation-calculator",
+    displayName: "Inflation Calculator",
+    category: "pay-tax",
+    jurisdictionScope: "au",
+    releasePriority: "P0",
+    calculationClass: "B",
+    engineDependencies: ["E04"],
+    rulePackDependencies: ["cpi"],
+    supportedModes: ["simple", "advanced"],
+    inputSchemaVersion: "1",
+    resultSchemaVersion: "1",
+    disclosureSet: ["universal-footer-v2.0"],
+    sourceSet: ["rba-g1-cpi-2026-08-21"],
+    seo: {
+      title: "Inflation Calculator Australia: Your Salary in Real Terms",
+      description:
+        "See what inflation has done to your salary since your last pay rise, using the official ABS consumer price index, and the salary needed to keep its purchasing power.",
+    },
+    ownership: { owner: "tmayorx@gmail.com", reviewCadence: "quarterly CPI release" },
+  }),
+  payEntry({
+    id: "AU-PAY-014",
+    slug: "income-tax-calculator",
+    displayName: "Income Tax Calculator",
+    engines: ["E02"],
+    title: "Australian Income Tax Calculator and Bracket Explorer",
+    description:
+      "Explore Australian income tax brackets by year and residency, slide a salary along the marginal-rate curve and see the tax at every step, from official rule packs.",
+  }),
+  zRegistryEntry.parse({
     id: "AU-BIZ-001",
     slug: "gst-calculator",
     displayName: "GST Calculator",

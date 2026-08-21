@@ -10,6 +10,7 @@ const SOURCE_AUTHORITIES = [
   "Revenue NSW",
   "Queensland Revenue Office",
   "State Revenue Office Tasmania",
+  "Reserve Bank of Australia",
 ];
 
 const CAPABILITIES = [
