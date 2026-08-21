@@ -350,6 +350,8 @@ export function PayCalculator({ variant }: { variant: PayVariant }) {
   const [resolution, setResolution] = useState<PayResolutionOutcome | "pending">("pending");
   const [result, setResult] = useState<CalculationResultV1<AuPayOutput> | null>(null);
   const [compareResult, setCompareResult] = useState<CalculationResultV1<AuPayOutput> | null>(null);
+  /** Index into GRID_COLUMNS for the small-screen single-cycle view. */
+  const [mobileCycle, setMobileCycle] = useState(3);
   const [savedFlash, setSavedFlash] = useState<string | null>(null);
   const [hydrated, setHydrated] = useState(false);
   const hydratedOnce = useRef(false);
@@ -879,63 +881,103 @@ export function PayCalculator({ variant }: { variant: PayVariant }) {
                     All pay cycles
                   </span>
                 </div>
-                <div className="overflow-x-auto">
-                  <table className="w-full min-w-[560px] border-collapse text-left">
-                    <caption className="sr-only">
-                      Gross package through to net cash at each pay cycle, under the resolved rule packs
-                    </caption>
-                    <thead>
-                      <tr className="border-b border-hairline font-mono text-[10px] uppercase tracking-[0.14em] text-ink-3">
-                        <th scope="col" className="py-2 pe-4 font-normal">Line</th>
-                        {GRID_COLUMNS.map((column) => (
-                          <th key={column.label} scope="col" className="py-2 ps-4 text-right font-normal">
-                            {column.label}
-                          </th>
-                        ))}
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {(
-                        [
-                          ["Gross package", output.annualised.grossPackage, false],
-                          ["Employer super", output.annualised.employerSuper, false],
-                          ["Gross cash income", output.annualised.grossCashIncome, false],
-                          ["Taxable income", output.liability.taxableIncome, false],
-                          ["Income tax", output.liability.grossIncomeTax, false],
-                          ["Low income tax offset", output.liability.litoOffset, false],
-                          ["Medicare levy", output.liability.medicareLevy, false],
-                          ["Medicare levy surcharge", output.liability.medicareLevySurcharge, false],
-                          ["Study loan repayment", output.liability.studyLoanRepayment, false],
-                          ["Total annual liability", output.liability.totalAnnualLiability, true],
-                          ["Net cash", output.netAnnualCash, true],
-                        ] as const
-                      ).map(([label, amount, emphasis]) => (
-                        <tr
-                          key={label}
-                          className={
-                            emphasis
-                              ? "border-b-2 border-hairline-strong"
-                              : "border-b border-hairline"
-                          }
-                        >
-                          <th scope="row" className="py-2 pe-4 text-[13px] font-normal text-ink-2">
-                            {label}
-                          </th>
-                          {GRID_COLUMNS.map((column) => (
-                            <td
-                              key={column.label}
-                              className={`py-2 ps-4 text-right font-mono text-[13px] tabular-nums ${
-                                emphasis ? "text-ink" : "text-ink-2"
-                              } ${column.divisor === 1 && emphasis ? "text-[var(--pc-accent-text)]" : ""}`}
-                            >
-                              {formatMoney(perPeriod(amount, column.divisor))}
-                            </td>
-                          ))}
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
+                {(() => {
+                  const rows = [
+                    ["Gross package", output.annualised.grossPackage, false],
+                    ["Employer super", output.annualised.employerSuper, false],
+                    ["Gross cash income", output.annualised.grossCashIncome, false],
+                    ["Taxable income", output.liability.taxableIncome, false],
+                    ["Income tax", output.liability.grossIncomeTax, false],
+                    ["Low income tax offset", output.liability.litoOffset, false],
+                    ["Medicare levy", output.liability.medicareLevy, false],
+                    ["Medicare levy surcharge", output.liability.medicareLevySurcharge, false],
+                    ["Study loan repayment", output.liability.studyLoanRepayment, false],
+                    ["Total annual liability", output.liability.totalAnnualLiability, true],
+                    ["Net cash", output.netAnnualCash, true],
+                  ] as const;
+                  const mobile = GRID_COLUMNS[mobileCycle] ?? GRID_COLUMNS[3];
+                  return (
+                    <>
+                      {/* Small screens: one cycle at a time, no horizontal scroll. */}
+                      <div className="grid gap-4 md:hidden">
+                        <SegmentedControl
+                          label="Pay cycle shown"
+                          size="sm"
+                          value={String(mobileCycle)}
+                          onChange={(value) => setMobileCycle(Number(value))}
+                          options={GRID_COLUMNS.map((column, index) => ({
+                            value: String(index),
+                            label: column.label,
+                          }))}
+                        />
+                        <table className="w-full border-collapse text-left">
+                          <caption className="sr-only">
+                            Gross package through to net cash, {mobile.label.toLowerCase()}
+                          </caption>
+                          <tbody>
+                            {rows.map(([label, amount, emphasis]) => (
+                              <tr
+                                key={label}
+                                className={emphasis ? "border-b-2 border-hairline-strong" : "border-b border-hairline"}
+                              >
+                                <th scope="row" className="py-2 pe-3 text-[13px] font-normal text-ink-2">
+                                  {label}
+                                </th>
+                                <td
+                                  className={`py-2 text-right font-mono text-[13px] tabular-nums ${
+                                    emphasis ? "text-ink" : "text-ink-2"
+                                  }`}
+                                >
+                                  {formatMoney(perPeriod(amount, mobile.divisor))}
+                                </td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                      {/* md+: all cycles side by side. */}
+                      <div className="hidden md:block">
+                        <table className="w-full border-collapse text-left">
+                          <caption className="sr-only">
+                            Gross package through to net cash at each pay cycle, under the resolved rule packs
+                          </caption>
+                          <thead>
+                            <tr className="border-b border-hairline font-mono text-[10px] uppercase tracking-[0.14em] text-ink-3">
+                              <th scope="col" className="py-2 pe-4 font-normal">Line</th>
+                              {GRID_COLUMNS.map((column) => (
+                                <th key={column.label} scope="col" className="py-2 ps-4 text-right font-normal">
+                                  {column.label}
+                                </th>
+                              ))}
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {rows.map(([label, amount, emphasis]) => (
+                              <tr
+                                key={label}
+                                className={emphasis ? "border-b-2 border-hairline-strong" : "border-b border-hairline"}
+                              >
+                                <th scope="row" className="py-2 pe-4 text-[13px] font-normal text-ink-2">
+                                  {label}
+                                </th>
+                                {GRID_COLUMNS.map((column) => (
+                                  <td
+                                    key={column.label}
+                                    className={`py-2 ps-4 text-right font-mono text-[13px] tabular-nums ${
+                                      emphasis ? "text-ink" : "text-ink-2"
+                                    } ${column.divisor === 1 && emphasis ? "text-[var(--pc-accent-text)]" : ""}`}
+                                  >
+                                    {formatMoney(perPeriod(amount, column.divisor))}
+                                  </td>
+                                ))}
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    </>
+                  );
+                })()}
                 <p className="text-[12px] leading-5 text-ink-3">
                   Weekly, fortnightly and monthly columns are display divisions of the annual
                   position. The headline figure and the withholding below come straight from the
@@ -954,7 +996,7 @@ export function PayCalculator({ variant }: { variant: PayVariant }) {
                     </span>
                   </div>
                   <div className="overflow-x-auto">
-                    <table className="w-full min-w-[420px] border-collapse text-left">
+                    <table className="w-full border-collapse text-left">
                       <caption className="sr-only">
                         Statutory income tax brackets for the selected residency; your bracket is marked
                       </caption>
@@ -962,7 +1004,7 @@ export function PayCalculator({ variant }: { variant: PayVariant }) {
                         <tr className="border-b border-hairline font-mono text-[10px] uppercase tracking-[0.14em] text-ink-3">
                           <th scope="col" className="py-2 pe-4 font-normal">Taxable income</th>
                           <th scope="col" className="py-2 ps-4 text-right font-normal">Marginal rate</th>
-                          <th scope="col" className="py-2 ps-4 text-right font-normal">Position</th>
+                          <th scope="col" className="hidden py-2 ps-4 text-right font-normal sm:table-cell">Position</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -979,8 +1021,14 @@ export function PayCalculator({ variant }: { variant: PayVariant }) {
                             </td>
                             <td className="py-2 ps-4 text-right font-mono text-[13px] tabular-nums text-ink-2">
                               {formatRatePercent(row.rate)}
+                              {/* Small screens: the marker folds into this cell. */}
+                              {row.active ? (
+                                <span className="ms-2 font-mono text-[10px] uppercase tracking-[0.1em] text-[var(--pc-accent-text)] sm:hidden">
+                                  · Yours
+                                </span>
+                              ) : null}
                             </td>
-                            <td className="py-2 ps-4 text-right font-mono text-[10px] uppercase tracking-[0.14em]">
+                            <td className="hidden py-2 ps-4 text-right font-mono text-[10px] uppercase tracking-[0.14em] sm:table-cell">
                               {row.active ? (
                                 <span className="text-[var(--pc-accent-text)]">Your bracket</span>
                               ) : (
@@ -1055,7 +1103,7 @@ export function PayCalculator({ variant }: { variant: PayVariant }) {
                 {output.withholding ? (
                   <>
                     <div className="overflow-x-auto">
-                      <table className="w-full min-w-[320px] border-collapse text-left">
+                      <table className="w-full border-collapse text-left">
                         <caption className="sr-only">
                           Withholding components for one pay period
                         </caption>
@@ -1140,7 +1188,7 @@ export function PayCalculator({ variant }: { variant: PayVariant }) {
               }
               breakdown={
                 <div className="overflow-x-auto">
-                  <table className="nexus-table w-full min-w-[420px] border-collapse text-left">
+                  <table className="nexus-table w-full border-collapse text-left">
                     <caption className="sr-only">Net pay at each frequency</caption>
                     <thead>
                       <tr className="border-b border-hairline font-mono text-[10px] uppercase tracking-[0.14em] text-ink-3">

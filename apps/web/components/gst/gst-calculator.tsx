@@ -523,8 +523,8 @@ export function GstCalculator() {
                       <thead>
                         <tr className="border-b border-hairline font-mono text-[10px] uppercase tracking-[0.14em] text-ink-3">
                           <th scope="col" className="py-2 pe-4 font-normal">Line</th>
-                          <th scope="col" className="py-2 pe-4 font-normal">Treatment</th>
-                          <th scope="col" className="py-2 pe-4 text-right font-normal">Ex GST</th>
+                          <th scope="col" className="hidden py-2 pe-4 font-normal sm:table-cell">Treatment</th>
+                          <th scope="col" className="hidden py-2 pe-4 text-right font-normal sm:table-cell">Ex GST</th>
                           <th scope="col" className="py-2 pe-4 text-right font-normal">GST</th>
                           <th scope="col" className="py-2 text-right font-normal">Inc GST</th>
                         </tr>
@@ -538,10 +538,10 @@ export function GstCalculator() {
                                 <span className="text-ink-3"> × {line.quantity}</span>
                               ) : null}
                             </td>
-                            <td className="py-2 pe-4 font-mono text-[11px] uppercase tracking-[0.14em] text-ink-2">
+                            <td className="hidden py-2 pe-4 font-mono text-[11px] uppercase tracking-[0.14em] text-ink-2 sm:table-cell">
                               {line.treatment.replace("_", " ")}
                             </td>
-                            <td className="py-2 pe-4 text-right font-mono text-[13px] tabular-nums text-ink">
+                            <td className="hidden py-2 pe-4 text-right font-mono text-[13px] tabular-nums text-ink sm:table-cell">
                               {formatMoney(line.exclusiveAmount)}
                             </td>
                             <td className="py-2 pe-4 text-right font-mono text-[13px] tabular-nums text-ink">
@@ -554,8 +554,8 @@ export function GstCalculator() {
                         ))}
                         <tr className="font-semibold">
                           <td className="py-2 pe-4 text-[13px] text-ink">Totals</td>
-                          <td className="py-2 pe-4" />
-                          <td className="py-2 pe-4 text-right font-mono text-[13px] tabular-nums text-ink">
+                          <td className="hidden py-2 pe-4 sm:table-cell" />
+                          <td className="hidden py-2 pe-4 text-right font-mono text-[13px] tabular-nums text-ink sm:table-cell">
                             {formatMoney(output.exclusiveAmount)}
                           </td>
                           <td className="py-2 pe-4 text-right font-mono text-[13px] tabular-nums text-ink">

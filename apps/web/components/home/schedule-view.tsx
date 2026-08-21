@@ -98,10 +98,10 @@ export function ScheduleView({
           <thead>
             <tr className="border-b border-hairline font-mono text-[10px] uppercase tracking-[0.14em] text-ink-3">
               <th scope="col" className="py-2 pe-4 font-normal">Year</th>
-              <th scope="col" className="py-2 pe-4 text-right font-normal">Payments</th>
+              <th scope="col" className="hidden py-2 pe-4 text-right font-normal sm:table-cell">Payments</th>
               <th scope="col" className="py-2 pe-4 text-right font-normal">Interest</th>
               <th scope="col" className="py-2 pe-4 text-right font-normal">Principal</th>
-              <th scope="col" className="py-2 pe-4 text-right font-normal">Interest to date</th>
+              <th scope="col" className="hidden py-2 pe-4 text-right font-normal sm:table-cell">Interest to date</th>
               <th scope="col" className="py-2 text-right font-normal">Closing balance</th>
             </tr>
           </thead>
@@ -115,7 +115,7 @@ export function ScheduleView({
                     <span className="sr-only"> repayments</span>
                   </span>
                 </th>
-                <td className="py-2 pe-4 text-right font-mono text-[13px] tabular-nums text-ink">
+                <td className="hidden py-2 pe-4 text-right font-mono text-[13px] tabular-nums text-ink sm:table-cell">
                   {formatMajor(group.payments)}
                 </td>
                 <td className="py-2 pe-4 text-right font-mono text-[13px] tabular-nums text-ink">
@@ -124,7 +124,7 @@ export function ScheduleView({
                 <td className="py-2 pe-4 text-right font-mono text-[13px] tabular-nums text-ink">
                   {formatMajor(group.principal)}
                 </td>
-                <td className="py-2 pe-4 text-right font-mono text-[13px] tabular-nums text-ink-2">
+                <td className="hidden py-2 pe-4 text-right font-mono text-[13px] tabular-nums text-ink-2 sm:table-cell">
                   {formatMajor(group.interestToDate)}
                 </td>
                 <td className="py-2 text-right font-mono text-[13px] tabular-nums text-ink">
@@ -139,7 +139,7 @@ export function ScheduleView({
                 <th scope="row" className="py-2 pe-4 font-mono text-[11px] font-normal uppercase tracking-[0.14em] text-ink-2">
                   Whole loan
                 </th>
-                <td className="py-2 pe-4 text-right font-mono text-[13px] tabular-nums text-ink">
+                <td className="hidden py-2 pe-4 text-right font-mono text-[13px] tabular-nums text-ink sm:table-cell">
                   {formatMajor(totals.payments)}
                 </td>
                 <td className="py-2 pe-4 text-right font-mono text-[13px] tabular-nums text-ink">
@@ -148,7 +148,7 @@ export function ScheduleView({
                 <td className="py-2 pe-4 text-right font-mono text-[13px] tabular-nums text-ink">
                   {formatMajor(totals.principal)}
                 </td>
-                <td className="py-2 pe-4 text-right font-mono text-[13px] tabular-nums text-ink-2">
+                <td className="hidden py-2 pe-4 text-right font-mono text-[13px] tabular-nums text-ink-2 sm:table-cell">
                   {formatMajor(totals.interest)}
                 </td>
                 <td className="py-2 text-right font-mono text-[13px] tabular-nums text-ink-2">
