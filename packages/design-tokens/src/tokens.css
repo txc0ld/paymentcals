@@ -43,7 +43,8 @@
   --pc-warn-surface: rgba(251, 191, 36, 0.1);
   --pc-error: #f87171;
   --pc-error-surface: rgba(248, 113, 113, 0.1);
-  --pc-positive: #4ade80;
+  /* Spring green (owner brand colour): positive states + selected toggles. */
+  --pc-positive: #00ff7f;
   --pc-selection-bg: var(--pc-pink-500);
   --pc-selection-text: #000000;
 
@@ -91,7 +92,8 @@
   --pc-warn-surface: rgba(146, 64, 14, 0.08);
   --pc-error: #b91c1c;
   --pc-error-surface: rgba(185, 28, 28, 0.07);
-  --pc-positive: #15803d;
+  /* Darker pair of the spring-green brand colour (5.8:1 on white). */
+  --pc-positive: #00753f;
   --pc-selection-bg: var(--pc-pink-500);
   --pc-selection-text: #000000;
 }

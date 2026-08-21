@@ -235,12 +235,12 @@ export function ToggleField({
         aria-describedby={description ? descriptionId : undefined}
         onClick={() => onChange(!checked)}
         className={`relative mt-0.5 h-11 w-14 shrink-0 border transition-colors duration-[var(--pc-duration-fast)] ease-[var(--pc-ease)] focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-focus ${
-          checked ? "border-ink bg-ink" : "border-hairline-strong bg-surface-2"
+          checked ? "border-positive bg-positive" : "border-hairline-strong bg-surface-2"
         }`}
       >
         <span
           aria-hidden="true"
-          className={`absolute top-1/2 h-5 w-5 -translate-y-1/2 border transition-transform duration-[var(--pc-duration-fast)] ease-[var(--pc-ease)] ${
+          className={`absolute start-0 top-1/2 h-5 w-5 -translate-y-1/2 border transition-transform duration-[var(--pc-duration-fast)] ease-[var(--pc-ease)] ${
             checked
               ? "translate-x-7 border-canvas bg-canvas"
               : "translate-x-1.5 border-hairline-strong bg-ink-3"
