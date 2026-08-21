@@ -122,6 +122,6 @@ export function DeltaCell({
 /** Section heading inside a result or explanation panel. */
 export function PanelHeading({ children }: { children: ReactNode }) {
   return (
-    <h3 className="font-mono text-[11px] uppercase tracking-[0.16em] text-ink-2">{children}</h3>
+    <h3 className="font-mono text-[11px] uppercase tracking-[0.16em] text-[var(--pc-accent-text)]">{children}</h3>
   );
 }

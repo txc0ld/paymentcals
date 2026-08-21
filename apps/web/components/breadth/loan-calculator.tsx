@@ -276,7 +276,7 @@ export function LoanCalculator({ variant }: { variant: "personal" | "car" }) {
             </div>
             {costOfCredit ? (
               <div className="grid min-w-0 gap-4 border-t border-hairline pt-6">
-                <h3 className="font-mono text-[10px] uppercase tracking-[0.18em] text-ink-3">
+                <h3 className="font-mono text-[10px] uppercase tracking-[0.18em] text-[var(--pc-accent-text)]">
                   Total cost of credit
                 </h3>
                 <div className="nexus-panel-soft grid min-w-0 px-4 py-2">

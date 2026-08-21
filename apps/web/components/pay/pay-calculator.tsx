@@ -872,7 +872,7 @@ export function PayCalculator({ variant }: { variant: PayVariant }) {
 
               <section aria-label="Annual tax position" className="nexus-panel-soft grid gap-4 p-6 md:p-8">
                 <div className="flex min-w-0 flex-wrap items-baseline justify-between gap-x-6 gap-y-2">
-                  <h2 className="font-mono text-[11px] tracking-[0.16em] text-ink-2">
+                  <h2 className="font-mono text-[11px] tracking-[0.16em] text-[var(--pc-accent-text)]">
                     Annual tax position (estimate)
                   </h2>
                   <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-[var(--pc-accent-text)]">
@@ -946,7 +946,7 @@ export function PayCalculator({ variant }: { variant: PayVariant }) {
               {bracketLadder ? (
                 <section aria-label="Tax brackets" className="nexus-panel-soft grid gap-4 p-6 md:p-8">
                   <div className="flex min-w-0 flex-wrap items-baseline justify-between gap-x-6 gap-y-2">
-                    <h2 className="font-mono text-[11px] tracking-[0.16em] text-ink-2">
+                    <h2 className="font-mono text-[11px] tracking-[0.16em] text-[var(--pc-accent-text)]">
                       FY {state.financialYear} bracket ladder
                     </h2>
                     <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-ink-3">
@@ -996,7 +996,7 @@ export function PayCalculator({ variant }: { variant: PayVariant }) {
               ) : null}
 
               <section aria-label="Compare another salary" className="nexus-panel-soft grid gap-4 p-6 md:p-8">
-                <h2 className="font-mono text-[11px] tracking-[0.16em] text-ink-2">
+                <h2 className="font-mono text-[11px] tracking-[0.16em] text-[var(--pc-accent-text)]">
                   Compare another salary
                 </h2>
                 <div className="grid items-start gap-4 sm:grid-cols-2">
@@ -1049,7 +1049,7 @@ export function PayCalculator({ variant }: { variant: PayVariant }) {
               </section>
 
               <section aria-label="Estimated employer withholding" className="nexus-panel-soft grid gap-4 p-6 md:p-8">
-                <h2 className="font-mono text-[11px] tracking-[0.16em] text-ink-2">
+                <h2 className="font-mono text-[11px] tracking-[0.16em] text-[var(--pc-accent-text)]">
                   Estimated employer withholding ({CYCLE_LABEL[state.payCycle]})
                 </h2>
                 {output.withholding ? (

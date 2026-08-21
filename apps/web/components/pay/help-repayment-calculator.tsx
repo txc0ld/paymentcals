@@ -229,7 +229,7 @@ export function HelpRepaymentCalculator() {
               {tiers.length > 0 ? (
                 <section aria-label="Repayment rate thresholds" className="grid gap-4 border-t border-hairline pt-6">
                   <div className="flex min-w-0 flex-wrap items-baseline justify-between gap-x-6 gap-y-2">
-                    <h2 className="font-mono text-[11px] tracking-[0.16em] text-ink-2">
+                    <h2 className="font-mono text-[11px] tracking-[0.16em] text-[var(--pc-accent-text)]">
                       Repayment rate thresholds
                     </h2>
                     <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-[var(--pc-accent-text)]">

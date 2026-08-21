@@ -185,7 +185,7 @@ export function ContractorCalculator() {
               </div>
               {sensitivity && sensitivity.length > 1 ? (
                 <div className="grid min-w-0 gap-4 border-t border-hairline pt-6">
-                  <h3 className="font-mono text-[10px] uppercase tracking-[0.18em] text-ink-3">
+                  <h3 className="font-mono text-[10px] uppercase tracking-[0.18em] text-[var(--pc-accent-text)]">
                     Rate sensitivity to utilisation (excluding GST)
                   </h3>
                   <div className="overflow-x-auto">

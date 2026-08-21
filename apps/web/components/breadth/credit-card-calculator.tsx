@@ -162,7 +162,7 @@ export function CreditCardCalculator() {
             ) : null}
             {comparison ? (
               <div className="grid min-w-0 gap-4 border-t border-hairline pt-6">
-                <h3 className="font-mono text-[10px] uppercase tracking-[0.18em] text-ink-3">
+                <h3 className="font-mono text-[10px] uppercase tracking-[0.18em] text-[var(--pc-accent-text)]">
                   Minimum only against your fixed payment
                 </h3>
                 <div className="overflow-x-auto">

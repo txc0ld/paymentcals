@@ -81,7 +81,7 @@ function CoefficientTable({
 }) {
   return (
     <div className="grid gap-4">
-      <h3 className="font-mono text-[11px] tracking-[0.16em] text-ink-2">{caption}</h3>
+      <h3 className="font-mono text-[11px] tracking-[0.16em] text-[var(--pc-accent-text)]">{caption}</h3>
       <div className="overflow-x-auto">
         <table className="w-full min-w-[320px] border-collapse text-left">
           <caption className="sr-only">{caption}</caption>
@@ -328,7 +328,7 @@ export function WithholdingCalculator() {
               className="nexus-panel grid min-w-0 gap-6 p-6 md:p-8"
             >
               <div className="flex min-w-0 flex-wrap items-baseline justify-between gap-x-6 gap-y-2">
-                <h2 className="font-mono text-[11px] tracking-[0.16em] text-ink-2">Working</h2>
+                <h2 className="font-mono text-[11px] tracking-[0.16em] text-[var(--pc-accent-text)]">Working</h2>
                 <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-[var(--pc-accent-text)]">
                   {SCALE_LABEL[computation.scale] ?? computation.scale}
                 </span>

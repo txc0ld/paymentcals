@@ -148,7 +148,7 @@ export function MoneyField({
 export function FieldGroup({ legend, children }: { legend: string; children: ReactNode }) {
   return (
     <fieldset className="nexus-panel-soft flex flex-col gap-4 p-5">
-      <legend className="px-3 font-mono text-[10px] uppercase tracking-[0.18em] text-ink-3">
+      <legend className="px-3 font-mono text-[10px] uppercase tracking-[0.18em] text-[var(--pc-accent-text)]">
         {legend}
       </legend>
       {children}
