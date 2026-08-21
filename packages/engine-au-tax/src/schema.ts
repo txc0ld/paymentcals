@@ -50,6 +50,21 @@ export const zAuPayInput = z.object({
         dependants: 0,
       }),
   }),
+  /** Self-employment (sole trader) mode. Absent = employee. */
+  business: z
+    .object({
+      isSoleTrader: z.boolean(),
+      /**
+       * Claim the small business income tax offset. Eligibility (carrying on
+       * a small business; aggregated turnover under the pack's threshold) is
+       * self-assessed by the taxpayer — the engine computes the published
+       * formula only.
+       */
+      claimSmallBusinessOffset: z.boolean().default(false),
+      /** Net small business income; when absent, all income is treated as it. */
+      netSmallBusinessIncome: zMoney.optional(),
+    })
+    .optional(),
   adjustments: z
     .object({
       bonus: zMoney.optional(),
@@ -81,6 +96,8 @@ export interface AuAnnualLiability {
   litoOffset: Money;
   /** Seniors and pensioners tax offset actually applied (non-refundable). */
   saptoOffset: Money;
+  /** Small business income tax offset actually applied (non-refundable). */
+  sbitoOffset: Money;
   medicareLevy: Money;
   medicareLevySurcharge: Money;
   studyLoanRepayment: Money;

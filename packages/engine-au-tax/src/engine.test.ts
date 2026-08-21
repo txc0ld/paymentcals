@@ -5,6 +5,7 @@ import {
   medicarePacks,
   paygWithholdingPacks,
   saptoPack,
+  sbitoPack,
   stslPacks,
   superGuaranteePacks,
 } from "@paymentcalcs/rules-au";
@@ -285,5 +286,58 @@ describe("SAPTO (F-TAX-006)", () => {
 
   it("fails closed when SAPTO is claimed but no pack resolves", () => {
     expect(() => computeAuPay(saptoInput("40000"), { ...saptoResolution, sapto: null })).toThrow();
+  });
+});
+
+describe("SBITO + sole trader mode (F-TAX-007)", () => {
+  const sbitoResolution: AuPayResolution = {
+    ...resolutionFor("2026-27"),
+    sbito: { pack: sbitoPack, manifestRef: ref(sbitoPack) },
+  };
+  const soleTraderInput = (income: string, opts: { claim?: boolean; nsbi?: string } = {}) =>
+    zAuPayInput.parse({
+      financialYear: "2026-27",
+      income: { amount: aud(income), frequency: "annually" },
+      package: { treatment: "base_plus_super" },
+      business: {
+        isSoleTrader: true,
+        claimSmallBusinessOffset: opts.claim ?? true,
+        ...(opts.nsbi ? { netSmallBusinessIncome: aud(opts.nsbi) } : {}),
+      },
+      taxpayer: { residency: "resident" },
+    });
+
+  it("sole trader: no employer super, withholding replaced by the instalments note", () => {
+    const { output } = computeAuPay(soleTraderInput("100000", { claim: false }), resolutionFor("2026-27"));
+    expect(output.annualised.employerSuper.minorUnits).toBe("0");
+    expect(output.annualised.grossCashIncome.minorUnits).toBe("10000000");
+    expect(output.withholding).toBeNull();
+    expect(output.withholdingUnavailableReason).toMatch(/PAYG instalments/);
+    expect(output.liability.sbitoOffset.minorUnits).toBe("0");
+  });
+
+  it("caps the offset at the pack maximum when all income is business income", () => {
+    const { output } = computeAuPay(soleTraderInput("100000"), sbitoResolution);
+    // 0.16 x 20,520 = 3,283.20, capped at the pack's $1,000 maximum.
+    expect(output.liability.sbitoOffset.minorUnits).toBe("100000");
+    expect(output.liability.totalAnnualLiability.minorUnits).toBe("2152000");
+  });
+
+  it("computes the published proportional formula below the cap", () => {
+    const { output } = computeAuPay(soleTraderInput("45000", { nsbi: "22500" }), sbitoResolution);
+    // grossTax(45,000) from the pack, proportion 0.5, rate from the pack:
+    // 0.16 x 4,020 x 0.5 = 321.60 — under the cap and under tax-after-LITO.
+    expect(output.liability.sbitoOffset.minorUnits).toBe("32160");
+  });
+
+  it("net small business income never exceeds taxable income and zero yields zero", () => {
+    const { output } = computeAuPay(soleTraderInput("45000", { nsbi: "0" }), sbitoResolution);
+    expect(output.liability.sbitoOffset.minorUnits).toBe("0");
+  });
+
+  it("fails closed when the offset is claimed but no pack resolves", () => {
+    expect(() => computeAuPay(soleTraderInput("45000"), resolutionFor("2026-27"))).toThrow(
+      /Small business income tax offset rules are not available/,
+    );
   });
 });

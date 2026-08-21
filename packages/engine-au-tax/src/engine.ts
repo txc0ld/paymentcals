@@ -18,6 +18,7 @@ import {
 } from "@paymentcalcs/calculation-core";
 import type {
   SaptoRulePack,
+  SbitoRulePack,
   IncomeTaxRulePack,
   MedicareRulePack,
   PaygWithholdingRulePack,
@@ -47,6 +48,8 @@ export interface AuPayResolution {
   payg: { pack: PaygWithholdingRulePack; manifestRef: RulePackManifestRef } | null;
   /** Optional: SAPTO thresholds; required only when the input claims SAPTO. */
   sapto?: { pack: SaptoRulePack; manifestRef: RulePackManifestRef } | null;
+  /** Optional: small business income tax offset; required only when claimed. */
+  sbito?: { pack: SbitoRulePack; manifestRef: RulePackManifestRef } | null;
 }
 
 export interface AuPayContext {
@@ -109,8 +112,12 @@ export function computeAuPay(input: AuPayInput, resolution: AuPayResolution): Li
     input.package.employerSuperRate !== null
       ? { ...resolution.superGuarantee.pack.rules, rate: input.package.employerSuperRate }
       : resolution.superGuarantee.pack.rules;
-  const decomposition =
-    input.package.treatment === "total_package_including_super"
+  const soleTrader = input.business?.isSoleTrader === true;
+  const decomposition = soleTrader
+    ? // The super guarantee obliges employers; a sole trader has none, so the
+      // whole amount is gross business income and no SG decomposition applies.
+      { baseSalary: annualIncome, employerSuper: zero(), totalPackage: annualIncome, method: "sole_trader" }
+    : input.package.treatment === "total_package_including_super"
       ? baseFromPackage(annualIncome, sgRules, input.package.applyMaximumContributionBase)
       : packageFromBase(annualIncome, sgRules, input.package.applyMaximumContributionBase);
   const baseSalary = decomposition.baseSalary;
@@ -119,8 +126,9 @@ export function computeAuPay(input: AuPayInput, resolution: AuPayResolution): Li
   trace.push({
     id: "decompose",
     formulaId: "F-PAY-001",
-    label:
-      input.package.treatment === "total_package_including_super"
+    label: soleTrader
+      ? "Sole trader gross business income (no super guarantee)"
+      : input.package.treatment === "total_package_including_super"
         ? `Base salary from total package (${decomposition.method})`
         : "Employer super on base salary",
     expression:
@@ -253,6 +261,48 @@ export function computeAuPay(input: AuPayInput, resolution: AuPayResolution): Li
       unit: "AUD",
     });
   }
+  /* Small business income tax offset (F-TAX-007): rate x the proportion of
+   * basic income tax liability attributable to net small business income,
+   * capped at the pack maximum, non-refundable after LITO and SAPTO.
+   * Eligibility (turnover under the pack threshold) is self-assessed. */
+  let sbito = zero();
+  const sbitoClaim = input.business?.isSoleTrader === true && input.business.claimSmallBusinessOffset === true;
+  if (sbitoClaim) {
+    if (!resolution.sbito) {
+      throw new RulesUnavailableError(
+        `Small business income tax offset rules are not available for ${input.financialYear}.`,
+      );
+    }
+    const sbitoRules = resolution.sbito.pack.rules.current;
+    const nsbiInput = input.business?.netSmallBusinessIncome
+      ? moneyDec(input.business.netSmallBusinessIncome)
+      : taxableIncome;
+    // A net small business loss is treated as zero; NSBI never exceeds taxable income.
+    const nsbi = Dec.min(Dec.max(zero(), nsbiInput) as DecimalValue, taxableIncome) as DecimalValue;
+    const proportion = taxableIncome.isZero() ? zero() : (nsbi.div(taxableIncome) as DecimalValue);
+    const raw = grossTax.times(proportion).times(new Dec(sbitoRules.ratePercent));
+    const capped = Dec.min(
+      raw.toDecimalPlaces(2, Dec.ROUND_HALF_UP) as DecimalValue,
+      new Dec(sbitoRules.maxOffset) as DecimalValue,
+    ) as DecimalValue;
+    sbito = Dec.min(capped, Dec.max(zero(), grossTax.minus(lito).minus(sapto)) as DecimalValue) as DecimalValue;
+    warnings.push({
+      code: "PC-CALC-0205",
+      severity: "info",
+      message:
+        "The small business income tax offset assumes you meet the eligibility conditions, including the aggregated turnover threshold; eligibility is assessed on your tax return.",
+    });
+    trace.push({
+      id: "sbito",
+      formulaId: "F-TAX-007",
+      label: "Small business income tax offset",
+      expression: "min(rate x basic tax x (net small business income / taxable income), cap)",
+      substitution: `sbito(nsbi = ${nsbi.toFixed(2)}, proportion = ${proportion.toFixed(4)})`,
+      value: sbito.toFixed(2),
+      unit: "AUD",
+    });
+  }
+
   const mls =
     input.taxpayer.residency === "resident"
       ? medicareLevySurcharge(taxableIncome, resolution.medicare.pack.rules, {
@@ -291,7 +341,7 @@ export function computeAuPay(input: AuPayInput, resolution: AuPayResolution): Li
     });
   }
 
-  const totalLiability = grossTax.minus(lito).minus(sapto).plus(levyResult.levy).plus(mls).plus(stsl) as DecimalValue;
+  const totalLiability = grossTax.minus(lito).minus(sapto).minus(sbito).plus(levyResult.levy).plus(mls).plus(stsl) as DecimalValue;
   const postTax = moneyDec(adj.postTaxDeductions);
   const netAnnual = grossCash.minus(preTax).minus(totalLiability).minus(postTax) as DecimalValue;
 
@@ -339,7 +389,25 @@ export function computeAuPay(input: AuPayInput, resolution: AuPayResolution): Li
       bumpSapto = Dec.min(bumpEntitlement, Dec.max(zero(), bumpTax.minus(bumpLito)) as DecimalValue) as DecimalValue;
     }
   }
-  const bumpLiability = bumpTax.minus(bumpLito).minus(bumpSapto).plus(bumpLevy).plus(bumpMls).plus(bumpStsl) as DecimalValue;
+  let bumpSbito = zero();
+  if (sbitoClaim && resolution.sbito) {
+    const sbitoRules = resolution.sbito.pack.rules.current;
+    const bumpNsbiInput = input.business?.netSmallBusinessIncome
+      ? moneyDec(input.business.netSmallBusinessIncome)
+      : bumpTaxable;
+    const bumpNsbi = Dec.min(Dec.max(zero(), bumpNsbiInput) as DecimalValue, bumpTaxable) as DecimalValue;
+    const bumpProportion = bumpTaxable.isZero() ? zero() : (bumpNsbi.div(bumpTaxable) as DecimalValue);
+    const bumpRaw = bumpTax.times(bumpProportion).times(new Dec(sbitoRules.ratePercent));
+    const bumpCapped = Dec.min(
+      bumpRaw.toDecimalPlaces(2, Dec.ROUND_HALF_UP) as DecimalValue,
+      new Dec(sbitoRules.maxOffset) as DecimalValue,
+    ) as DecimalValue;
+    bumpSbito = Dec.min(
+      bumpCapped,
+      Dec.max(zero(), bumpTax.minus(bumpLito).minus(bumpSapto)) as DecimalValue,
+    ) as DecimalValue;
+  }
+  const bumpLiability = bumpTax.minus(bumpLito).minus(bumpSapto).minus(bumpSbito).plus(bumpLevy).plus(bumpMls).plus(bumpStsl) as DecimalValue;
   const nextThousandNet = new Dec(1000).minus(bumpLiability.minus(totalLiability)) as DecimalValue;
 
   // Withholding (E03) — separate engine, separate labelling (PAY-AC-002).
@@ -350,7 +418,10 @@ export function computeAuPay(input: AuPayInput, resolution: AuPayResolution): Li
     claimsTaxFreeThreshold: input.taxpayer.claimsTaxFreeThreshold,
     medicareStatus: input.taxpayer.medicare.status,
   });
-  if (typeof scale !== "string") {
+  if (soleTrader) {
+    withholdingUnavailableReason =
+      "Employer PAYG withholding does not apply to sole traders. Income tax on business income is typically prepaid through PAYG instalments; the annual position above is the figure that matters.";
+  } else if (typeof scale !== "string") {
     withholdingUnavailableReason = scale.unsupported;
   } else if (!resolution.payg) {
     withholdingUnavailableReason = `The official PAYG withholding schedule for ${input.financialYear} is not available in this build — the ATO publishes withholding schedules for the current year, and only FY 2026-27 is packaged. Select FY 2026-27 to see withholding; the annual liability estimate above is unaffected.`;
@@ -408,6 +479,7 @@ export function computeAuPay(input: AuPayInput, resolution: AuPayResolution): Li
       grossIncomeTax: aud(grossTax),
       litoOffset: aud(lito),
       saptoOffset: aud(sapto),
+      sbitoOffset: aud(sbito),
       medicareLevy: aud(levyResult.levy),
       medicareLevySurcharge: aud(mls),
       studyLoanRepayment: aud(stsl),

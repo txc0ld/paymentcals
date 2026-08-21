@@ -142,3 +142,13 @@ QRO's six published worked examples). Owner spot-checks:
 - [ ] **au-duty-concessions-qld** (QRO home + first-home concession pages): engine reproduces QRO's own worked examples ($550k→$10,600; $950k→$28,600; first home $650k→$0, $730k→$6,555, $795k→$19,890, $850k→$24,100)
 - [ ] **au-duty-concessions-vic** (SRO PPR rates ≤ $550k): e.g. $130k–$440k band = $2,870 + 5% of the excess over $130k — confirm the bracket table against the page
 - [ ] **au-duty-concessions-act** (ACT Revenue Table 1 owner-occupier, DI2026-155): continuity identities verified in-script
+
+## Update 2026-08-21 (D-023): au-sbito — small business income tax offset
+
+Owner directive: "add self employed options to relevant calculators". Authored by
+`packages/rules-au/scripts/author_sbito_2026_08_21.py` (machine-parses the ATO page's
+progressive-changes table; asserts all 4 published rows and the three method sentences
+verbatim). Sources archived with sha256: ato/sbito.2026-08-21.html + sbito-mytax-2026.
+
+- [ ] **au-sbito**: confirm 2021-22-onwards row — $5m aggregated turnover, 16% rate, $1,000 maximum — and the method (offset = rate × proportion of basic income tax liability attributable to net small business income; NSBI ≥ taxable ⇒ rate × basic liability; loss ⇒ zero) against the archived page
+- [ ] Confirm the engine's treatment: non-refundable after LITO and SAPTO; eligibility (incl. turnover) self-assessed via checkbox with an on-surface note

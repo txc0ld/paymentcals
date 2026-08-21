@@ -21,13 +21,14 @@ export async function resolvePayPacks(financialYear: FinancialYear): Promise<Pay
   const valuationDate = fyValuationDate(financialYear);
   const query = { jurisdiction: "AU", valuationDate, allowDraftRules };
 
-  const [incomeTax, medicare, superGuarantee, stsl, payg, sapto] = await Promise.all([
+  const [incomeTax, medicare, superGuarantee, stsl, payg, sapto, sbito] = await Promise.all([
     resolveRulePack(allAuRulePacks, auIntegrityManifest, { ...query, domain: "income-tax" }),
     resolveRulePack(allAuRulePacks, auIntegrityManifest, { ...query, domain: "medicare" }),
     resolveRulePack(allAuRulePacks, auIntegrityManifest, { ...query, domain: "super-guarantee" }),
     resolveRulePack(allAuRulePacks, auIntegrityManifest, { ...query, domain: "stsl" }),
     resolveRulePack(allAuRulePacks, auIntegrityManifest, { ...query, domain: "payg-withholding" }),
     resolveRulePack(allAuRulePacks, auIntegrityManifest, { ...query, domain: "sapto" }),
+    resolveRulePack(allAuRulePacks, auIntegrityManifest, { ...query, domain: "sbito" }),
   ]);
 
   if (!incomeTax.ok) return { ok: false, reason: `income tax rules: ${incomeTax.reason}` };
@@ -61,6 +62,10 @@ export async function resolvePayPacks(financialYear: FinancialYear): Promise<Pay
       // SAPTO is optional: the engine fails closed only when the offset is claimed.
       sapto: sapto.ok
         ? { pack: sapto.pack as NonNullable<AuPayResolution["sapto"]>["pack"], manifestRef: sapto.manifestRef }
+        : null,
+      // SBITO is optional: the engine fails closed only when the offset is claimed.
+      sbito: sbito.ok
+        ? { pack: sbito.pack as NonNullable<AuPayResolution["sbito"]>["pack"], manifestRef: sbito.manifestRef }
         : null,
     },
   };

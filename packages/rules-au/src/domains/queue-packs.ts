@@ -44,6 +44,22 @@ export type SaptoRules = z.infer<typeof zSaptoRules>;
 export const zSaptoRulePack = zRulePackV1(zSaptoRules);
 export type SaptoRulePack = RulePackV1<SaptoRules>;
 
+/* -------------------------------------- Small business income tax offset */
+const zSbitoRow = z.object({
+  incomeYears: z.string(),
+  aggregatedTurnoverThreshold: dollars,
+  ratePercent: zDecimalString,
+  maxOffset: dollars,
+});
+export const zSbitoRules = z.object({
+  current: zSbitoRow,
+  history: z.array(zSbitoRow).length(4),
+  lossIsZero: z.literal(true),
+});
+export type SbitoRules = z.infer<typeof zSbitoRules>;
+export const zSbitoRulePack = zRulePackV1(zSbitoRules);
+export type SbitoRulePack = RulePackV1<SbitoRules>;
+
 /* ------------------------------------------------------- HELP indexation */
 export const zHelpIndexationRules = z.object({
   appliesOn: z.string().regex(/^\d{2}-\d{2}$/),

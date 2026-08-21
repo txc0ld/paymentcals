@@ -14,6 +14,7 @@ import auSuperThresholds from "./packs/au-super-thresholds.json" with { type: "j
 import auWpiQuarterly from "./packs/au-wpi-quarterly.json" with { type: "json" };
 import auLenderRates from "./packs/au-lender-rates.json" with { type: "json" };
 import auSapto from "./packs/au-sapto.json" with { type: "json" };
+import auSbito from "./packs/au-sbito.json" with { type: "json" };
 import auHelpIndexation from "./packs/au-help-indexation.json" with { type: "json" };
 import auGstRegistration from "./packs/au-gst-registration.json" with { type: "json" };
 import auSchedule5 from "./packs/au-schedule5.json" with { type: "json" };
@@ -58,12 +59,14 @@ import {
   zHelpIndexationRulePack,
   zLenderRatesRulePack,
   zSaptoRulePack,
+  zSbitoRulePack,
   zSchedule5RulePack,
   zWpiRulePack,
   type GstRegistrationRulePack,
   type HelpIndexationRulePack,
   type LenderRatesRulePack,
   type SaptoRulePack,
+  type SbitoRulePack,
   type Schedule5RulePack,
   type WpiRulePack,
 } from "./domains/queue-packs";
@@ -78,6 +81,7 @@ export const superThresholdsPack: SuperThresholdsRulePack = zSuperThresholdsRule
 export const wpiPack: WpiRulePack = zWpiRulePack.parse(auWpiQuarterly);
 export const lenderRatesPack: LenderRatesRulePack = zLenderRatesRulePack.parse(auLenderRates);
 export const saptoPack: SaptoRulePack = zSaptoRulePack.parse(auSapto);
+export const sbitoPack: SbitoRulePack = zSbitoRulePack.parse(auSbito);
 export const helpIndexationPack: HelpIndexationRulePack = zHelpIndexationRulePack.parse(auHelpIndexation);
 export const gstRegistrationPack: GstRegistrationRulePack = zGstRegistrationRulePack.parse(auGstRegistration);
 export const schedule5Pack: Schedule5RulePack = zSchedule5RulePack.parse(auSchedule5);
@@ -113,6 +117,7 @@ export const allAuRulePacks: readonly RulePackV1[] = [
   wpiPack,
   lenderRatesPack,
   saptoPack,
+  sbitoPack,
   helpIndexationPack,
   gstRegistrationPack,
   schedule5Pack,
@@ -182,12 +187,14 @@ export {
   zHelpIndexationRules,
   zLenderRatesRules,
   zSaptoRules,
+  zSbitoRules,
   zSchedule5Rules,
   zWpiRules,
   type GstRegistrationRules,
   type HelpIndexationRules,
   type LenderRatesRules,
   type SaptoRules,
+  type SbitoRules,
   type Schedule5Rules,
   type WpiRules,
 } from "./domains/queue-packs";
@@ -196,6 +203,7 @@ export type {
   HelpIndexationRulePack,
   LenderRatesRulePack,
   SaptoRulePack,
+  SbitoRulePack,
   Schedule5RulePack,
   WpiRulePack,
 } from "./domains/queue-packs";
