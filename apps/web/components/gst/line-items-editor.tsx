@@ -81,7 +81,9 @@ export function LineItemsEditor({
                   />
                 </label>
               </div>
-              <div className="grid gap-4 lg:grid-cols-[1fr_auto_auto]">
+              {/* Always stacked: this editor lives in the narrow inputs column,
+                * so viewport breakpoints would lay three controls across ~440px. */}
+              <div className="grid gap-4">
                 <label className="grid gap-1.5">
                   <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-ink-2">
                     Unit amount
