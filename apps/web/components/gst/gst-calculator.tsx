@@ -371,17 +371,6 @@ export function GstCalculator() {
                       : { label: "Current", tone: "neutral" }
                     : { label: "Rules unavailable", tone: "warn" },
             }}
-            modeControl={
-              <SegmentedControl
-                label="Calculator mode"
-                value={uiMode}
-                onChange={setUiMode}
-                options={[
-                  { value: "simple", label: "Simple" },
-                  { value: "advanced", label: "Invoice" },
-                ]}
-              />
-            }
             actions={
               <span className="no-print flex max-w-full flex-wrap items-center gap-2">
                 {savedFlash ? (
@@ -413,42 +402,58 @@ export function GstCalculator() {
         inputs={
           resolution !== "pending" && !resolution.ok ? (
             <RuleUnavailableState jurisdictionLabel="Australia" detail={resolution.reason} />
-          ) : uiMode === "simple" ? (
-            <div className="grid gap-6">
-              <SegmentedControl
-                label="GST operation"
-                value={simpleMode}
-                onChange={setSimpleMode}
-                options={SIMPLE_MODES}
-              />
-              <MoneyField
-                id="gst-amount"
-                label={simpleMode === "add" ? "Amount excluding GST" : "Amount including GST"}
-                description={
-                  simpleMode === "add"
-                    ? "The GST-exclusive price you are starting from."
-                    : "The GST-inclusive price you are starting from."
-                }
-                value={amountRaw}
-                onChange={setAmountRaw}
-                error={parsed.amountError}
-              />
-            </div>
           ) : (
             <div className="grid gap-6">
-              <div className="grid gap-1.5">
-                <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-ink-2">Rounding</span>
+              {/* Calculator mode lives above the financial inputs it controls. */}
+              <div className="no-print flex justify-start border-b border-hairline pb-5">
                 <SegmentedControl
-                  label="Rounding level"
-                  value={roundingLevel}
-                  onChange={setRoundingLevel}
+                  label="Calculator mode"
+                  value={uiMode}
+                  onChange={setUiMode}
                   options={[
-                    { value: "per_line", label: "Per line" },
-                    { value: "invoice_total", label: "Invoice total" },
+                    { value: "simple", label: "Simple" },
+                    { value: "advanced", label: "Invoice" },
                   ]}
                 />
               </div>
-              <LineItemsEditor items={items} onChange={setItems} errors={parsed.itemErrors} />
+              {uiMode === "simple" ? (
+                <>
+                  <SegmentedControl
+                    label="GST operation"
+                    value={simpleMode}
+                    onChange={setSimpleMode}
+                    options={SIMPLE_MODES}
+                  />
+                  <MoneyField
+                    id="gst-amount"
+                    label={simpleMode === "add" ? "Amount excluding GST" : "Amount including GST"}
+                    description={
+                      simpleMode === "add"
+                        ? "The GST-exclusive price you are starting from."
+                        : "The GST-inclusive price you are starting from."
+                    }
+                    value={amountRaw}
+                    onChange={setAmountRaw}
+                    error={parsed.amountError}
+                  />
+                </>
+              ) : (
+                <>
+                  <div className="grid gap-1.5">
+                    <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-ink-2">Rounding</span>
+                    <SegmentedControl
+                      label="Rounding level"
+                      value={roundingLevel}
+                      onChange={setRoundingLevel}
+                      options={[
+                        { value: "per_line", label: "Per line" },
+                        { value: "invoice_total", label: "Invoice total" },
+                      ]}
+                    />
+                  </div>
+                  <LineItemsEditor items={items} onChange={setItems} errors={parsed.itemErrors} />
+                </>
+              )}
             </div>
           )
         }

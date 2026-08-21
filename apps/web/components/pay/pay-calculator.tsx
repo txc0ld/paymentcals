@@ -554,17 +554,6 @@ export function PayCalculator({ variant }: { variant: PayVariant }) {
                       : { label: "Current", tone: "neutral" }
                     : { label: "Rules unavailable", tone: "warn" },
             }}
-            modeControl={
-              <SegmentedControl
-                label="Detail level"
-                value={uiMode}
-                onChange={setUiMode}
-                options={[
-                  { value: "simple", label: "Simple" },
-                  { value: "advanced", label: "Advanced" },
-                ]}
-              />
-            }
             actions={
               <span className="no-print flex items-center gap-2">
                 {savedFlash ? (
@@ -598,6 +587,18 @@ export function PayCalculator({ variant }: { variant: PayVariant }) {
             <RuleUnavailableState jurisdictionLabel={`Australia FY ${state.financialYear}`} detail={resolution.reason} />
           ) : (
             <div className="grid gap-6">
+              {/* Detail level lives above the financial inputs it controls. */}
+              <div className="no-print flex justify-start border-b border-hairline pb-5">
+                <SegmentedControl
+                  label="Detail level"
+                  value={uiMode}
+                  onChange={setUiMode}
+                  options={[
+                    { value: "simple", label: "Simple" },
+                    { value: "advanced", label: "Advanced" },
+                  ]}
+                />
+              </div>
               {variant.intro ? <p className="text-[13px] leading-5 text-ink-3">{variant.intro}</p> : null}
               <SelectField
                 id="pay-fy"
