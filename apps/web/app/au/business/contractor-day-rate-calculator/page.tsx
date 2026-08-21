@@ -66,6 +66,24 @@ const FAQ: FaqItem[] = [
     answer:
       "Income tax, business structure choices, professional indemnity and public liability insurance premiums, workers compensation and personal services income rules are outside this calculation, which the limitations panel states. Overheads are whatever annual figure you enter, so anything you leave out of that number is absent from the rate. The result is a pricing calculation, not a tax position.",
   },
+  {
+    question: "Do contractors pay their own super and tax?",
+    answer:
+      "Generally yes — both come out of the rate, because there is no employer withholding tax each payday and no employer super guarantee contribution unless the contract is one the guarantee treats as employment. Income tax on business profit is assessed at individual marginal rates and is typically prepaid through PAYG instalments, then settled when the return is lodged. Retirement saving comes from personal contributions paid into a fund, which is why the rate here carries an editable super replacement percentage rather than assuming the amount away.",
+    render: (
+      <p>
+        Generally yes — both come out of the rate, because there is no employer withholding tax each
+        payday and no employer super guarantee contribution unless the contract is one the guarantee
+        treats as employment. Income tax on business profit is assessed at individual marginal rates
+        and is typically prepaid through PAYG instalments, then settled when the return is lodged, and
+        retirement saving comes from personal contributions paid into a fund. The{" "}
+        <Link href="/au/pay-tax/pay-calculator" className={LINK}>
+          pay calculator
+        </Link>{" "}
+        has a sole-trader mode that shows the annual tax position on business profit.
+      </p>
+    ),
+  },
 ];
 
 export const metadata: Metadata = {

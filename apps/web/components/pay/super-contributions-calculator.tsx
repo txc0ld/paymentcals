@@ -12,6 +12,7 @@ import {
   ResultMetric,
   RuleUnavailableState,
   ScenarioActions,
+  SegmentedControl,
   SelectField,
   UniversalDisclosure,
   formatMoney,
@@ -67,8 +68,11 @@ const AGE_LABELS: Record<string, string> = {
   "m. 75 and over": "75 and over",
 };
 
+type Employment = "employee" | "self-employed";
+
 export function SuperContributionsCalculator() {
   const [financialYear, setFinancialYear] = useState<FinancialYear>("2026-27");
+  const [employment, setEmployment] = useState<Employment>("employee");
   const [salaryRaw, setSalaryRaw] = useState("");
   const [sacrificeRaw, setSacrificeRaw] = useState("");
   const [ageRange, setAgeRange] = useState("f. 40 - 44");
@@ -78,10 +82,13 @@ export function SuperContributionsCalculator() {
 
   const scenario = useScenarioActions({
     calculatorId: entry.id,
-    state: { financialYear, salaryRaw, sacrificeRaw, ageRange, sex, incomeRange },
+    state: { financialYear, employment, salaryRaw, sacrificeRaw, ageRange, sex, incomeRange },
     onHydrate: (saved) => {
       if (FINANCIAL_YEARS.includes(saved.financialYear as FinancialYear)) {
         setFinancialYear(saved.financialYear as FinancialYear);
+      }
+      if (saved.employment === "employee" || saved.employment === "self-employed") {
+        setEmployment(saved.employment);
       }
       if (typeof saved.salaryRaw === "string") setSalaryRaw(saved.salaryRaw);
       if (typeof saved.sacrificeRaw === "string") setSacrificeRaw(saved.sacrificeRaw);
@@ -130,27 +137,41 @@ export function SuperContributionsCalculator() {
   const salary = useMemo(() => parseMoneyInput(salaryRaw), [salaryRaw]);
   const sacrifice = useMemo(() => (sacrificeRaw.trim() ? parseMoneyInput(sacrificeRaw) : null), [sacrificeRaw]);
 
+  const selfEmployed = employment === "self-employed";
+
   const summary = useMemo((): { ok: true; value: SuperContributionSummary } | { ok: false; reason: string } | null => {
     if (resolution === "pending" || !resolution.ok || !salary.ok) return null;
     if (sacrifice !== null && !sacrifice.ok) return null;
     try {
       const major = (m: { minorUnits: string }) => new Dec(m.minorUnits).div(100).toFixed(2);
+      const income = major(salary.money);
+      /* Self-employed: no employer, so the summary runs on a zero super
+       * guarantee base and personal deductible contributions are the only
+       * concessional amount — the full cap is theirs. */
+      const value = superContributionSummary(
+        resolution.packs.sg.rules,
+        resolution.packs.thresholds.rules,
+        financialYear,
+        selfEmployed ? "0" : income,
+        sacrifice ? major(sacrifice.money) : "0",
+      );
+      if (!selfEmployed) return { ok: true, value };
+      /* Division 293 still tests income plus concessional contributions against
+       * the pack threshold, so the income the zero base left out is re-added. */
+      const excess = Dec.max(
+        new Dec(0),
+        new Dec(income).plus(value.concessionalTotal).minus(value.division293Threshold),
+      );
       return {
         ok: true,
-        value: superContributionSummary(
-          resolution.packs.sg.rules,
-          resolution.packs.thresholds.rules,
-          financialYear,
-          major(salary.money),
-          sacrifice ? major(sacrifice.money) : "0",
-        ),
+        value: { ...value, division293Excess: excess.toDecimalPlaces(2, Dec.ROUND_HALF_UP).toFixed(2) },
       };
     } catch (error) {
       if (error instanceof SuperThresholdUnavailableError) return { ok: false, reason: error.message };
       if (error instanceof RangeError) return { ok: false, reason: error.message };
       throw error;
     }
-  }, [resolution, salary, sacrifice, financialYear]);
+  }, [resolution, salary, sacrifice, financialYear, selfEmployed]);
 
   const statistics = resolution !== "pending" && resolution.ok ? resolution.packs.statistics.rules : null;
   const incomeRanges = useMemo(() => {
@@ -192,6 +213,7 @@ export function SuperContributionsCalculator() {
                 onShare={scenario.onShare}
                 onReset={() => {
                   setFinancialYear("2026-27");
+                  setEmployment("employee");
                   setSalaryRaw("");
                   setSacrificeRaw("");
                   setAgeRange("f. 40 - 44");
@@ -207,6 +229,18 @@ export function SuperContributionsCalculator() {
             <RuleUnavailableState jurisdictionLabel={`Australia FY ${financialYear}`} detail={resolution.reason} />
           ) : (
             <div className="grid gap-6">
+              {/* Employment status governs whether an employer contribution exists at all. */}
+              <div className="no-print flex justify-start border-b border-hairline pb-5">
+                <SegmentedControl
+                  label="Employment"
+                  value={employment}
+                  onChange={setEmployment}
+                  options={[
+                    { value: "employee", label: "Employee" },
+                    { value: "self-employed", label: "Self-employed" },
+                  ]}
+                />
+              </div>
               <SelectField
                 id="sup-fy"
                 label="Financial year"
@@ -216,16 +250,28 @@ export function SuperContributionsCalculator() {
               />
               <MoneyField
                 id="sup-salary"
-                label="Annual base salary"
-                description="Ordinary time earnings before tax, excluding employer super."
+                label={selfEmployed ? "Annual income before tax" : "Annual base salary"}
+                description={
+                  selfEmployed
+                    ? "Income for the year. Used with your contributions for the Division 293 test."
+                    : "Ordinary time earnings before tax, excluding employer super."
+                }
                 value={salaryRaw}
                 onChange={setSalaryRaw}
                 error={!salary.ok && salary.error ? salary.error : undefined}
               />
               <MoneyField
                 id="sup-sacrifice"
-                label="Salary sacrifice to super (annual)"
-                description="Pre-tax contributions you choose to add. Counts toward the concessional cap."
+                label={
+                  selfEmployed
+                    ? "Personal contributions claimed as a deduction (annual)"
+                    : "Salary sacrifice to super (annual)"
+                }
+                description={
+                  selfEmployed
+                    ? "Contributions you make to your own fund and claim as a deduction. Counts toward the concessional cap."
+                    : "Pre-tax contributions you choose to add. Counts toward the concessional cap."
+                }
                 value={sacrificeRaw}
                 onChange={setSacrificeRaw}
                 error={sacrifice && !sacrifice.ok && sacrifice.error ? sacrifice.error : undefined}
@@ -269,22 +315,41 @@ export function SuperContributionsCalculator() {
             <EmptyState>{summary.reason}</EmptyState>
           ) : !summary || !salary.ok ? (
             <EmptyState>
-              Enter your salary to see employer super at the official rate, concessional cap headroom
-              and the published balance ranges for your age group.
+              {selfEmployed
+                ? "Enter your income and any personal deductible contributions to see concessional cap headroom and the published balance ranges for your age group."
+                : "Enter your salary to see employer super at the official rate, concessional cap headroom and the published balance ranges for your age group."}
             </EmptyState>
           ) : (
             <div className="grid gap-6">
               <div className="nexus-result grid gap-6 p-6 md:p-8">
-                <PrimaryResult
-                  label="Employer super per year"
-                  amount={moneyFromDecimalString("AUD", summary.value.sgAmount, 2)}
-                  qualifier={`Super guarantee at ${formatRatePercent(summary.value.sgRate)} under FY ${financialYear} rules, on ordinary time earnings up to the maximum contribution base. Paid to your fund, never counted as take-home cash.`}
-                />
+                {selfEmployed ? (
+                  <div className="grid gap-2 border-l-2 border-hairline-strong pl-4">
+                    <span className="font-mono text-[10px] uppercase tracking-[0.16em] text-ink-3">
+                      Employer super guarantee — not applicable
+                    </span>
+                    <p className="text-[13px] leading-5 text-ink-2">
+                      The super guarantee is an obligation on employers. A self-employed person has no
+                      employer, so no guarantee amount is calculated here and super for the year comes
+                      from the personal contributions entered, measured against the concessional cap
+                      below.
+                    </p>
+                  </div>
+                ) : (
+                  <PrimaryResult
+                    label="Employer super per year"
+                    amount={moneyFromDecimalString("AUD", summary.value.sgAmount, 2)}
+                    qualifier={`Super guarantee at ${formatRatePercent(summary.value.sgRate)} under FY ${financialYear} rules, on ordinary time earnings up to the maximum contribution base. Paid to your fund, never counted as take-home cash.`}
+                  />
+                )}
                 <div className="grid auto-rows-fr gap-4 border-t border-hairline pt-6 @md:grid-cols-3">
                   <ResultMetric
                     label="Concessional total"
                     amount={moneyFromDecimalString("AUD", summary.value.concessionalTotal, 2)}
-                    detail="Employer super + salary sacrifice"
+                    detail={
+                      selfEmployed
+                        ? "Personal contributions claimed as a deduction"
+                        : "Employer super + salary sacrifice"
+                    }
                   />
                   <ResultMetric
                     label="Cap headroom"

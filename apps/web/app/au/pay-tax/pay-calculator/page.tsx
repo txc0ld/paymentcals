@@ -76,4 +76,14 @@ const FAQS = [
     answer:
       "SAPTO is the seniors and pensioners tax offset, a non-refundable offset for Australian residents who meet the ATO age and pension eligibility conditions. It is applied against income tax after the low income tax offset and cannot on its own produce a refund. Switching on the SAPTO field and choosing the matching status includes it in the annual liability at the amounts in the rule pack for the selected year.",
   },
+  {
+    question: "How is tax different for sole traders?",
+    answer:
+      "A sole trader pays the same individual marginal rates on business profit that an employee pays on salary, because business income is assessed in the individual's own tax return. The difference is collection: there is no employer withholding tax each payday, so the tax is typically prepaid through PAYG instalments and settled when the return is lodged. The sole-trader mode here shows the annual position on business profit and applies the small business income tax offset where it is claimed.",
+  },
+  {
+    question: "What is the small business income tax offset?",
+    answer:
+      "It is an offset for sole traders and for individuals with a share of net small business income from a partnership or trust. It is computed on the proportion of income tax attributable to that business income and is capped at the maximum published for the year. Eligibility, including the aggregated turnover threshold, is assessed on the tax return rather than here, and every value used comes from the active ATO-sourced rule pack.",
+  },
 ];

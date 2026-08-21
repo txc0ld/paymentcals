@@ -69,4 +69,9 @@ const FAQS = [
       </p>
     ),
   },
+  {
+    question: "Do self-employed people get super?",
+    answer:
+      "Not from an employer — the super guarantee is an obligation on employers, and a sole trader has none, so no guarantee contribution arises from the business itself. Super for a self-employed person therefore comes from personal contributions paid into a fund out of business income. Those contributions can be claimed as a deduction where the conditions are met, and they count towards the concessional cap alongside any employer or salary sacrifice amounts from other work. Switching this calculator to self-employed removes the employer figure and measures personal contributions against the whole cap.",
+  },
 ];

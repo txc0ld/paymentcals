@@ -65,6 +65,8 @@ export interface PayVariant {
 
 export interface PayFormState {
   financialYear: FinancialYear;
+  /** Employee (PAYG withholding applies) or sole trader (it does not). */
+  employment: "employee" | "sole_trader";
   amountRaw: string;
   frequency: "annually" | "monthly" | "fortnightly" | "weekly" | "hourly";
   includesSuper: boolean;
@@ -88,6 +90,10 @@ export interface PayFormState {
   spouseIncomeRaw: string;
   saptoEligible: boolean;
   saptoStatus: "single" | "couple_each" | "illness_separated_each";
+  /** Sole trader only: claim the small business income tax offset. */
+  claimSbito: boolean;
+  /** Sole trader only: blank = the whole taxable income is business income. */
+  netSmallBusinessIncomeRaw: string;
   payCycle: "weekly" | "fortnightly" | "monthly" | "quarterly";
   additionalWithholdingRaw: string;
   /** Annual gross to compare against, same settings. Empty = no comparison. */
@@ -96,6 +102,7 @@ export interface PayFormState {
 
 const DEFAULT_STATE: PayFormState = {
   financialYear: "2026-27",
+  employment: "employee",
   amountRaw: "",
   frequency: "annually",
   includesSuper: false,
@@ -119,6 +126,8 @@ const DEFAULT_STATE: PayFormState = {
   spouseIncomeRaw: "",
   saptoEligible: false,
   saptoStatus: "single",
+  claimSbito: false,
+  netSmallBusinessIncomeRaw: "",
   payCycle: "fortnightly",
   additionalWithholdingRaw: "",
   compareRaw: "",
@@ -143,15 +152,18 @@ function parseOptionalMoney(raw: string, errors: Record<string, string>, key: st
 }
 
 /**
- * `saptoAvailable` gates the offset claim: the engine fails closed when SAPTO
- * is claimed without a resolved pack, so the claim is only ever sent once the
- * pack has resolved. Without it the calculator shows the unavailable state.
+ * `saptoAvailable` and `sbitoAvailable` gate their offset claims: the engine
+ * fails closed when an offset is claimed without a resolved pack, so a claim is
+ * only ever sent once the pack has resolved. Without it the calculator shows
+ * the unavailable state.
  */
 function buildInput(
   state: PayFormState,
   saptoAvailable: boolean,
+  sbitoAvailable: boolean,
 ): { input: AuPayInput | null; errors: Record<string, string> } {
   const errors: Record<string, string> = {};
+  const soleTrader = state.employment === "sole_trader";
   const amount = parseMoneyInput(state.amountRaw);
   if (!amount.ok) {
     if (amount.error) errors.amount = amount.error;
@@ -163,7 +175,9 @@ function buildInput(
   if (!/^\d+(\.\d+)?$/.test(state.weeksPaidRaw.trim())) {
     errors.weeks = "Weeks paid per year must be a number.";
   }
-  if (state.superRateRaw.trim() !== "" && !/^\d+(\.\d+)?$/.test(state.superRateRaw.trim())) {
+  // The employer super rate is hidden — and ignored by the engine — for sole
+  // traders, so a stale value never blocks the calculation.
+  if (!soleTrader && state.superRateRaw.trim() !== "" && !/^\d+(\.\d+)?$/.test(state.superRateRaw.trim())) {
     errors.superRate = "Enter the employer super rate as a percentage, like 12.";
   }
   if (!/^\d{1,2}$/.test(state.dependantsRaw.trim())) {
@@ -178,9 +192,11 @@ function buildInput(
       weeksPaidPerYear: state.weeksPaidRaw.trim() || "52",
     },
     package: {
-      treatment: state.includesSuper ? "total_package_including_super" : "base_plus_super",
+      // A sole trader has no super guarantee, so the packaging controls are
+      // hidden and the engine takes the amount as gross business income.
+      treatment: !soleTrader && state.includesSuper ? "total_package_including_super" : "base_plus_super",
       employerSuperRate:
-        state.superRateRaw.trim() === ""
+        soleTrader || state.superRateRaw.trim() === ""
           ? null
           : new Dec(state.superRateRaw.trim()).div(100).toString(),
       applyMaximumContributionBase: true,
@@ -201,6 +217,24 @@ function buildInput(
           : {}),
       },
     },
+    ...(soleTrader
+      ? {
+          business: {
+            isSoleTrader: true,
+            // Only ever claimed once the offset pack has resolved.
+            claimSmallBusinessOffset: state.claimSbito && sbitoAvailable,
+            ...(state.netSmallBusinessIncomeRaw.trim()
+              ? {
+                  netSmallBusinessIncome: parseOptionalMoney(
+                    state.netSmallBusinessIncomeRaw,
+                    errors,
+                    "netSmallBusinessIncome",
+                  ),
+                }
+              : {}),
+          },
+        }
+      : {}),
     adjustments: {
       ...(state.bonusRaw.trim() ? { bonus: parseOptionalMoney(state.bonusRaw, errors, "bonus") } : {}),
       ...(state.otherIncomeRaw.trim()
@@ -347,7 +381,8 @@ function NetSplitBar({ output }: { output: AuPayOutput }) {
   const net = moneyToDecimal(output.netAnnualCash) as DecimalValue;
   const incomeTax = (moneyToDecimal(output.liability.grossIncomeTax) as DecimalValue)
     .minus(moneyToDecimal(output.liability.litoOffset) as DecimalValue)
-    .minus(moneyToDecimal(output.liability.saptoOffset) as DecimalValue);
+    .minus(moneyToDecimal(output.liability.saptoOffset) as DecimalValue)
+    .minus(moneyToDecimal(output.liability.sbitoOffset) as DecimalValue);
   const medicare = (moneyToDecimal(output.liability.medicareLevy) as DecimalValue).plus(
     moneyToDecimal(output.liability.medicareLevySurcharge) as DecimalValue,
   );
@@ -569,16 +604,31 @@ export function PayCalculator({ variant }: { variant: PayVariant }) {
   /** Claimed but unresolvable: the offset is never estimated, only declared missing. */
   const saptoUnavailable =
     state.saptoEligible && resolution !== "pending" && resolution.ok && !saptoAvailable;
+  const soleTrader = state.employment === "sole_trader";
+  /** The small business offset pack for the selected year; null = not runnable. */
+  const sbitoAvailable =
+    resolution !== "pending" && resolution.ok && resolution.resolution.sbito !== null;
+  /** Claimed but unresolvable: the offset is never estimated, only declared missing. */
+  const sbitoUnavailable =
+    soleTrader && state.claimSbito && resolution !== "pending" && resolution.ok && !sbitoAvailable;
 
-  const { input, errors } = useMemo(() => buildInput(state, saptoAvailable), [state, saptoAvailable]);
+  const { input, errors } = useMemo(
+    () => buildInput(state, saptoAvailable, sbitoAvailable),
+    [state, saptoAvailable, sbitoAvailable],
+  );
   const compareInput = useMemo(() => {
     if (!state.compareRaw.trim()) return null;
-    return buildInput({ ...state, amountRaw: state.compareRaw, frequency: "annually" }, saptoAvailable)
-      .input;
-  }, [state, saptoAvailable]);
+    return buildInput(
+      { ...state, amountRaw: state.compareRaw, frequency: "annually" },
+      saptoAvailable,
+      sbitoAvailable,
+    ).input;
+  }, [state, saptoAvailable, sbitoAvailable]);
   /** The offset only reaches the engine — and the breakdown — for residents. */
   const saptoClaimed =
     input?.taxpayer.sapto?.eligible === true && input.taxpayer.residency === "resident";
+  /** Claimed and actually run: the row only appears when the engine computed it. */
+  const sbitoClaimed = input?.business?.claimSmallBusinessOffset === true;
 
   useEffect(() => {
     if (resolution === "pending" || !resolution.ok || !input) {
@@ -808,6 +858,17 @@ export function PayCalculator({ variant }: { variant: PayVariant }) {
                 />
               </div>
               {variant.intro ? <p className="text-[13px] leading-5 text-ink-3">{variant.intro}</p> : null}
+              {/* How the income is earned decides whether super guarantee and
+                * employer withholding apply at all, so it sits above them. */}
+              <SegmentedControl
+                label="Employment"
+                value={state.employment}
+                onChange={(employment) => patch({ employment })}
+                options={[
+                  { value: "employee", label: "Employee" },
+                  { value: "sole_trader", label: "Sole trader" },
+                ]}
+              />
               <SelectField
                 id="pay-fy"
                 label="Financial year"
@@ -817,7 +878,8 @@ export function PayCalculator({ variant }: { variant: PayVariant }) {
               />
               <MoneyField
                 id="pay-amount"
-                label={state.includesSuper ? "Package amount (including super)" : "Income amount"}
+                label={!soleTrader && state.includesSuper ? "Package amount (including super)" : "Income amount"}
+                {...(soleTrader ? { description: "Business income before tax." } : {})}
                 value={state.amountRaw}
                 onChange={(amountRaw) => patch({ amountRaw })}
                 error={errors.amount}
@@ -883,13 +945,17 @@ export function PayCalculator({ variant }: { variant: PayVariant }) {
                   </div>
                 </div>
               ) : null}
-              <ToggleField
-                id="pay-includes-super"
-                label="Amount includes employer super"
-                description="On for a total remuneration package; the base salary is derived."
-                checked={state.includesSuper}
-                onChange={(includesSuper) => patch({ includesSuper })}
-              />
+              {/* No super guarantee applies to a sole trader, so there is no
+                * package to decompose and the control is withheld. */}
+              {soleTrader ? null : (
+                <ToggleField
+                  id="pay-includes-super"
+                  label="Amount includes employer super"
+                  description="On for a total remuneration package; the base salary is derived."
+                  checked={state.includesSuper}
+                  onChange={(includesSuper) => patch({ includesSuper })}
+                />
+              )}
               <ToggleField
                 id="pay-help"
                 label="HELP or other study loan"
@@ -929,28 +995,38 @@ export function PayCalculator({ variant }: { variant: PayVariant }) {
                     />
                   </FieldGroup>
                   <FieldGroup legend="Super and packaging">
-                    <div className="grid gap-1.5">
-                      <label htmlFor="pay-super-rate" className="font-mono text-[11px] uppercase tracking-[0.14em] text-ink-2">
-                        Employer super rate % (blank = official rate)
-                      </label>
-                      <input
-                        id="pay-super-rate"
-                        inputMode="decimal"
-                        placeholder="12"
-                        value={state.superRateRaw}
-                        onChange={(e) => patch({ superRateRaw: e.target.value })}
-                        aria-invalid={errors.superRate ? true : undefined}
-                        className="nexus-input min-h-11 bg-surface px-3 font-mono text-[15px] tabular-nums text-ink outline-none focus:border-focus"
-                      />
-                      {errors.superRate ? (
-                        <span role="alert" className="text-[12px] text-error">
-                          {errors.superRate}
-                        </span>
-                      ) : null}
-                    </div>
+                    {soleTrader ? null : (
+                      <div className="grid gap-1.5">
+                        <label htmlFor="pay-super-rate" className="font-mono text-[11px] uppercase tracking-[0.14em] text-ink-2">
+                          Employer super rate % (blank = official rate)
+                        </label>
+                        <input
+                          id="pay-super-rate"
+                          inputMode="decimal"
+                          placeholder="12"
+                          value={state.superRateRaw}
+                          onChange={(e) => patch({ superRateRaw: e.target.value })}
+                          aria-invalid={errors.superRate ? true : undefined}
+                          className="nexus-input min-h-11 bg-surface px-3 font-mono text-[15px] tabular-nums text-ink outline-none focus:border-focus"
+                        />
+                        {errors.superRate ? (
+                          <span role="alert" className="text-[12px] text-error">
+                            {errors.superRate}
+                          </span>
+                        ) : null}
+                      </div>
+                    )}
                     <MoneyField
                       id="pay-sacrifice"
                       label="Salary sacrifice to super (annual)"
+                      /* Same engine field either way: a sole trader's personal
+                       * contributions are deducted on the identical income tests. */
+                      {...(soleTrader
+                        ? {
+                            description:
+                              "Personal super contributions you claim as a deduction on your tax return.",
+                          }
+                        : {})}
                       value={state.salarySacrificeRaw}
                       onChange={(salarySacrificeRaw) => patch({ salarySacrificeRaw })}
                       error={errors.salarySacrifice}
@@ -1050,6 +1126,34 @@ export function PayCalculator({ variant }: { variant: PayVariant }) {
                       Thresholds are the latest published by the ATO (2025&ndash;26).
                     </p>
                   </FieldGroup>
+                  {soleTrader ? (
+                    <FieldGroup legend="Small business income tax offset">
+                      <ToggleField
+                        id="pay-sbito"
+                        label="Claim the small business income tax offset"
+                        description="Applies to the part of your income tax that relates to net small business income."
+                        checked={state.claimSbito}
+                        onChange={(claimSbito) => patch({ claimSbito })}
+                      />
+                      {state.claimSbito ? (
+                        sbitoUnavailable ? (
+                          <RuleUnavailableState
+                            jurisdictionLabel="Australia (small business offset)"
+                            detail="The small business income tax offset pack could not be resolved, so no offset is applied."
+                          />
+                        ) : (
+                          <MoneyField
+                            id="pay-nsbi"
+                            label="Net small business income"
+                            description="Leave empty to treat all income as business income. Eligibility, including the aggregated turnover threshold, is self-assessed on your tax return."
+                            value={state.netSmallBusinessIncomeRaw}
+                            onChange={(netSmallBusinessIncomeRaw) => patch({ netSmallBusinessIncomeRaw })}
+                            error={errors.netSmallBusinessIncome}
+                          />
+                        )
+                      ) : null}
+                    </FieldGroup>
+                  ) : null}
                 </>
               ) : null}
             </div>
@@ -1133,6 +1237,9 @@ export function PayCalculator({ variant }: { variant: PayVariant }) {
                     // Only when the offset was actually claimed and run.
                     ...(saptoClaimed
                       ? [["SAPTO offset", output.liability.saptoOffset, false] as const]
+                      : []),
+                    ...(sbitoClaimed
+                      ? [["Small business offset", output.liability.sbitoOffset, false] as const]
                       : []),
                     ["Medicare levy", output.liability.medicareLevy, false],
                     ["Medicare levy surcharge", output.liability.medicareLevySurcharge, false],
@@ -1555,7 +1662,7 @@ export function PayCalculator({ variant }: { variant: PayVariant }) {
               summary={
                 <div className="grid gap-4">
                   <p className="max-w-2xl text-[14px] leading-6 text-ink">
-                    {`On ${formatMoney(output.annualised.grossCashIncome)} of gross cash income in FY ${state.financialYear}, the estimated annual liability is ${formatMoney(output.liability.totalAnnualLiability)}, leaving ${formatMoney(output.netAnnualCash)} net per year (${formatMoney(output.netPerCycle)} ${CYCLE_LABEL[state.payCycle]}). Employer super of ${formatMoney(output.annualised.employerSuper)} is paid separately to your fund.`}
+                    {`On ${formatMoney(output.annualised.grossCashIncome)} of gross cash income in FY ${state.financialYear}, the estimated annual liability is ${formatMoney(output.liability.totalAnnualLiability)}, leaving ${formatMoney(output.netAnnualCash)} net per year (${formatMoney(output.netPerCycle)} ${CYCLE_LABEL[state.payCycle]}).${soleTrader ? " No employer super guarantee applies to a sole trader." : ` Employer super of ${formatMoney(output.annualised.employerSuper)} is paid separately to your fund.`}`}
                   </p>
                   <p className="text-[13px] leading-5 text-ink-3">
                     The annual tax position and the pay-cycle withholding are different measures and are
