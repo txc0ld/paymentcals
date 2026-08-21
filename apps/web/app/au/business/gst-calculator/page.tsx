@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { getRegistryEntry } from "@paymentcalcs/calculator-registry";
 import { GstCalculator } from "../../../../components/gst/gst-calculator";
+import { CalculatorStructuredData } from "../../../../components/structured-data";
 
 const entry = getRegistryEntry("AU-BIZ-001")!;
 
@@ -16,5 +17,10 @@ export const metadata: Metadata = {
 };
 
 export default function GstCalculatorPage() {
-  return <GstCalculator />;
+  return (
+    <>
+      <CalculatorStructuredData id="AU-BIZ-001" />
+      <GstCalculator />
+    </>
+  );
 }

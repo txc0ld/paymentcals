@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { getRegistryEntry } from "@paymentcalcs/calculator-registry";
 import { SavingsPresetCalculator } from "../../../../components/home/savings-preset-calculator";
+import { CalculatorStructuredData } from "../../../../components/structured-data";
 
 const entry = getRegistryEntry("AU-HOME-006")!;
 
@@ -12,5 +13,10 @@ export const metadata: Metadata = {
 };
 
 export default function Page() {
-  return <SavingsPresetCalculator variant="offset" />;
+  return (
+    <>
+      <CalculatorStructuredData id="AU-HOME-006" />
+      <SavingsPresetCalculator variant="offset" />
+    </>
+  );
 }

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { getRegistryEntry } from "@paymentcalcs/calculator-registry";
 import { SuperContributionsCalculator } from "../../../../components/pay/super-contributions-calculator";
+import { CalculatorStructuredData } from "../../../../components/structured-data";
 
 const entry = getRegistryEntry("AU-PAY-016")!;
 
@@ -12,5 +13,10 @@ export const metadata: Metadata = {
 };
 
 export default function Page() {
-  return <SuperContributionsCalculator />;
+  return (
+    <>
+      <CalculatorStructuredData id="AU-PAY-016" />
+      <SuperContributionsCalculator />
+    </>
+  );
 }

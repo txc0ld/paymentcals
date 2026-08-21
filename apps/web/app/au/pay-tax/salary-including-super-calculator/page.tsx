@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { getRegistryEntry } from "@paymentcalcs/calculator-registry";
 import { PayCalculator } from "../../../../components/pay/pay-calculator";
+import { CalculatorStructuredData } from "../../../../components/structured-data";
 
 const entry = getRegistryEntry("AU-PAY-005")!;
 
@@ -12,5 +13,10 @@ export const metadata: Metadata = {
 };
 
 export default function Page() {
-  return <PayCalculator variant={{ calculatorId: "AU-PAY-005", primaryMetric: "netPerCycle", primaryLabel: "Take-home pay", defaults: { includesSuper: true }, intro: "Enter a total remuneration package. The base salary is derived after super, including the maximum contribution base where it applies." }} />;
+  return (
+    <>
+      <CalculatorStructuredData id="AU-PAY-005" />
+      <PayCalculator variant={{ calculatorId: "AU-PAY-005", primaryMetric: "netPerCycle", primaryLabel: "Take-home pay", defaults: { includesSuper: true }, intro: "Enter a total remuneration package. The base salary is derived after super, including the maximum contribution base where it applies." }} />
+    </>
+  );
 }

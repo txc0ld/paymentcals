@@ -10,6 +10,7 @@ import {
   PrimaryResult,
   ResultMetric,
   RuleUnavailableState,
+  ScenarioActions,
   SelectField,
   ToggleField,
   UniversalDisclosure,
@@ -32,6 +33,7 @@ import {
 import { analytics } from "../../lib/analytics";
 import { parseMoneyInput } from "../../lib/money-input";
 import { FINANCIAL_YEARS, resolvePayPacks, type FinancialYear, type PayResolutionOutcome } from "../../lib/pay-packs";
+import { useScenarioActions } from "./use-scenario-actions";
 
 const entry = getRegistryEntry("AU-PAY-004")!;
 
@@ -48,6 +50,20 @@ export function NetToGrossCalculator() {
   const [solved, setSolved] = useState<NetToGrossResult | null>(null);
   /** The annual target the displayed solution was solved against. */
   const [solvedTarget, setSolvedTarget] = useState<Money | null>(null);
+
+  const scenario = useScenarioActions({
+    calculatorId: entry.id,
+    state: { financialYear, targetRaw, frequency, helpDebt, includesSuper },
+    onHydrate: (saved) => {
+      if (FINANCIAL_YEARS.includes(saved.financialYear as FinancialYear)) {
+        setFinancialYear(saved.financialYear as FinancialYear);
+      }
+      if (typeof saved.targetRaw === "string") setTargetRaw(saved.targetRaw);
+      if (saved.frequency && saved.frequency in PERIODS) setFrequency(saved.frequency);
+      if (typeof saved.helpDebt === "boolean") setHelpDebt(saved.helpDebt);
+      if (typeof saved.includesSuper === "boolean") setIncludesSuper(saved.includesSuper);
+    },
+  });
 
   useEffect(() => {
     let cancelled = false;
@@ -124,6 +140,20 @@ export function NetToGrossCalculator() {
                       : { label: "Current", tone: "neutral" }
                     : { label: "Rules unavailable", tone: "warn" },
             }}
+            methodologyHref={`/methodology/${entry.slug}`}
+            actions={
+              <ScenarioActions
+                onSave={scenario.onSave}
+                onShare={scenario.onShare}
+                onReset={() => {
+                  setFinancialYear("2026-27");
+                  setTargetRaw("");
+                  setFrequency("annually");
+                  setHelpDebt(false);
+                  setIncludesSuper(false);
+                }}
+              />
+            }
           />
         }
         inputs={

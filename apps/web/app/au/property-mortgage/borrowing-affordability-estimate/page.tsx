@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { getRegistryEntry } from "@paymentcalcs/calculator-registry";
 import { AffordabilityEstimate } from "../../../../components/breadth/property-tools";
+import { CalculatorStructuredData } from "../../../../components/structured-data";
 
 const entry = getRegistryEntry("AU-HOME-022")!;
 
@@ -12,5 +13,10 @@ export const metadata: Metadata = {
 };
 
 export default function Page() {
-  return <AffordabilityEstimate />;
+  return (
+    <>
+      <CalculatorStructuredData id="AU-HOME-022" />
+      <AffordabilityEstimate />
+    </>
+  );
 }

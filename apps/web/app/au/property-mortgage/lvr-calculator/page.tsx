@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { getRegistryEntry } from "@paymentcalcs/calculator-registry";
 import { LvrCalculator } from "../../../../components/breadth/property-tools";
+import { CalculatorStructuredData } from "../../../../components/structured-data";
 
 const entry = getRegistryEntry("AU-HOME-020")!;
 
@@ -12,5 +13,10 @@ export const metadata: Metadata = {
 };
 
 export default function Page() {
-  return <LvrCalculator />;
+  return (
+    <>
+      <CalculatorStructuredData id="AU-HOME-020" />
+      <LvrCalculator />
+    </>
+  );
 }

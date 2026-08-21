@@ -6,3 +6,6 @@ export { ExplainabilityTabs } from "./explainability";
 export { DISCLOSURE_VERSION, DraftRulesBanner, UniversalDisclosure } from "./disclosures";
 export { EmptyState, EngineFailureState, RuleUnavailableState } from "./states";
 export { CalculatorHeader, CalculatorShell, type CalculatorHeaderMeta } from "./shell";
+export { ScenarioActions } from "./scenario-actions";
+export { WorkingPanel, type WorkingSource } from "./working-panel";
+export { downloadCsv, toCsv } from "./export-csv";

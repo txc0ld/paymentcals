@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import dynamic from "next/dynamic";
+import { downloadCsv, toCsv } from "@paymentcalcs/calculation-ui";
 import type { SLedgerRow } from "../../lib/ledger-serialize";
 import { formatMajor } from "../../lib/format-major";
 import { extremeMajor } from "./result-parts";
@@ -17,7 +18,15 @@ const AreaChartInner = dynamic(() => import("./balance-chart-inner"), {
  * §20.8: every chart carries a title, unit, accessible summary and a full
  * data-table alternative. Series colours are paired with non-colour cues.
  */
-export function BalanceChart({ rows, periodsPerYear }: { rows: SLedgerRow[]; periodsPerYear: number }) {
+export function BalanceChart({
+  rows,
+  periodsPerYear,
+  calculatorId,
+}: {
+  rows: SLedgerRow[];
+  periodsPerYear: number;
+  calculatorId: string;
+}) {
   const [view, setView] = useState<"chart" | "table">("chart");
 
   const yearly = useMemo(() => {
@@ -51,13 +60,32 @@ export function BalanceChart({ rows, periodsPerYear }: { rows: SLedgerRow[]; per
         <figcaption className="font-mono text-[11px] uppercase tracking-[0.16em] text-ink-2">
           Balance over time (AUD, end of each year)
         </figcaption>
-        <button
-          type="button"
-          onClick={() => setView(view === "chart" ? "table" : "chart")}
-          className="nexus-quiet-button min-h-11 px-3 font-mono text-[10px] uppercase tracking-[0.14em] text-ink-2 hover:text-ink focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-focus"
-        >
-          {view === "chart" ? "View as table" : "View as chart"}
-        </button>
+        <span className="flex flex-wrap items-center gap-2">
+          <button
+            type="button"
+            onClick={() => setView(view === "chart" ? "table" : "chart")}
+            className="nexus-quiet-button min-h-11 px-3 font-mono text-[10px] uppercase tracking-[0.14em] text-ink-2 hover:text-ink focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-focus"
+          >
+            {view === "chart" ? "View as table" : "View as chart"}
+          </button>
+          {/* C4 shared writer: the plotted year-end series, not the per-period
+            * schedule the table below it exports. */}
+          <button
+            type="button"
+            onClick={() =>
+              downloadCsv(
+                `${calculatorId.toLowerCase()}-balance-by-year.csv`,
+                toCsv(
+                  ["year", "date", "closing_balance", "offset_balance"],
+                  yearly.map((point) => [point.year, point.date, point.balance, point.offset]),
+                ),
+              )
+            }
+            className="nexus-quiet-button min-h-11 px-3 font-mono text-[10px] uppercase tracking-[0.14em] text-ink-2 hover:text-ink focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-focus"
+          >
+            Export chart data (CSV)
+          </button>
+        </span>
       </div>
       {view === "chart" ? (
         <AreaChartInner data={yearly} />

@@ -9,23 +9,32 @@ import {
   MoneyField,
   PrimaryResult,
   ResultMetric,
+  ScenarioActions,
+  SelectField,
+  WorkingPanel,
 } from "@paymentcalcs/calculation-ui";
 import { getRegistryEntry } from "@paymentcalcs/calculator-registry";
 import { moneyFromDecimalString } from "@paymentcalcs/calculation-core";
+import type { LoanFrequencyKind } from "@paymentcalcs/engine-loans";
 import { formatMajor } from "../../lib/format-major";
 import type { SRefinanceResult } from "../../lib/ledger-serialize";
 import { parseMoneyInput } from "../../lib/money-input";
 import { useLedgerJob } from "../../lib/use-ledger";
+import { AdvantageChart } from "./advantage-chart";
 import { MortgageDisclosure } from "./mortgage-disclosure";
 import { PanelHeading, diffMajor, formatSignedMajor, sumMajor } from "./result-parts";
+import { PPY } from "./loan-fields";
+import { FIRST_REPAYMENT_DATE, REFINANCE_STEP, workingContentFor } from "./working-notes";
 
 const entry = getRegistryEntry("AU-HOME-012")!;
 
-/** The refinance comparison always runs monthly, so a year is 12 ledger rows. */
-const HORIZONS: ReadonlyArray<{ label: string; months: number }> = [
-  { label: "After 2 years", months: 24 },
-  { label: "After 5 years", months: 60 },
+/** Horizons are stated in years and converted to ledger rows at the chosen frequency. */
+const HORIZONS: ReadonlyArray<{ label: string; years: number }> = [
+  { label: "After 2 years", years: 2 },
+  { label: "After 5 years", years: 5 },
 ];
+
+const CYCLE_LABEL = { weekly: "per week", fortnightly: "per fortnight", monthly: "per month" } as const;
 
 function ratePct(raw: string): string | null {
   return /^\d+(\.\d+)?$/.test(raw.trim()) && Number.parseFloat(raw) <= 30
@@ -33,18 +42,33 @@ function ratePct(raw: string): string | null {
     : null;
 }
 
+const DEFAULTS = {
+  balanceRaw: "",
+  oldRateRaw: "",
+  newRateRaw: "",
+  remainingYearsRaw: "25",
+  newTermYearsRaw: "25",
+  upfrontRaw: "",
+  financedRaw: "",
+  cashbackRaw: "",
+  cashbackDate: "",
+  frequency: "monthly" as LoanFrequencyKind,
+};
+
 export function RefinanceCalculator() {
-  const [balanceRaw, setBalanceRaw] = useState("");
-  const [oldRateRaw, setOldRateRaw] = useState("");
-  const [newRateRaw, setNewRateRaw] = useState("");
-  const [remainingYearsRaw, setRemainingYearsRaw] = useState("25");
-  const [newTermYearsRaw, setNewTermYearsRaw] = useState("25");
-  const [upfrontRaw, setUpfrontRaw] = useState("");
-  const [financedRaw, setFinancedRaw] = useState("");
-  const [cashbackRaw, setCashbackRaw] = useState("");
-  const [cashbackDate, setCashbackDate] = useState("");
+  const [balanceRaw, setBalanceRaw] = useState(DEFAULTS.balanceRaw);
+  const [oldRateRaw, setOldRateRaw] = useState(DEFAULTS.oldRateRaw);
+  const [newRateRaw, setNewRateRaw] = useState(DEFAULTS.newRateRaw);
+  const [remainingYearsRaw, setRemainingYearsRaw] = useState(DEFAULTS.remainingYearsRaw);
+  const [newTermYearsRaw, setNewTermYearsRaw] = useState(DEFAULTS.newTermYearsRaw);
+  const [upfrontRaw, setUpfrontRaw] = useState(DEFAULTS.upfrontRaw);
+  const [financedRaw, setFinancedRaw] = useState(DEFAULTS.financedRaw);
+  const [cashbackRaw, setCashbackRaw] = useState(DEFAULTS.cashbackRaw);
+  const [cashbackDate, setCashbackDate] = useState(DEFAULTS.cashbackDate);
+  const [frequency, setFrequency] = useState<LoanFrequencyKind>(DEFAULTS.frequency);
 
   const balance = useMemo(() => parseMoneyInput(balanceRaw), [balanceRaw]);
+  const periodsPerYear = PPY[frequency];
 
   const job = useMemo(() => {
     const oldRate = ratePct(oldRateRaw);
@@ -55,15 +79,25 @@ export function RefinanceCalculator() {
     const clean = (raw: string, fallback: string) => (raw.trim() ? raw.trim().replace(/,/g, "") : fallback);
     const principal = clean(balanceRaw, "0");
     const shared = {
-      repaymentFrequency: "monthly" as const,
-      firstRepaymentDate: "2026-10-01",
+      repaymentFrequency: frequency,
+      firstRepaymentDate: FIRST_REPAYMENT_DATE,
       repaymentType: "principal_and_interest" as const,
       repaymentResetPolicy: "recalculate_to_term" as const,
     };
     return {
       kind: "refinance" as const,
-      oldInput: { ...shared, openingPrincipal: principal, annualRate: oldRate, termPeriods: Math.round(oldYears * 12) },
-      newInput: { ...shared, openingPrincipal: principal, annualRate: newRate, termPeriods: Math.round(newYears * 12) },
+      oldInput: {
+        ...shared,
+        openingPrincipal: principal,
+        annualRate: oldRate,
+        termPeriods: Math.round(oldYears * periodsPerYear),
+      },
+      newInput: {
+        ...shared,
+        openingPrincipal: principal,
+        annualRate: newRate,
+        termPeriods: Math.round(newYears * periodsPerYear),
+      },
       costs: {
         upfrontCash: clean(upfrontRaw, "0"),
         financedCosts: clean(financedRaw, "0"),
@@ -72,7 +106,20 @@ export function RefinanceCalculator() {
         ...(cashbackDate ? { cashbackDate } : {}),
       },
     };
-  }, [balance, balanceRaw, oldRateRaw, newRateRaw, remainingYearsRaw, newTermYearsRaw, upfrontRaw, financedRaw, cashbackRaw, cashbackDate]);
+  }, [
+    balance,
+    balanceRaw,
+    oldRateRaw,
+    newRateRaw,
+    remainingYearsRaw,
+    newTermYearsRaw,
+    upfrontRaw,
+    financedRaw,
+    cashbackRaw,
+    cashbackDate,
+    periodsPerYear,
+    frequency,
+  ]);
 
   const { result, error } = useLedgerJob<SRefinanceResult>(job);
 
@@ -87,8 +134,8 @@ export function RefinanceCalculator() {
     const last = result.cumulativeDelta.length - 1;
     const indexes: Array<{ label: string; index: number }> = [];
     for (const horizon of HORIZONS) {
-      const index = horizon.months - 1;
-      if (index < last) indexes.push({ label: horizon.label, index });
+      const index = Math.round(horizon.years * periodsPerYear) - 1;
+      if (index > 0 && index < last) indexes.push({ label: horizon.label, index });
     }
     indexes.push({ label: "At the common horizon", index: last });
     return indexes.map(({ label, index }) => {
@@ -105,7 +152,20 @@ export function RefinanceCalculator() {
         economic: sumMajor([point.delta, residual]),
       };
     });
-  }, [result]);
+  }, [result, periodsPerYear]);
+
+  function reset() {
+    setBalanceRaw(DEFAULTS.balanceRaw);
+    setOldRateRaw(DEFAULTS.oldRateRaw);
+    setNewRateRaw(DEFAULTS.newRateRaw);
+    setRemainingYearsRaw(DEFAULTS.remainingYearsRaw);
+    setNewTermYearsRaw(DEFAULTS.newTermYearsRaw);
+    setUpfrontRaw(DEFAULTS.upfrontRaw);
+    setFinancedRaw(DEFAULTS.financedRaw);
+    setCashbackRaw(DEFAULTS.cashbackRaw);
+    setCashbackDate(DEFAULTS.cashbackDate);
+    setFrequency(DEFAULTS.frequency);
+  }
 
   const rateInput =(id: string, label: string, value: string, onChange: (v: string) => void) => (
     <div className="grid min-w-0 gap-1.5">
@@ -122,6 +182,8 @@ export function RefinanceCalculator() {
     </div>
   );
 
+  const working = workingContentFor(entry.id, [REFINANCE_STEP]);
+
   return (
     <CalculatorShell
       header={
@@ -133,6 +195,10 @@ export function RefinanceCalculator() {
             calculationClass: entry.calculationClass,
             ruleStatus: { label: "No statutory rules required", tone: "neutral" },
           }}
+          methodologyHref={`/methodology/${entry.slug}`}
+          // No URL-state mechanism exists on this route, so no Save or Share:
+          // inventing a serialization here is out of scope (C1).
+          actions={<ScenarioActions onReset={reset} />}
         />
       }
       inputs={
@@ -150,6 +216,19 @@ export function RefinanceCalculator() {
             {rateInput("ref-old-rate", "Current rate % p.a.", oldRateRaw, setOldRateRaw)}
             {rateInput("ref-old-years", "Remaining term (years)", remainingYearsRaw, setRemainingYearsRaw)}
           </div>
+          {/* Both loans are compared on the same frequency: a comparison across
+            * two different repayment cycles is not like-for-like. */}
+          <SelectField
+            id="ref-frequency"
+            label="Repayment frequency"
+            value={frequency}
+            onChange={setFrequency}
+            options={[
+              { value: "monthly", label: "Monthly" },
+              { value: "fortnightly", label: "Fortnightly" },
+              { value: "weekly", label: "Weekly" },
+            ]}
+          />
           <FieldGroup legend="The refinance offer">
             <div className="grid items-start gap-4 @md:grid-cols-2">
               {rateInput("ref-new-rate", "New rate % p.a.", newRateRaw, setNewRateRaw)}
@@ -213,7 +292,7 @@ export function RefinanceCalculator() {
               <ResultMetric
                 label="Repayment difference"
                 amount={moneyFromDecimalString("AUD", result.repaymentDifference, 2)}
-                detail="per month, old − new"
+                detail={`${CYCLE_LABEL[frequency]}, old − new`}
               />
               <ResultMetric
                 label="New loan interest (life)"
@@ -243,56 +322,74 @@ export function RefinanceCalculator() {
         )
       }
       explanation={
-        horizons.length > 0 ? (
-          <div className="nexus-panel-soft grid min-w-0 gap-6 p-6 md:p-8">
-            <PanelHeading>Position at each horizon</PanelHeading>
-            <div className="overflow-x-auto">
-              <table className="nexus-table w-full min-w-[560px] border-collapse text-left">
-                <caption className="sr-only">
-                  Cumulative cash position, residual balance difference and combined economic
-                  position of switching, at two years, five years and the common horizon
-                </caption>
-                <thead>
-                  <tr className="border-b border-hairline font-mono text-[10px] uppercase tracking-[0.14em] text-ink-3">
-                    <th scope="col" className="py-2 pe-4 font-normal">Horizon</th>
-                    <th scope="col" className="py-2 pe-4 font-normal">Date</th>
-                    <th scope="col" className="py-2 pe-4 text-right font-normal">Cash position</th>
-                    <th scope="col" className="py-2 pe-4 text-right font-normal">Balance difference</th>
-                    <th scope="col" className="py-2 text-right font-normal">Economic position</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {horizons.map((horizon) => (
-                    <tr key={horizon.label} className="border-b border-hairline">
-                      <th scope="row" className="py-2 pe-4 font-mono text-[13px] font-normal text-ink-2">
-                        {horizon.label}
-                      </th>
-                      <td className="py-2 pe-4 font-mono text-[13px] tabular-nums text-ink-2">
-                        {horizon.date}
-                      </td>
-                      <td className="py-2 pe-4 text-right font-mono text-[13px] tabular-nums text-ink">
-                        {formatSignedMajor(horizon.cash)}
-                      </td>
-                      <td className="py-2 pe-4 text-right font-mono text-[13px] tabular-nums text-ink">
-                        {formatSignedMajor(horizon.residual)}
-                      </td>
-                      <td className="py-2 text-right font-mono text-[13px] tabular-nums text-ink">
-                        {formatSignedMajor(horizon.economic)}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+        result && horizons.length > 0 ? (
+          <div className="grid min-w-0 gap-8">
+            <div className="nexus-panel-soft grid min-w-0 gap-6 p-6 md:p-8">
+              <PanelHeading>Cumulative advantage over time</PanelHeading>
+              <AdvantageChart
+                points={result.cumulativeDelta}
+                periodsPerYear={periodsPerYear}
+                breakEvenDate={result.breakEvenDate}
+                calculatorId={entry.id}
+              />
             </div>
-            <p className="text-[12px] leading-5 text-ink-3">
-              A positive amount is the refinanced loan ahead; a negative amount is the current loan
-              ahead. Cash position is cumulative payments and fees, net of switching costs and any
-              counted cashback. Balance difference is what is still owed on the current loan minus
-              what is still owed on the refinanced loan at that same date. Horizons past the shorter
-              of the two schedules are not shown.
-            </p>
+            <div className="nexus-panel-soft grid min-w-0 gap-6 p-6 md:p-8">
+              <PanelHeading>Position at each horizon</PanelHeading>
+              <div className="overflow-x-auto">
+                <table className="nexus-table w-full min-w-[560px] border-collapse text-left">
+                  <caption className="sr-only">
+                    Cumulative cash position, residual balance difference and combined economic
+                    position of switching, at two years, five years and the common horizon
+                  </caption>
+                  <thead>
+                    <tr className="border-b border-hairline font-mono text-[10px] uppercase tracking-[0.14em] text-ink-3">
+                      <th scope="col" className="py-2 pe-4 font-normal">Horizon</th>
+                      <th scope="col" className="py-2 pe-4 font-normal">Date</th>
+                      <th scope="col" className="py-2 pe-4 text-right font-normal">Cash position</th>
+                      <th scope="col" className="py-2 pe-4 text-right font-normal">Balance difference</th>
+                      <th scope="col" className="py-2 text-right font-normal">Economic position</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {horizons.map((horizon) => (
+                      <tr key={horizon.label} className="border-b border-hairline">
+                        <th scope="row" className="py-2 pe-4 font-mono text-[13px] font-normal text-ink-2">
+                          {horizon.label}
+                        </th>
+                        <td className="py-2 pe-4 font-mono text-[13px] tabular-nums text-ink-2">
+                          {horizon.date}
+                        </td>
+                        <td className="py-2 pe-4 text-right font-mono text-[13px] tabular-nums text-ink">
+                          {formatSignedMajor(horizon.cash)}
+                        </td>
+                        <td className="py-2 pe-4 text-right font-mono text-[13px] tabular-nums text-ink">
+                          {formatSignedMajor(horizon.residual)}
+                        </td>
+                        <td className="py-2 text-right font-mono text-[13px] tabular-nums text-ink">
+                          {formatSignedMajor(horizon.economic)}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+              <p className="text-[12px] leading-5 text-ink-3">
+                A positive amount is the refinanced loan ahead; a negative amount is the current loan
+                ahead. Cash position is cumulative payments and fees, net of switching costs and any
+                counted cashback. Balance difference is what is still owed on the current loan minus
+                what is still owed on the refinanced loan at that same date. Horizons past the shorter
+                of the two schedules are not shown.
+              </p>
+            </div>
           </div>
-        ) : null
+        ) : (
+          <WorkingPanel
+            summary={working.summary}
+            steps={working.steps}
+            assumptions={working.assumptions}
+            limitations={working.limitations}
+          />
+        )
       }
       disclosure={<MortgageDisclosure />}
     />

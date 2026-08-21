@@ -11,6 +11,7 @@ import {
   PrimaryResult,
   ResultMetric,
   RuleUnavailableState,
+  ScenarioActions,
   SelectField,
   UniversalDisclosure,
   formatMoney,
@@ -37,6 +38,7 @@ import { allowDraftRules } from "../../lib/draft-rules";
 import { formatMajor } from "../../lib/format-major";
 import { parseMoneyInput } from "../../lib/money-input";
 import { FINANCIAL_YEARS, type FinancialYear } from "../../lib/pay-packs";
+import { useScenarioActions } from "./use-scenario-actions";
 
 const entry = getRegistryEntry("AU-PAY-016")!;
 
@@ -73,6 +75,21 @@ export function SuperContributionsCalculator() {
   const [sex, setSex] = useState<"Male" | "Female">("Female");
   const [incomeRange, setIncomeRange] = useState<string>("");
   const [resolution, setResolution] = useState<Resolution>("pending");
+
+  const scenario = useScenarioActions({
+    calculatorId: entry.id,
+    state: { financialYear, salaryRaw, sacrificeRaw, ageRange, sex, incomeRange },
+    onHydrate: (saved) => {
+      if (FINANCIAL_YEARS.includes(saved.financialYear as FinancialYear)) {
+        setFinancialYear(saved.financialYear as FinancialYear);
+      }
+      if (typeof saved.salaryRaw === "string") setSalaryRaw(saved.salaryRaw);
+      if (typeof saved.sacrificeRaw === "string") setSacrificeRaw(saved.sacrificeRaw);
+      if (saved.ageRange && saved.ageRange in AGE_LABELS) setAgeRange(saved.ageRange);
+      if (saved.sex === "Male" || saved.sex === "Female") setSex(saved.sex);
+      if (typeof saved.incomeRange === "string") setIncomeRange(saved.incomeRange);
+    },
+  });
 
   useEffect(() => {
     let cancelled = false;
@@ -168,6 +185,21 @@ export function SuperContributionsCalculator() {
                       : { label: "Current", tone: "neutral" }
                     : { label: "Rules unavailable", tone: "warn" },
             }}
+            methodologyHref={`/methodology/${entry.slug}`}
+            actions={
+              <ScenarioActions
+                onSave={scenario.onSave}
+                onShare={scenario.onShare}
+                onReset={() => {
+                  setFinancialYear("2026-27");
+                  setSalaryRaw("");
+                  setSacrificeRaw("");
+                  setAgeRange("f. 40 - 44");
+                  setSex("Female");
+                  setIncomeRange("");
+                }}
+              />
+            }
           />
         }
         inputs={

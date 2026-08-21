@@ -20,6 +20,7 @@ import {
   PrimaryResult,
   ResultMetric,
   RuleUnavailableState,
+  ScenarioActions,
   SegmentedControl,
   SelectField,
   ToggleField,
@@ -29,10 +30,13 @@ import {
 } from "@paymentcalcs/calculation-ui";
 import { getRegistryEntry } from "@paymentcalcs/calculator-registry";
 import {
+  NET_TO_GROSS_TOLERANCE_NOTE,
   calculateAuPay,
+  solveGrossForNet,
   zAuPayInput,
   type AuPayInput,
   type AuPayOutput,
+  type NetToGrossResult,
 } from "@paymentcalcs/engine-au-tax";
 import { genderMix, incomePercentileFor } from "@paymentcalcs/engine-compensation";
 import { resolveRulePack } from "@paymentcalcs/rule-schema";
@@ -256,11 +260,29 @@ const GRID_COLUMNS = [
   { label: "Annually", divisor: 1 },
 ] as const;
 
+/** One financial year's re-run of the same input. Nulls mean "did not resolve". */
+interface FyComparisonRow {
+  financialYear: FinancialYear;
+  net: Money | null;
+  liability: Money | null;
+}
+
 /** Annual Money → the selected display period. Decimal only, never floats. */
 function perPeriod(annual: Money, divisor: number): Money {
   if (divisor === 1) return annual;
   const value = (moneyToDecimal(annual) as DecimalValue).div(divisor);
   return moneyFromDecimalString(annual.currency, value.toFixed(2), 2);
+}
+
+/** Signed difference between two annual figures; null when either is missing. */
+function deltaLabel(value: Money | null, baseline: Money | null): string | null {
+  if (!value || !baseline) return null;
+  const delta = (moneyToDecimal(value) as DecimalValue).minus(
+    moneyToDecimal(baseline) as DecimalValue,
+  );
+  if (delta.isZero()) return "no change";
+  const magnitude = formatMoney(moneyFromDecimalString(value.currency, delta.abs().toFixed(2), 2));
+  return `${delta.greaterThan(0) ? "▲" : "▼"}${magnitude} ${delta.greaterThan(0) ? "more" : "less"}`;
 }
 
 /** Whole-dollar bracket bound from the rule pack, formatted for display. */
@@ -479,7 +501,10 @@ export function PayCalculator({ variant }: { variant: PayVariant }) {
       cancelled = true;
     };
   }, []);
-  const [savedFlash, setSavedFlash] = useState<string | null>(null);
+  /** Same input re-run under every supported FY; null = that FY did not resolve. */
+  const [fyStrip, setFyStrip] = useState<FyComparisonRow[] | null>(null);
+  /** Target-net solver: deliberately local-only, never in the shared URL state. */
+  const [targetNetRaw, setTargetNetRaw] = useState("");
   const [hydrated, setHydrated] = useState(false);
   const hydratedOnce = useRef(false);
 
@@ -574,6 +599,61 @@ export function PayCalculator({ variant }: { variant: PayVariant }) {
     };
   }, [resolution, input, compareInput, uiMode, entry.id, entry.inputSchemaVersion, state.financialYear]);
 
+  /* FY comparison: the identical input re-resolved and re-run under each
+   * supported financial year. A year whose packs fail to resolve, or whose
+   * calculation does not succeed, stays null and renders as an em dash. */
+  useEffect(() => {
+    if (!input) {
+      setFyStrip(null);
+      return;
+    }
+    let cancelled = false;
+    Promise.all(
+      FINANCIAL_YEARS.map(async (financialYear): Promise<FyComparisonRow> => {
+        const empty: FyComparisonRow = { financialYear, net: null, liability: null };
+        const outcome = await resolvePayPacks(financialYear);
+        if (!outcome.ok) return empty;
+        const calculated = await calculateAuPay(
+          {
+            requestId: "web-fy-compare",
+            calculatorId: entry.id,
+            calculatorSchemaVersion: entry.inputSchemaVersion,
+            jurisdiction: { country: "AU" as const },
+            locale: "en-AU",
+            currency: "AUD",
+            valuationDate: `${financialYear.slice(0, 4)}-10-01`,
+            input: { ...input, financialYear },
+            options: { traceLevel: "none" as const },
+          },
+          outcome.resolution,
+          { now: new Date().toISOString() },
+        );
+        const compared = calculated.output;
+        if (!compared) return empty;
+        if (calculated.status !== "success" && calculated.status !== "success_with_warnings") return empty;
+        return {
+          financialYear,
+          net: compared.netAnnualCash,
+          liability: compared.liability.totalAnnualLiability,
+        };
+      }),
+    ).then((rows) => {
+      if (!cancelled) setFyStrip(rows);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [input, entry.id, entry.inputSchemaVersion]);
+
+  const targetNet = useMemo(() => parseMoneyInput(targetNetRaw), [targetNetRaw]);
+  /* Gross needed for a target net: bisection over the same forward engine,
+   * seeded with the current input so every other setting is carried across. */
+  const solvedForTarget = useMemo((): NetToGrossResult | null => {
+    if (!input || targetNetRaw.trim() === "" || !targetNet.ok) return null;
+    if (resolution === "pending" || !resolution.ok) return null;
+    return solveGrossForNet(targetNet.money, input, resolution.resolution);
+  }, [input, targetNet, targetNetRaw, resolution]);
+
   useEffect(() => {
     if (!hydrated) return;
     const encoded = encodeUrlState({ calculatorId: entry.id, input: { ...state, uiMode } });
@@ -582,42 +662,32 @@ export function PayCalculator({ variant }: { variant: PayVariant }) {
     window.history.replaceState(null, "", url);
   }, [hydrated, state, uiMode, entry.id]);
 
-  async function onSave() {
+  async function onSave(): Promise<string> {
     const now = new Date().toISOString();
-    try {
-      await saveScenario({
-        scenarioId: `sc_${crypto.randomUUID().slice(0, 8)}`,
-        schemaVersion: "1",
-        calculatorId: entry.id,
-        createdAt: now,
-        updatedAt: now,
-        jurisdiction: { country: "AU" },
-        locale: "en-AU",
-        currency: "AUD",
-        input: { ...state, uiMode },
-        selectedRulePacks:
-          resolution !== "pending" && resolution.ok
-            ? [resolution.resolution.incomeTax.pack.rulePackId]
-            : [],
-        consent: { storage: "local" },
-      });
-      setSavedFlash("Saved on this device");
-      analytics.track("scenario_action", { calculator_id: entry.id, action: "save" });
-    } catch {
-      setSavedFlash("Saving is unavailable in this browser");
-    }
-    setTimeout(() => setSavedFlash(null), 2500);
+    await saveScenario({
+      scenarioId: `sc_${crypto.randomUUID().slice(0, 8)}`,
+      schemaVersion: "1",
+      calculatorId: entry.id,
+      createdAt: now,
+      updatedAt: now,
+      jurisdiction: { country: "AU" },
+      locale: "en-AU",
+      currency: "AUD",
+      input: { ...state, uiMode },
+      selectedRulePacks:
+        resolution !== "pending" && resolution.ok
+          ? [resolution.resolution.incomeTax.pack.rulePackId]
+          : [],
+      consent: { storage: "local" },
+    });
+    analytics.track("scenario_action", { calculator_id: entry.id, action: "save" });
+    return "Saved on this device";
   }
 
-  async function onShare() {
-    try {
-      await navigator.clipboard.writeText(window.location.href);
-      setSavedFlash("Link copied");
-      analytics.track("scenario_action", { calculator_id: entry.id, action: "share" });
-    } catch {
-      setSavedFlash("Copy the address bar URL to share");
-    }
-    setTimeout(() => setSavedFlash(null), 2500);
+  async function onShare(): Promise<string> {
+    await navigator.clipboard.writeText(window.location.href);
+    analytics.track("scenario_action", { calculator_id: entry.id, action: "share" });
+    return "Link copied";
   }
 
   const draft = resolution !== "pending" && resolution.ok && resolution.draft;
@@ -681,31 +751,16 @@ export function PayCalculator({ variant }: { variant: PayVariant }) {
                       : { label: "Current", tone: "neutral" }
                     : { label: "Rules unavailable", tone: "warn" },
             }}
+            methodologyHref={`/methodology/${entry.slug}`}
             actions={
-              <span className="no-print flex items-center gap-2">
-                {savedFlash ? (
-                  <span role="status" className="font-mono text-[10px] uppercase tracking-[0.14em] text-positive">
-                    {savedFlash}
-                  </span>
-                ) : null}
-                {(
-                  [
-                    ["Save", onSave],
-                    ["Share", onShare],
-                    ["Print", () => window.print()],
-                    ["Reset", () => setState({ ...DEFAULT_STATE, ...variant.defaults })],
-                  ] as const
-                ).map(([label, handler]) => (
-                  <button
-                    key={label}
-                    type="button"
-                    onClick={handler}
-                    className="nexus-quiet-button min-h-11 px-4 font-mono text-[10px] uppercase tracking-[0.14em] text-ink-2 hover:text-ink focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-focus"
-                  >
-                    {label}
-                  </button>
-                ))}
-              </span>
+              <ScenarioActions
+                onSave={onSave}
+                onShare={onShare}
+                onReset={() => {
+                  setState({ ...DEFAULT_STATE, ...variant.defaults });
+                  setTargetNetRaw("");
+                }}
+              />
             }
           />
         }
@@ -1113,6 +1168,76 @@ export function PayCalculator({ variant }: { variant: PayVariant }) {
                 </p>
               </section>
 
+              {fyStrip ? (
+                <section
+                  /* Label deliberately avoids the words of the "Financial year"
+                   * field label, so region and field stay distinguishable. */
+                  aria-label="Comparison across tax years"
+                  className="nexus-panel-soft grid gap-4 p-6 md:p-8"
+                >
+                  <div className="flex min-w-0 flex-wrap items-baseline justify-between gap-x-6 gap-y-2">
+                    <h2 className="font-mono text-[11px] tracking-[0.16em] text-[var(--pc-accent-text)]">
+                      The same input, every financial year
+                    </h2>
+                    <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-ink-3">
+                      Differences measured against FY {state.financialYear}
+                    </span>
+                  </div>
+                  {/* Column query, not viewport: this sits inside the results
+                   * column, which is narrower than the page at every size. */}
+                  <div className="grid gap-px border border-hairline bg-hairline @md:grid-cols-3">
+                    {(() => {
+                      const baseline = fyStrip.find((row) => row.financialYear === state.financialYear);
+                      return fyStrip.map((row) => {
+                        const selected = row.financialYear === state.financialYear;
+                        return (
+                          <div
+                            key={row.financialYear}
+                            aria-current={selected ? "true" : undefined}
+                            className={`grid content-start gap-3 p-5 ${selected ? "bg-surface" : "bg-surface-2"}`}
+                          >
+                            <span className="font-mono text-[10px] uppercase tracking-[0.16em] text-ink-3">
+                              FY {row.financialYear}
+                              {selected ? (
+                                <span className="ms-2 text-[var(--pc-accent-text)]">Selected</span>
+                              ) : null}
+                            </span>
+                            <dl className="grid gap-3">
+                              {(
+                                [
+                                  ["Net per year", row.net, baseline?.net ?? null],
+                                  ["Total liability", row.liability, baseline?.liability ?? null],
+                                ] as const
+                              ).map(([label, amount, base]) => {
+                                const delta = selected ? null : deltaLabel(amount, base);
+                                return (
+                                  <div key={label} className="grid gap-1">
+                                    <dt className="font-mono text-[10px] uppercase tracking-[0.14em] text-ink-3">
+                                      {label}
+                                    </dt>
+                                    <dd className="font-mono text-[15px] tabular-nums text-ink">
+                                      {amount ? formatMoney(amount) : "—"}
+                                      {delta ? (
+                                        <span className="ms-2 font-mono text-[11px] text-ink-3">{delta}</span>
+                                      ) : null}
+                                    </dd>
+                                  </div>
+                                );
+                              })}
+                            </dl>
+                          </div>
+                        );
+                      });
+                    })()}
+                  </div>
+                  <p className="text-[12px] leading-5 text-ink-3">
+                    Every column re-runs the identical inputs through the annual engine under that
+                    year&rsquo;s own resolved rule packs. A year whose packs cannot be resolved shows an
+                    em dash rather than a carried-over number.
+                  </p>
+                </section>
+              ) : null}
+
               {bracketLadder ? (
                 <section aria-label="Tax brackets" className="nexus-panel-soft grid gap-4 p-6 md:p-8">
                   <div className="flex min-w-0 flex-wrap items-baseline justify-between gap-x-6 gap-y-2">
@@ -1222,6 +1347,64 @@ export function PayCalculator({ variant }: { variant: PayVariant }) {
                     </p>
                   ) : null}
                 </div>
+              </section>
+
+              <section
+                aria-label="Gross needed for a target net"
+                className="nexus-panel-soft grid gap-4 p-6 md:p-8"
+              >
+                <h2 className="font-mono text-[11px] tracking-[0.16em] text-[var(--pc-accent-text)]">
+                  Gross needed for a target net
+                </h2>
+                <div className="grid items-start gap-4 @md:grid-cols-2">
+                  <MoneyField
+                    id="pay-target-net"
+                    label="Target net per year"
+                    description="Solved with every other setting on this page held exactly as entered."
+                    value={targetNetRaw}
+                    onChange={setTargetNetRaw}
+                    error={
+                      targetNetRaw.trim() !== "" && !targetNet.ok && targetNet.error
+                        ? targetNet.error
+                        : undefined
+                    }
+                  />
+                  {solvedForTarget && solvedForTarget.status === "solved" ? (
+                    <dl className="grid content-start gap-2 border-l border-hairline ps-4">
+                      {(
+                        [
+                          ["Gross needed per year", solvedForTarget.grossAnnual],
+                          ["Verified net from that gross", solvedForTarget.achievedNetAnnual],
+                          ["Difference from target", solvedForTarget.residual],
+                        ] as const
+                      ).map(([label, amount]) =>
+                        amount ? (
+                          <div key={label} className="flex min-w-0 flex-wrap items-baseline justify-between gap-x-4">
+                            <dt className="font-mono text-[10px] uppercase tracking-[0.14em] text-ink-3">
+                              {label}
+                            </dt>
+                            <dd className="font-mono text-[13px] tabular-nums text-ink">
+                              {formatMoney(amount)}
+                            </dd>
+                          </div>
+                        ) : null,
+                      )}
+                    </dl>
+                  ) : solvedForTarget ? (
+                    <p className="self-center text-[13px] leading-5 text-ink-2">{solvedForTarget.reason}</p>
+                  ) : targetNetRaw.trim() ? (
+                    <p className="self-center text-[13px] leading-5 text-ink-3">
+                      Enter a valid annual amount to solve the gross.
+                    </p>
+                  ) : null}
+                </div>
+                {solvedForTarget && solvedForTarget.status === "solved" ? (
+                  <p className="text-[12px] leading-5 text-ink-3">
+                    Solved by bisection over the full forward engine in {solvedForTarget.iterations}{" "}
+                    iterations, then re-run on the solved gross — the verified net above is the engine&rsquo;s
+                    own answer, not the solver&rsquo;s. {NET_TO_GROSS_TOLERANCE_NOTE}
+                  </p>
+                ) : null}
               </section>
 
               {percentiles ? (

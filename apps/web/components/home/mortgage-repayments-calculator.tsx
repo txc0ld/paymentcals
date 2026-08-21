@@ -9,18 +9,24 @@ import {
   MoneyField,
   PrimaryResult,
   ResultMetric,
+  ScenarioActions,
   SegmentedControl,
+  WorkingPanel,
 } from "@paymentcalcs/calculation-ui";
 import { getRegistryEntry } from "@paymentcalcs/calculator-registry";
 import { moneyFromDecimalString } from "@paymentcalcs/calculation-core";
+import type { LedgerEvent } from "@paymentcalcs/engine-mortgage-ledger";
 import { formatMajor, periodsToYearsLabel } from "../../lib/format-major";
 import type { SLedgerResult, SLedgerRow } from "../../lib/ledger-serialize";
 import { parseMoneyInput } from "../../lib/money-input";
 import { useLedgerJob } from "../../lib/use-ledger";
+import { DisclosurePanel } from "./field-parts";
 import { MortgageDisclosure } from "./mortgage-disclosure";
+import { FrequencyComparison, RateSensitivityLadder } from "./mortgage-comparisons";
 import { MetricCell, PanelHeading, diffMajor, sharePct, sumMajor } from "./result-parts";
 import { ScheduleView } from "./schedule-view";
 import { LOAN_BASICS_DEFAULTS, LoanBasicsFields, PPY, parseLoanBasics, type LoanBasicsState } from "./loan-fields";
+import { FIRST_REPAYMENT_DATE, workingContentFor } from "./working-notes";
 
 const entry = getRegistryEntry("AU-HOME-001")!;
 
@@ -42,9 +48,28 @@ export function MortgageRepaymentsCalculator() {
   const [state, setState] = useState<LoanBasicsState>(LOAN_BASICS_DEFAULTS);
   const [uiMode, setUiMode] = useState<"simple" | "advanced">("simple");
   const [annualFeeRaw, setAnnualFeeRaw] = useState("");
+  const [showFrequencies, setShowFrequencies] = useState(false);
+  const [showLadder, setShowLadder] = useState(false);
 
   const parsed = useMemo(() => parseLoanBasics(state), [state]);
   const annualFee = useMemo(() => parseMoneyInput(annualFeeRaw), [annualFeeRaw]);
+
+  // One stable event array: the side comparisons take it as a dependency, and
+  // a fresh array each render would restart every worker job on every keystroke.
+  const events = useMemo<LedgerEvent[]>(
+    () =>
+      annualFeeRaw.trim() && annualFee.ok
+        ? [
+            {
+              type: "fee_annual" as const,
+              startDate: "2026-12-01",
+              amount: annualFeeRaw.trim().replace(/,/g, ""),
+              financed: false,
+            },
+          ]
+        : [],
+    [annualFeeRaw, annualFee],
+  );
 
   const job = useMemo(() => {
     if (!parsed.ok) return null;
@@ -55,24 +80,14 @@ export function MortgageRepaymentsCalculator() {
         annualRate: parsed.annualRate,
         termPeriods: parsed.termPeriods,
         repaymentFrequency: parsed.frequency,
-        firstRepaymentDate: "2026-10-01",
+        firstRepaymentDate: FIRST_REPAYMENT_DATE,
         repaymentType: "principal_and_interest" as const,
         interestOnlyPeriods: parsed.ioPeriods,
         repaymentResetPolicy: "recalculate_to_term" as const,
-        events:
-          annualFeeRaw.trim() && annualFee.ok
-            ? [
-                {
-                  type: "fee_annual" as const,
-                  startDate: "2026-12-01",
-                  amount: annualFeeRaw.trim().replace(/,/g, ""),
-                  financed: false,
-                },
-              ]
-            : [],
+        events,
       },
     };
-  }, [parsed, annualFeeRaw, annualFee]);
+  }, [parsed, events]);
 
   const { result, error } = useLedgerJob<SLedgerResult>(job);
 
@@ -95,6 +110,19 @@ export function MortgageRepaymentsCalculator() {
             calculationClass: entry.calculationClass,
             ruleStatus: { label: "No statutory rules required", tone: "neutral" },
           }}
+          methodologyHref={`/methodology/${entry.slug}`}
+          // Print only (plus Reset): this route has no URL-state mechanism, and
+          // C1 rules out inventing one here.
+          actions={
+            <ScenarioActions
+              onReset={() => {
+                setState(LOAN_BASICS_DEFAULTS);
+                setAnnualFeeRaw("");
+                setShowFrequencies(false);
+                setShowLadder(false);
+              }}
+            />
+          }
           modeControl={
             <SegmentedControl
               label="Detail level"
@@ -204,10 +232,36 @@ export function MortgageRepaymentsCalculator() {
       }
       explanation={
         result ? (
-          <div className="nexus-panel-soft min-w-0 p-6 md:p-8">
-            <ScheduleView result={result} calculatorId="AU-HOME-001" frequency={state.frequency} />
+          <div className="grid min-w-0 gap-8">
+            <div className="nexus-panel-soft min-w-0 p-6 md:p-8">
+              <ScheduleView result={result} calculatorId="AU-HOME-001" frequency={state.frequency} />
+            </div>
+            <div className="nexus-panel-soft min-w-0 p-6 md:p-8">
+              <DisclosurePanel
+                id="frequency-comparison"
+                open={showFrequencies}
+                onToggle={setShowFrequencies}
+                heading="Compare repayment frequencies"
+                summary="The same loan run weekly, fortnightly and monthly, each on its own schedule."
+              >
+                <FrequencyComparison state={state} events={events} />
+              </DisclosurePanel>
+            </div>
+            <div className="nexus-panel-soft min-w-0 p-6 md:p-8">
+              <DisclosurePanel
+                id="rate-sensitivity"
+                open={showLadder}
+                onToggle={setShowLadder}
+                heading="Rate sensitivity"
+                summary="The same loan re-run a quarter, a half and a full percentage point either side of the entered rate."
+              >
+                <RateSensitivityLadder state={state} events={events} anchor={result} />
+              </DisclosurePanel>
+            </div>
           </div>
-        ) : null
+        ) : (
+          <WorkingPanel {...workingContentFor(entry.id)} />
+        )
       }
       disclosure={<MortgageDisclosure />}
     />

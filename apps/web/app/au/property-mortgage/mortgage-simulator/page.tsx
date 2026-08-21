@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { getRegistryEntry } from "@paymentcalcs/calculator-registry";
 import { MortgageSimulator } from "../../../../components/home/mortgage-simulator";
+import { CalculatorStructuredData } from "../../../../components/structured-data";
 
 const entry = getRegistryEntry("AU-HOME-002")!;
 
@@ -12,5 +13,10 @@ export const metadata: Metadata = {
 };
 
 export default function Page() {
-  return <MortgageSimulator />;
+  return (
+    <>
+      <CalculatorStructuredData id="AU-HOME-002" />
+      <MortgageSimulator />
+    </>
+  );
 }

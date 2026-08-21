@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { getRegistryEntry } from "@paymentcalcs/calculator-registry";
 import { StampDutyCalculator } from "../../../../components/breadth/stamp-duty-calculator";
+import { CalculatorStructuredData } from "../../../../components/structured-data";
 
 const entry = getRegistryEntry("AU-HOME-017")!;
 
@@ -12,5 +13,10 @@ export const metadata: Metadata = {
 };
 
 export default function Page() {
-  return <StampDutyCalculator variant="duty" />;
+  return (
+    <>
+      <CalculatorStructuredData id="AU-HOME-017" />
+      <StampDutyCalculator variant="duty" />
+    </>
+  );
 }

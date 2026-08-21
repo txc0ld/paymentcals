@@ -10,6 +10,7 @@ import {
   PrimaryResult,
   ResultMetric,
   RuleUnavailableState,
+  ScenarioActions,
   SelectField,
   UniversalDisclosure,
   formatMoney,
@@ -22,8 +23,33 @@ import type { StslRules } from "@paymentcalcs/rules-au";
 import { analytics } from "../../lib/analytics";
 import { parseMoneyInput } from "../../lib/money-input";
 import { FINANCIAL_YEARS, resolvePayPacks, type FinancialYear, type PayResolutionOutcome } from "../../lib/pay-packs";
+import { useScenarioActions } from "./use-scenario-actions";
 
 const entry = getRegistryEntry("AU-PAY-013")!;
+
+/** Income steps either side of the entered figure, in whole dollars. */
+const SENSITIVITY_OFFSETS = [-10000, -5000, 0, 5000, 10000] as const;
+
+/** Every band opening in the resolved pack, ascending. */
+function bandBoundaries(rules: StslRules): DecimalValue[] {
+  const raw =
+    rules.system === "marginal"
+      ? [...rules.bands.map((band) => band.over), rules.highIncome.over]
+      : rules.rateTable.map((band) => band.over);
+  return raw
+    .map((value) => new Dec(value) as DecimalValue)
+    .sort((a, b) => a.comparedTo(b))
+    .filter((value, index, all) => index === 0 || !value.equals(all[index - 1]!));
+}
+
+/** The next band opening above this income, and the gap to it. */
+function nextBoundary(
+  rules: StslRules,
+  income: DecimalValue,
+): { boundary: DecimalValue; distance: DecimalValue } | null {
+  const next = bandBoundaries(rules).find((value) => value.greaterThan(income));
+  return next ? { boundary: next, distance: next.minus(income) as DecimalValue } : null;
+}
 
 /** Whole-dollar pack bound, formatted for display. */
 function bound(dollars: string): string {
@@ -98,6 +124,17 @@ export function HelpRepaymentCalculator() {
   const [incomeRaw, setIncomeRaw] = useState("");
   const [resolution, setResolution] = useState<PayResolutionOutcome | "pending">("pending");
 
+  const scenario = useScenarioActions({
+    calculatorId: entry.id,
+    state: { financialYear, incomeRaw },
+    onHydrate: (saved) => {
+      if (FINANCIAL_YEARS.includes(saved.financialYear as FinancialYear)) {
+        setFinancialYear(saved.financialYear as FinancialYear);
+      }
+      if (typeof saved.incomeRaw === "string") setIncomeRaw(saved.incomeRaw);
+    },
+  });
+
   useEffect(() => {
     let cancelled = false;
     setResolution("pending");
@@ -142,9 +179,24 @@ export function HelpRepaymentCalculator() {
     resolution !== "pending" && resolution.ok && resolution.resolution.stsl
       ? resolution.resolution.stsl.pack.rules
       : null;
-  const tiers = rules
-    ? tierWindow(repaymentTiers(rules, income.ok ? (moneyToDecimal(income.money) as DecimalValue) : null))
-    : [];
+  const incomeDec = income.ok ? (moneyToDecimal(income.money) as DecimalValue) : null;
+  const tiers = rules ? tierWindow(repaymentTiers(rules, incomeDec)) : [];
+  const toAud = (value: DecimalValue) =>
+    moneyFromDecimalString("AUD", value.toDecimalPlaces(2, Dec.ROUND_HALF_UP).toFixed(2), 2);
+  /* Five re-runs of the same engine on shifted incomes — cheap, pure, and it
+   * shows the step at a band opening instead of describing it. */
+  const sensitivity =
+    rules && incomeDec
+      ? SENSITIVITY_OFFSETS.map((offset) => {
+          const shifted = Dec.max(new Dec(0), incomeDec.plus(offset)) as DecimalValue;
+          return {
+            offset,
+            income: toAud(shifted),
+            repayment: toAud(stslRepayment(shifted, rules)),
+          };
+        })
+      : null;
+  const boundary = rules && incomeDec ? nextBoundary(rules, incomeDec) : null;
 
   return (
     <>
@@ -166,6 +218,17 @@ export function HelpRepaymentCalculator() {
                       : { label: "Current", tone: "neutral" }
                     : { label: "Rules unavailable", tone: "warn" },
             }}
+            methodologyHref={`/methodology/${entry.slug}`}
+            actions={
+              <ScenarioActions
+                onSave={scenario.onSave}
+                onShare={scenario.onShare}
+                onReset={() => {
+                  setFinancialYear("2026-27");
+                  setIncomeRaw("");
+                }}
+              />
+            }
           />
         }
         inputs={
@@ -225,6 +288,92 @@ export function HelpRepaymentCalculator() {
                   detail="repayment ÷ 12 for budgeting"
                 />
               </div>
+
+              {boundary ? (
+                <div className="nexus-panel-soft grid gap-1 p-5">
+                  <span className="font-mono text-[10px] uppercase tracking-[0.16em] text-ink-3">
+                    To the next band boundary
+                  </span>
+                  <span className="font-mono text-xl tabular-nums text-ink">
+                    {formatMoney(toAud(boundary.distance))}
+                  </span>
+                  <span className="text-[12px] leading-4 text-ink-3">
+                    The next repayment band in the resolved pack opens above{" "}
+                    {bound(boundary.boundary.toFixed(0))}.
+                  </span>
+                </div>
+              ) : rules ? (
+                <div className="nexus-panel-soft grid gap-1 p-5">
+                  <span className="font-mono text-[10px] uppercase tracking-[0.16em] text-ink-3">
+                    To the next band boundary
+                  </span>
+                  <span className="font-mono text-xl tabular-nums text-ink">—</span>
+                  <span className="text-[12px] leading-4 text-ink-3">
+                    This income is already above the highest band opening in the resolved pack.
+                  </span>
+                </div>
+              ) : null}
+
+              {sensitivity ? (
+                <section aria-label="Income sensitivity" className="grid gap-4 border-t border-hairline pt-6">
+                  <div className="flex min-w-0 flex-wrap items-baseline justify-between gap-x-6 gap-y-2">
+                    <h2 className="font-mono text-[11px] tracking-[0.16em] text-[var(--pc-accent-text)]">
+                      Income sensitivity
+                    </h2>
+                    <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-ink-3">
+                      Same rules, shifted repayment income
+                    </span>
+                  </div>
+                  <div className="min-w-0 overflow-x-auto">
+                    <table className="w-full min-w-[320px] border-collapse text-left">
+                      <caption className="sr-only">
+                        Compulsory repayment at repayment incomes ten and five thousand dollars either
+                        side of the amount entered
+                      </caption>
+                      <thead>
+                        <tr className="border-b border-hairline font-mono text-[10px] uppercase tracking-[0.14em] text-ink-3">
+                          <th scope="col" className="py-2 pe-4 font-normal">Change</th>
+                          <th scope="col" className="py-2 pe-4 text-right font-normal">Repayment income</th>
+                          <th scope="col" className="py-2 text-right font-normal">Compulsory repayment</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {sensitivity.map((row) => {
+                          const entered = row.offset === 0;
+                          return (
+                            <tr
+                              key={row.offset}
+                              aria-current={entered ? "true" : undefined}
+                              className={
+                                entered
+                                  ? "border-b-2 border-hairline-strong bg-surface-2"
+                                  : "border-b border-hairline"
+                              }
+                            >
+                              <th
+                                scope="row"
+                                className={`py-2 pe-4 font-mono text-[13px] font-normal tabular-nums ${entered ? "text-ink" : "text-ink-2"}`}
+                              >
+                                {entered
+                                  ? "As entered"
+                                  : `${row.offset > 0 ? "+" : "−"}$${Math.abs(row.offset).toLocaleString("en-AU")}`}
+                              </th>
+                              <td className="py-2 pe-4 text-right font-mono text-[13px] tabular-nums text-ink-3">
+                                {formatMoney(row.income)}
+                              </td>
+                              <td
+                                className={`py-2 text-right font-mono text-[13px] tabular-nums ${entered ? "text-ink" : "text-ink-2"}`}
+                              >
+                                {formatMoney(row.repayment)}
+                              </td>
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                    </table>
+                  </div>
+                </section>
+              ) : null}
 
               {tiers.length > 0 ? (
                 <section aria-label="Repayment rate thresholds" className="grid gap-4 border-t border-hairline pt-6">

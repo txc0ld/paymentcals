@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { getRegistryEntry } from "@paymentcalcs/calculator-registry";
 import { InflationCalculator } from "../../../../components/pay/inflation-calculator";
+import { CalculatorStructuredData } from "../../../../components/structured-data";
 
 const entry = getRegistryEntry("AU-PAY-015")!;
 
@@ -12,5 +13,10 @@ export const metadata: Metadata = {
 };
 
 export default function Page() {
-  return <InflationCalculator />;
+  return (
+    <>
+      <CalculatorStructuredData id="AU-PAY-015" />
+      <InflationCalculator />
+    </>
+  );
 }

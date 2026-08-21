@@ -21,10 +21,13 @@ export function CalculatorHeader({
   meta,
   modeControl,
   actions,
+  methodologyHref,
 }: {
   meta: CalculatorHeaderMeta;
   modeControl?: ReactNode;
   actions?: ReactNode;
+  /** C2 — link to the calculator's methodology page, e.g. `/methodology/<slug>`. */
+  methodologyHref?: string;
 }) {
   return (
     <header className="nexus-panel grid min-w-0 gap-5 p-6 md:p-8">
@@ -51,6 +54,14 @@ export function CalculatorHeader({
           </span>
         </span>
         <Badge tone={meta.ruleStatus.tone}>{meta.ruleStatus.label}</Badge>
+        {methodologyHref ? (
+          <a
+            href={methodologyHref}
+            className="text-[var(--pc-accent-text)] underline decoration-hairline-strong underline-offset-2 hover:decoration-current focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-focus"
+          >
+            Methodology
+          </a>
+        ) : null}
         {actions ? <span className="ms-auto flex max-w-full flex-wrap items-center gap-2">{actions}</span> : null}
       </div>
     </header>

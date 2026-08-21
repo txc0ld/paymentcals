@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { getRegistryEntry } from "@paymentcalcs/calculator-registry";
 import { SavingsCalculator } from "../../../../components/breadth/savings-calculator";
+import { CalculatorStructuredData } from "../../../../components/structured-data";
 
 const entry = getRegistryEntry("GL-SAVE-003")!;
 
@@ -12,5 +13,10 @@ export const metadata: Metadata = {
 };
 
 export default function Page() {
-  return <SavingsCalculator variant="goal" />;
+  return (
+    <>
+      <CalculatorStructuredData id="GL-SAVE-003" />
+      <SavingsCalculator variant="goal" />
+    </>
+  );
 }

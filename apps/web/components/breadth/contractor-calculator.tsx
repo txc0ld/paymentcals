@@ -9,27 +9,57 @@ import {
   MoneyField,
   PrimaryResult,
   ResultMetric,
+  ScenarioActions,
   ToggleField,
   UniversalDisclosure,
+  WorkingPanel,
   formatMoney,
+  type WorkingSource,
 } from "@paymentcalcs/calculation-ui";
 import { getRegistryEntry } from "@paymentcalcs/calculator-registry";
 import { moneyFromDecimalString, moneyToDecimalString } from "@paymentcalcs/calculation-core";
-import { contractorRates } from "@paymentcalcs/engine-business";
+import { WEEKDAYS_PER_YEAR, contractorRates } from "@paymentcalcs/engine-business";
 import { resolveRulePack, type ResolveOutcome } from "@paymentcalcs/rule-schema";
 import { allAuRulePacks, auIntegrityManifest, type GstRulePack } from "@paymentcalcs/rules-au";
 import { allowDraftRules } from "../../lib/draft-rules";
 import { formatMajor } from "../../lib/format-major";
 import { parseMoneyInput } from "../../lib/money-input";
+import { AdvancedGroup, NumberField } from "./advanced-group";
 
 const entry = getRegistryEntry("AU-BIZ-006")!;
 
+/** Capacity and cost defaults. Every one of them is editable below. */
+const DEFAULTS = {
+  overheads: "15000",
+  utilisationPct: "85",
+  superPct: "12",
+  annualLeaveDays: "20",
+  personalLeaveDays: "10",
+  publicHolidays: "11",
+  nonBillableDays: "20",
+  hoursPerDay: "7.6",
+  marginPct: "10",
+};
+
+const wholeDays = (raw: string) => /^\d{1,3}$/.test(raw.trim());
+const percentUpTo = (raw: string, max: number) =>
+  /^\d+(\.\d+)?$/.test(raw.trim()) && Number.parseFloat(raw) <= max;
+
 export function ContractorCalculator() {
   const [incomeRaw, setIncomeRaw] = useState("");
-  const [overheadsRaw, setOverheadsRaw] = useState("15000");
-  const [utilisationPctRaw, setUtilisationPctRaw] = useState("85");
+  const [overheadsRaw, setOverheadsRaw] = useState(DEFAULTS.overheads);
+  const [utilisationPctRaw, setUtilisationPctRaw] = useState(DEFAULTS.utilisationPct);
   const [gstRegistered, setGstRegistered] = useState(true);
   const [gstResolution, setGstResolution] = useState<ResolveOutcome | "pending">("pending");
+
+  // Advanced capacity and cost assumptions — the engine's full input surface.
+  const [superPctRaw, setSuperPctRaw] = useState(DEFAULTS.superPct);
+  const [annualLeaveRaw, setAnnualLeaveRaw] = useState(DEFAULTS.annualLeaveDays);
+  const [personalLeaveRaw, setPersonalLeaveRaw] = useState(DEFAULTS.personalLeaveDays);
+  const [publicHolidaysRaw, setPublicHolidaysRaw] = useState(DEFAULTS.publicHolidays);
+  const [nonBillableRaw, setNonBillableRaw] = useState(DEFAULTS.nonBillableDays);
+  const [hoursPerDayRaw, setHoursPerDayRaw] = useState(DEFAULTS.hoursPerDay);
+  const [marginPctRaw, setMarginPctRaw] = useState(DEFAULTS.marginPct);
 
   useEffect(() => {
     let cancelled = false;
@@ -48,7 +78,19 @@ export function ContractorCalculator() {
 
   const income = useMemo(() => parseMoneyInput(incomeRaw), [incomeRaw]);
   const overheads = useMemo(() => parseMoneyInput(overheadsRaw), [overheadsRaw]);
-  const utilisationValid = /^\d+(\.\d+)?$/.test(utilisationPctRaw.trim());
+  const utilisationValid = percentUpTo(utilisationPctRaw, 100);
+  const superValid = percentUpTo(superPctRaw, 100);
+  const marginValid = percentUpTo(marginPctRaw, 200);
+  const hoursValid =
+    /^\d+(\.\d+)?$/.test(hoursPerDayRaw.trim()) &&
+    Number.parseFloat(hoursPerDayRaw) > 0 &&
+    Number.parseFloat(hoursPerDayRaw) <= 24;
+  const daysValid =
+    wholeDays(annualLeaveRaw) &&
+    wholeDays(personalLeaveRaw) &&
+    wholeDays(publicHolidaysRaw) &&
+    wholeDays(nonBillableRaw);
+  const advancedValid = superValid && marginValid && hoursValid && daysValid;
 
   const gstRate =
     gstRegistered && gstResolution !== "pending" && gstResolution.ok
@@ -56,22 +98,34 @@ export function ContractorCalculator() {
       : null;
 
   const runAtUtilisation = useMemo(() => {
-    if (!income.ok) return null;
+    if (!income.ok || !advancedValid) return null;
     const base = {
       targetIncome: moneyToDecimalString(income.money),
-      superReplacementRate: "0.12",
-      annualLeaveDays: 20,
-      personalLeaveDays: 10,
-      publicHolidays: 11,
-      nonBillableDays: 20,
-      hoursPerBillableDay: "7.6",
+      superReplacementRate: (Number.parseFloat(superPctRaw) / 100).toString(),
+      annualLeaveDays: Number.parseInt(annualLeaveRaw, 10),
+      personalLeaveDays: Number.parseInt(personalLeaveRaw, 10),
+      publicHolidays: Number.parseInt(publicHolidaysRaw, 10),
+      nonBillableDays: Number.parseInt(nonBillableRaw, 10),
+      hoursPerBillableDay: hoursPerDayRaw.trim(),
       overheadsAnnual: overheads.ok ? moneyToDecimalString(overheads.money) : "0",
-      profitMargin: "0.1",
+      profitMargin: (Number.parseFloat(marginPctRaw) / 100).toString(),
       gstRate,
     };
     return (utilisationPct: number) =>
       contractorRates({ ...base, utilisation: (utilisationPct / 100).toString() });
-  }, [income, overheads, gstRate]);
+  }, [
+    income,
+    advancedValid,
+    superPctRaw,
+    annualLeaveRaw,
+    personalLeaveRaw,
+    publicHolidaysRaw,
+    nonBillableRaw,
+    hoursPerDayRaw,
+    overheads,
+    marginPctRaw,
+    gstRate,
+  ]);
 
   const result = useMemo(() => {
     if (!runAtUtilisation || !utilisationValid) return null;
@@ -91,6 +145,29 @@ export function ContractorCalculator() {
 
   const draft = gstResolution !== "pending" && gstResolution.ok && gstResolution.draft && gstRegistered;
 
+  const sources: WorkingSource[] =
+    gstRate !== null && gstResolution !== "pending" && gstResolution.ok
+      ? gstResolution.pack.sources.map((source) => ({
+          title: `${source.authority} — ${source.title}`,
+          url: source.url,
+          detail: `retrieved ${source.retrievedAt.slice(0, 10)}`,
+        }))
+      : [];
+
+  function onReset() {
+    setIncomeRaw("");
+    setOverheadsRaw(DEFAULTS.overheads);
+    setUtilisationPctRaw(DEFAULTS.utilisationPct);
+    setGstRegistered(true);
+    setSuperPctRaw(DEFAULTS.superPct);
+    setAnnualLeaveRaw(DEFAULTS.annualLeaveDays);
+    setPersonalLeaveRaw(DEFAULTS.personalLeaveDays);
+    setPublicHolidaysRaw(DEFAULTS.publicHolidays);
+    setNonBillableRaw(DEFAULTS.nonBillableDays);
+    setHoursPerDayRaw(DEFAULTS.hoursPerDay);
+    setMarginPctRaw(DEFAULTS.marginPct);
+  }
+
   return (
     <>
       {draft ? <DraftRulesBanner /> : null}
@@ -109,6 +186,8 @@ export function ContractorCalculator() {
                     ? { label: "Draft rules — not verified", tone: "draft" }
                     : { label: "Editable defaults", tone: "neutral" },
             }}
+            methodologyHref={`/methodology/${entry.slug}`}
+            actions={<ScenarioActions onReset={onReset} />}
           />
         }
         inputs={
@@ -147,10 +226,78 @@ export function ContractorCalculator() {
               checked={gstRegistered}
               onChange={setGstRegistered}
             />
-            <p className="text-[13px] leading-5 text-ink-3">
-              Editable defaults: 12% super replacement, 20 days annual leave, 10 days personal
-              leave, 11 public holidays, 20 non-billable days, 7.6-hour days, 10% risk margin.
-            </p>
+            <AdvancedGroup
+              legend="Capacity and cost assumptions"
+              hint={`These open at the modelled defaults. The year starts from ${WEEKDAYS_PER_YEAR} weekdays, and everything you enter here is subtracted from it or priced into the rate.`}
+            >
+              <div className="grid items-start gap-4 @md:grid-cols-2">
+                <NumberField
+                  id="con-annual-leave"
+                  label="Annual leave days"
+                  value={annualLeaveRaw}
+                  onChange={setAnnualLeaveRaw}
+                  unit="days"
+                  inputMode="numeric"
+                  error={wholeDays(annualLeaveRaw) ? undefined : "Whole days only."}
+                />
+                <NumberField
+                  id="con-personal-leave"
+                  label="Personal leave days"
+                  value={personalLeaveRaw}
+                  onChange={setPersonalLeaveRaw}
+                  unit="days"
+                  inputMode="numeric"
+                  error={wholeDays(personalLeaveRaw) ? undefined : "Whole days only."}
+                />
+                <NumberField
+                  id="con-public-holidays"
+                  label="Public holidays"
+                  value={publicHolidaysRaw}
+                  onChange={setPublicHolidaysRaw}
+                  unit="days"
+                  inputMode="numeric"
+                  error={wholeDays(publicHolidaysRaw) ? undefined : "Whole days only."}
+                />
+                <NumberField
+                  id="con-non-billable"
+                  label="Non-billable days"
+                  description="Admin, marketing, proposals and training days you do not invoice."
+                  value={nonBillableRaw}
+                  onChange={setNonBillableRaw}
+                  unit="days"
+                  inputMode="numeric"
+                  error={wholeDays(nonBillableRaw) ? undefined : "Whole days only."}
+                />
+              </div>
+              <div className="grid items-start gap-4 @md:grid-cols-2">
+                <NumberField
+                  id="con-hours"
+                  label="Hours per billable day"
+                  value={hoursPerDayRaw}
+                  onChange={setHoursPerDayRaw}
+                  unit="hrs"
+                  error={hoursValid ? undefined : "Enter hours above 0 and up to 24."}
+                />
+                <NumberField
+                  id="con-super"
+                  label="Super replacement %"
+                  description="Set aside on top of the income, in place of employer super."
+                  value={superPctRaw}
+                  onChange={setSuperPctRaw}
+                  unit="%"
+                  error={superValid ? undefined : "Enter a percentage up to 100."}
+                />
+              </div>
+              <NumberField
+                id="con-margin"
+                label="Risk margin %"
+                description="Added on top of break-even revenue to cover variability and profit."
+                value={marginPctRaw}
+                onChange={setMarginPctRaw}
+                unit="%"
+                error={marginValid ? undefined : "Enter a percentage up to 200."}
+              />
+            </AdvancedGroup>
           </div>
         }
         results={
@@ -237,7 +384,38 @@ export function ContractorCalculator() {
             </div>
           )
         }
-        explanation={null}
+        explanation={
+          <WorkingPanel
+            summary={
+              result
+                ? `The year starts at ${WEEKDAYS_PER_YEAR} weekdays. Leave, public holidays and non-billable days come off it, utilisation is applied to what is left, and the revenue that covers your income, super replacement and overheads — plus the risk margin — is divided across those billable days.`
+                : "Enter a target annual income to see the day rate and the working behind it."
+            }
+            steps={[
+              `capacity days = ${WEEKDAYS_PER_YEAR} − public holidays − annual leave − personal leave − non-billable days`,
+              "billable days = capacity days × utilisation",
+              "super replacement = target income × super replacement rate",
+              "break-even revenue = target income + super replacement + annual overheads",
+              "target revenue = break-even revenue × (1 + risk margin)",
+              "target day rate = target revenue ÷ billable days",
+              "hourly equivalent = target day rate ÷ hours per billable day",
+              "GST, when registered, is added to the day rate and shown separately",
+            ]}
+            assumptions={[
+              "Every figure on this route is your own entry or an editable default. Nothing here is a published rate or an award condition.",
+              "Utilisation applies to the days that remain after leave and non-billable days, so it is not double-counted.",
+              "Super replacement is money set aside, not spendable income, and no contribution cap or tax treatment is applied.",
+              "GST collected is held for the ATO and is never counted as revenue in any figure above.",
+            ]}
+            sources={sources}
+            limitations={[
+              "Income tax, PAYG instalments, deductions, entity structure and personal services income rules are out of scope.",
+              "Insurance, workers compensation, licensing obligations and superannuation guarantee obligations to others are not assessed.",
+              "Whether you are or must be registered for GST is your selection, not a determination made here.",
+              "Result accuracy class B: a capacity model built entirely on the assumptions you set.",
+            ]}
+          />
+        }
         disclosure={<UniversalDisclosure financialYear="current" />}
       />
     </>

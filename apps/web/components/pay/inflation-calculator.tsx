@@ -9,7 +9,10 @@ import {
   EmptyState,
   MoneyField,
   RuleUnavailableState,
+  ScenarioActions,
   UniversalDisclosure,
+  downloadCsv,
+  toCsv,
 } from "@paymentcalcs/calculation-ui";
 import { getRegistryEntry } from "@paymentcalcs/calculator-registry";
 import { CpiRangeError, computeRealIncome, type RealIncomeResult } from "@paymentcalcs/engine-compensation";
@@ -18,6 +21,7 @@ import { allAuRulePacks, auIntegrityManifest, type CpiRulePack } from "@paymentc
 import { allowDraftRules } from "../../lib/draft-rules";
 import { formatMajor } from "../../lib/format-major";
 import { parseMoneyInput } from "../../lib/money-input";
+import { useScenarioActions } from "./use-scenario-actions";
 
 const entry = getRegistryEntry("AU-PAY-015")!;
 
@@ -69,7 +73,20 @@ export function InflationCalculator() {
   const [salaryRaw, setSalaryRaw] = useState("100000");
   const [fromMonth, setFromMonth] = useState("2021-01");
   const [toMonth, setToMonth] = useState("");
+  /** Optional "what I earn now" — blank leaves every existing figure untouched. */
+  const [currentSalaryRaw, setCurrentSalaryRaw] = useState("");
   const [resolution, setResolution] = useState<CpiResolution>("pending");
+
+  const scenario = useScenarioActions({
+    calculatorId: entry.id,
+    state: { salaryRaw, fromMonth, toMonth, currentSalaryRaw },
+    onHydrate: (saved) => {
+      if (typeof saved.salaryRaw === "string") setSalaryRaw(saved.salaryRaw);
+      if (typeof saved.fromMonth === "string") setFromMonth(saved.fromMonth);
+      if (typeof saved.toMonth === "string") setToMonth(saved.toMonth);
+      if (typeof saved.currentSalaryRaw === "string") setCurrentSalaryRaw(saved.currentSalaryRaw);
+    },
+  });
 
   useEffect(() => {
     let cancelled = false;
@@ -113,6 +130,39 @@ export function InflationCalculator() {
   const result = computation && computation.ok ? computation.result : null;
   const pctRise = result ? new Dec(result.cumulativeInflation).times(100).toFixed(2) : null;
 
+  const currentSalary = useMemo(
+    () => (currentSalaryRaw.trim() ? parseMoneyInput(currentSalaryRaw) : null),
+    [currentSalaryRaw],
+  );
+  /* Did the raise keep up: today's salary against the salary that would have
+   * held the original purchasing power, and against the rise that would. */
+  const raiseCheck =
+    result && currentSalary && currentSalary.ok && salary.ok
+      ? (() => {
+          const now = new Dec(currentSalary.money.minorUnits).div(100);
+          const started = new Dec(salary.money.minorUnits).div(100);
+          const gap = now.minus(new Dec(result.neededSalary));
+          return {
+            now: now.toFixed(2),
+            actualRise: now.minus(started).toFixed(2),
+            inflationRise: result.shortfall,
+            gapAbs: gap.abs().toFixed(2),
+            keptPace: gap.greaterThanOrEqualTo(0),
+          };
+        })()
+      : null;
+
+  function onDownloadSteps() {
+    if (!result) return;
+    downloadCsv(
+      `cpi-${result.fromQuarter.date}-to-${result.toQuarter.date}.csv`,
+      toCsv(
+        ["Quarter", "CPI index", "Salary needed", "Effective value"],
+        result.steps.map((step) => [step.quarterDate, step.index, step.neededSalary, step.effectiveValue]),
+      ),
+    );
+  }
+
   const monthField = (id: string, label: string, value: string, onChange: (v: string) => void, placeholderLatest?: boolean) => (
     <div className="grid content-start gap-1.5">
       <label htmlFor={id} className="font-mono text-[11px] uppercase tracking-[0.14em] text-ink-2">
@@ -153,6 +203,19 @@ export function InflationCalculator() {
                       : { label: "Current", tone: "neutral" }
                     : { label: "Rules unavailable", tone: "warn" },
             }}
+            methodologyHref={`/methodology/${entry.slug}`}
+            actions={
+              <ScenarioActions
+                onSave={scenario.onSave}
+                onShare={scenario.onShare}
+                onReset={() => {
+                  setSalaryRaw("100000");
+                  setFromMonth("2021-01");
+                  setToMonth("");
+                  setCurrentSalaryRaw("");
+                }}
+              />
+            }
           />
         }
         inputs={
@@ -175,6 +238,14 @@ export function InflationCalculator() {
                 {monthField("inf-from", "Date of last pay rise", fromMonth, setFromMonth)}
                 {monthField("inf-to", "Comparison date", toMonth, setToMonth, true)}
               </div>
+              <MoneyField
+                id="inf-current-salary"
+                label="Salary now (optional)"
+                description="Fill this in to compare what you earn today with the inflation-matching figure. Blank leaves the result unchanged."
+                value={currentSalaryRaw}
+                onChange={setCurrentSalaryRaw}
+                error={currentSalary && !currentSalary.ok && currentSalary.error ? currentSalary.error : undefined}
+              />
             </div>
           )
         }
@@ -226,6 +297,49 @@ export function InflationCalculator() {
                 </div>
               </div>
 
+              {raiseCheck ? (
+                <section
+                  aria-label="Did the raise keep up"
+                  className="nexus-panel-soft @container grid gap-4 p-6 md:p-8"
+                >
+                  <div className="flex min-w-0 flex-wrap items-baseline justify-between gap-x-6 gap-y-2">
+                    <h2 className="font-mono text-[11px] tracking-[0.16em] text-[var(--pc-accent-text)]">
+                      Did the raise keep up
+                    </h2>
+                    <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-ink-3">
+                      Salary now against the inflation-matching figure
+                    </span>
+                  </div>
+                  <div className="grid gap-px border border-hairline bg-hairline @md:grid-cols-3">
+                    {(
+                      [
+                        ["Salary now", formatMajor(raiseCheck.now), "As entered"],
+                        [
+                          "Raise received",
+                          formatMajor(raiseCheck.actualRise),
+                          `Inflation-matching raise: ${formatMajor(raiseCheck.inflationRise)}`,
+                        ],
+                        [
+                          raiseCheck.keptPace ? "Ahead of CPI by" : "Behind CPI by",
+                          formatMajor(raiseCheck.gapAbs),
+                          `Against ${formatMajor(result.neededSalary)} needed on ${result.toQuarter.date}`,
+                        ],
+                      ] as const
+                    ).map(([label, value, detail]) => (
+                      <div key={label} className="grid content-start gap-1 bg-surface-2 p-5">
+                        <span className="font-mono text-[10px] uppercase tracking-[0.16em] text-ink-3">{label}</span>
+                        <span className="font-mono text-[15px] tabular-nums text-[var(--pc-accent-text)]">{value}</span>
+                        <span className="text-[12px] leading-4 text-ink-3">{detail}</span>
+                      </div>
+                    ))}
+                  </div>
+                  <p className="text-[12px] leading-5 text-ink-3">
+                    This compares two figures only: what you earn now and what the same purchasing power
+                    costs on {result.toQuarter.date}. It says nothing about the value of the work.
+                  </p>
+                </section>
+              ) : null}
+
               <section aria-label="Salary versus inflation" className="nexus-panel-soft grid gap-4 p-6 md:p-8">
                 <div className="flex min-w-0 flex-wrap items-baseline justify-between gap-x-6 gap-y-2">
                   <h2 className="font-mono text-[11px] tracking-[0.16em] text-[var(--pc-accent-text)]">
@@ -248,6 +362,19 @@ export function InflationCalculator() {
                     <dd className="font-mono text-[12px] tabular-nums text-ink-2">{formatMajor(result.effectiveValue)}</dd>
                   </div>
                 </dl>
+                <div className="no-print flex flex-wrap items-center gap-3 border-t border-hairline pt-4">
+                  <button
+                    type="button"
+                    onClick={onDownloadSteps}
+                    aria-label={`Download the ${result.steps.length} quarterly CPI steps as CSV`}
+                    className="nexus-quiet-button min-h-11 px-4 font-mono text-[10px] uppercase tracking-[0.14em] text-ink-2 hover:text-ink focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-focus"
+                  >
+                    Download CSV
+                  </button>
+                  <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-ink-3">
+                    {result.steps.length} quarters · index, salary needed, effective value
+                  </span>
+                </div>
                 <p className="text-[12px] leading-5 text-ink-3">
                   Published quarters only — this calculator never extrapolates or forecasts. CPI is an
                   economy-wide basket; your own costs can move differently.

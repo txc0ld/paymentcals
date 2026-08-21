@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo } from "react";
+import { downloadCsv, toCsv } from "@paymentcalcs/calculation-ui";
 import { analytics } from "../../lib/analytics";
 import { formatMajor } from "../../lib/format-major";
 import type { SLedgerResult } from "../../lib/ledger-serialize";
@@ -60,25 +61,32 @@ export function ScheduleView({
     return { payments, interest, principal: diffMajor(payments, interest), closing: last.closing };
   }, [yearly]);
 
+  // C4: the shared RFC 4180 writer, which quotes anything containing a comma,
+  // quote or newline — the hand-rolled join it replaces did not.
   function exportCsv() {
-    const header = "period,date,annual_rate,payment,extra_payment,interest,fees,offset_balance,closing_balance";
-    const lines = result.rows.map(
-      (row) =>
-        `${row.period},${row.date},${row.annualRate},${row.payment},${row.extraPayment},${row.interest},${row.fees},${row.offsetBalance},${row.closingBalance}`,
+    downloadCsv(
+      `${calculatorId.toLowerCase()}-schedule.csv`,
+      toCsv(
+        ["period", "date", "annual_rate", "payment", "extra_payment", "interest", "fees", "offset_balance", "closing_balance"],
+        result.rows.map((row) => [
+          row.period,
+          row.date,
+          row.annualRate,
+          row.payment,
+          row.extraPayment,
+          row.interest,
+          row.fees,
+          row.offsetBalance,
+          row.closingBalance,
+        ]),
+      ),
     );
-    const blob = new Blob([`${header}\n${lines.join("\n")}\n`], { type: "text/csv" });
-    const url = URL.createObjectURL(blob);
-    const anchor = document.createElement("a");
-    anchor.href = url;
-    anchor.download = `${calculatorId.toLowerCase()}-schedule.csv`;
-    anchor.click();
-    URL.revokeObjectURL(url);
     analytics.track("scenario_action", { calculator_id: calculatorId, action: "export_csv" });
   }
 
   return (
     <div className="grid min-w-0 gap-6">
-      <BalanceChart rows={result.rows} periodsPerYear={PPY[frequency]} />
+      <BalanceChart rows={result.rows} periodsPerYear={PPY[frequency]} calculatorId={calculatorId} />
       <div className="flex flex-wrap items-center justify-between gap-4">
         <PanelHeading>Schedule by year ({result.rows.length} repayments)</PanelHeading>
         <button

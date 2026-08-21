@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { getRegistryEntry } from "@paymentcalcs/calculator-registry";
 import { IncomeTaxExplorer } from "../../../../components/pay/income-tax-explorer";
+import { CalculatorStructuredData } from "../../../../components/structured-data";
 
 const entry = getRegistryEntry("AU-PAY-014")!;
 
@@ -12,5 +13,10 @@ export const metadata: Metadata = {
 };
 
 export default function Page() {
-  return <IncomeTaxExplorer />;
+  return (
+    <>
+      <CalculatorStructuredData id="AU-PAY-014" />
+      <IncomeTaxExplorer />
+    </>
+  );
 }

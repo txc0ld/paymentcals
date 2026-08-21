@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { getRegistryEntry } from "@paymentcalcs/calculator-registry";
 import { PayCalculator } from "../../../../components/pay/pay-calculator";
+import { CalculatorStructuredData } from "../../../../components/structured-data";
 
 const entry = getRegistryEntry("AU-PAY-007")!;
 
@@ -12,5 +13,10 @@ export const metadata: Metadata = {
 };
 
 export default function Page() {
-  return <PayCalculator variant={{ calculatorId: "AU-PAY-007", primaryMetric: "impliedHourly", primaryLabel: "Implied hourly rate", simpleShowsHours: true, intro: "See what an annual salary works out to per hour for your hours and weeks worked." }} />;
+  return (
+    <>
+      <CalculatorStructuredData id="AU-PAY-007" />
+      <PayCalculator variant={{ calculatorId: "AU-PAY-007", primaryMetric: "impliedHourly", primaryLabel: "Implied hourly rate", simpleShowsHours: true, intro: "See what an annual salary works out to per hour for your hours and weeks worked." }} />
+    </>
+  );
 }

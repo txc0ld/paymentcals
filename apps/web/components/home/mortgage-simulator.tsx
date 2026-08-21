@@ -9,7 +9,9 @@ import {
   MoneyField,
   PrimaryResult,
   ResultMetric,
+  ScenarioActions,
   SegmentedControl,
+  WorkingPanel,
 } from "@paymentcalcs/calculation-ui";
 import { getRegistryEntry } from "@paymentcalcs/calculator-registry";
 import { moneyFromDecimalString } from "@paymentcalcs/calculation-core";
@@ -23,6 +25,7 @@ import { DeltaCell, MetricCell, diffMajor } from "./result-parts";
 import { ScheduleView } from "./schedule-view";
 import { TimelineEditor, type DraftEvent } from "./timeline-editor";
 import { LOAN_BASICS_DEFAULTS, LoanBasicsFields, PPY, parseLoanBasics, type LoanBasicsState } from "./loan-fields";
+import { FIRST_REPAYMENT_DATE, workingContentFor } from "./working-notes";
 
 const entry = getRegistryEntry("AU-HOME-002")!;
 
@@ -76,7 +79,7 @@ function buildJob(scenario: ScenarioState) {
     annualRate: parsed.annualRate,
     termPeriods: parsed.termPeriods,
     repaymentFrequency: parsed.frequency,
-    firstRepaymentDate: "2026-10-01",
+    firstRepaymentDate: FIRST_REPAYMENT_DATE,
     repaymentType: "principal_and_interest",
     interestOnlyPeriods: parsed.ioPeriods,
     repaymentResetPolicy: "recalculate_to_term",
@@ -124,6 +127,19 @@ export function MortgageSimulator() {
             calculationClass: entry.calculationClass,
             ruleStatus: { label: "No statutory rules required", tone: "neutral" },
           }}
+          methodologyHref={`/methodology/${entry.slug}`}
+          // Print and Reset only: the simulator has no URL-state mechanism, so
+          // there is nothing to Save or Share without inventing one (C1).
+          actions={
+            <ScenarioActions
+              onReset={() => {
+                setScenarioA(EMPTY_SCENARIO);
+                setScenarioB(null);
+                setMode("single");
+                setActive("A");
+              }}
+            />
+          }
           modeControl={
             <SegmentedControl
               label="Simulator mode"
@@ -247,7 +263,9 @@ export function MortgageSimulator() {
               frequency={editing.basics.frequency}
             />
           </div>
-        ) : null
+        ) : (
+          <WorkingPanel {...workingContentFor(entry.id)} />
+        )
       }
       disclosure={<MortgageDisclosure />}
     />

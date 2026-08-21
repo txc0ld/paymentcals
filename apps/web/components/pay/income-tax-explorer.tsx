@@ -1,8 +1,13 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import type { CalculationResultV1 } from "@paymentcalcs/calculation-core";
-import { Dec, moneyToDecimal, type DecimalValue } from "@paymentcalcs/calculation-core";
+import type { CalculationResultV1, Money } from "@paymentcalcs/calculation-core";
+import {
+  Dec,
+  moneyFromDecimalString,
+  moneyToDecimal,
+  type DecimalValue,
+} from "@paymentcalcs/calculation-core";
 import {
   CalculatorHeader,
   CalculatorShell,
@@ -12,6 +17,7 @@ import {
   PrimaryResult,
   ResultMetric,
   RuleUnavailableState,
+  ScenarioActions,
   SelectField,
   UniversalDisclosure,
   formatMoney,
@@ -19,11 +25,19 @@ import {
 } from "@paymentcalcs/calculation-ui";
 import { getRegistryEntry } from "@paymentcalcs/calculator-registry";
 import { calculateAuPay, type AuPayOutput } from "@paymentcalcs/engine-au-tax";
-import type { TaxBracket } from "@paymentcalcs/rules-au";
+import type { IncomeTaxRules, TaxBracket } from "@paymentcalcs/rules-au";
 import { parseMoneyInput } from "../../lib/money-input";
 import { FINANCIAL_YEARS, resolvePayPacks, type FinancialYear, type PayResolutionOutcome } from "../../lib/pay-packs";
+import { useScenarioActions } from "./use-scenario-actions";
 
 const entry = getRegistryEntry("AU-PAY-014")!;
+
+/** The residency's published ladder, or null when the pack has none. */
+function bracketsFor(rules: IncomeTaxRules, residency: Residency): readonly TaxBracket[] | null {
+  if (residency === "resident") return rules.resident;
+  if (residency === "foreign_resident") return rules.foreignResident;
+  return rules.workingHolidayMaker;
+}
 
 type Residency = "resident" | "foreign_resident" | "working_holiday_maker";
 
@@ -126,6 +140,24 @@ export function IncomeTaxExplorer() {
   const [salaryRaw, setSalaryRaw] = useState("90000");
   const [resolution, setResolution] = useState<PayResolutionOutcome | "pending">("pending");
   const [result, setResult] = useState<CalculationResultV1<AuPayOutput> | null>(null);
+  /** Same income under each residency; null tax = the pack has no ladder. */
+  const [residencyRows, setResidencyRows] = useState<
+    Array<{ residency: Residency; label: string; grossIncomeTax: Money | null }> | null
+  >(null);
+
+  const scenario = useScenarioActions({
+    calculatorId: entry.id,
+    state: { financialYear, residency, salaryRaw },
+    onHydrate: (saved) => {
+      if (FINANCIAL_YEARS.includes(saved.financialYear as FinancialYear)) {
+        setFinancialYear(saved.financialYear as FinancialYear);
+      }
+      if (RESIDENCY_OPTIONS.some((option) => option.value === saved.residency)) {
+        setResidency(saved.residency as Residency);
+      }
+      if (typeof saved.salaryRaw === "string") setSalaryRaw(saved.salaryRaw);
+    },
+  });
 
   useEffect(() => {
     let cancelled = false;
@@ -180,13 +212,65 @@ export function IncomeTaxExplorer() {
     };
   }, [resolution, salary, residency, financialYear]);
 
+  /* Residency comparison: the same income re-run under each published ladder.
+   * A residency the pack does not publish is reported as unavailable, never
+   * left blank and never filled from another residency's brackets. */
+  useEffect(() => {
+    if (resolution === "pending" || !resolution.ok || !salary.ok) {
+      setResidencyRows(null);
+      return;
+    }
+    const rules = resolution.resolution.incomeTax.pack.rules;
+    let cancelled = false;
+    Promise.all(
+      RESIDENCY_OPTIONS.map(async (option) => {
+        const empty: { residency: Residency; label: string; grossIncomeTax: Money | null } = {
+          residency: option.value,
+          label: option.label,
+          grossIncomeTax: null,
+        };
+        if (!bracketsFor(rules, option.value)) return empty;
+        const calculated = await calculateAuPay(
+          {
+            requestId: "web-residency-compare",
+            calculatorId: entry.id,
+            calculatorSchemaVersion: entry.inputSchemaVersion,
+            jurisdiction: { country: "AU" },
+            locale: "en-AU",
+            currency: "AUD",
+            valuationDate: `${financialYear.slice(0, 4)}-10-01`,
+            input: {
+              financialYear,
+              income: { amount: salary.money, frequency: "annually", weeksPaidPerYear: "52" },
+              package: { treatment: "base_plus_super", employerSuperRate: null, applyMaximumContributionBase: true },
+              taxpayer: {
+                residency: option.value,
+                claimsTaxFreeThreshold: true,
+                medicare: { status: "standard", hasPrivateHospitalCover: false, familyStatus: "single", dependants: 0 },
+              },
+              adjustments: {},
+              studyLoans: { enabled: false },
+              withholding: { payFrequency: "fortnightly" },
+            },
+            options: { traceLevel: "none" },
+          },
+          resolution.resolution,
+          { now: new Date().toISOString() },
+        );
+        const out = calculated.output;
+        return out ? { ...empty, grossIncomeTax: out.liability.grossIncomeTax } : empty;
+      }),
+    ).then((rows) => {
+      if (!cancelled) setResidencyRows(rows);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [resolution, salary, financialYear]);
+
   const brackets =
     resolution !== "pending" && resolution.ok
-      ? residency === "resident"
-        ? resolution.resolution.incomeTax.pack.rules.resident
-        : residency === "foreign_resident"
-          ? resolution.resolution.incomeTax.pack.rules.foreignResident
-          : resolution.resolution.incomeTax.pack.rules.workingHolidayMaker
+      ? bracketsFor(resolution.resolution.incomeTax.pack.rules, residency)
       : null;
   const rows = brackets ? liabilityRows(brackets) : null;
   const output =
@@ -203,6 +287,39 @@ export function IncomeTaxExplorer() {
     SLIDER_MAX,
     Math.max(0, Math.round(Number(salaryDec.toFixed(0)) || 0)),
   );
+
+  /* Dollars taxed inside each band × that band's rate. Fails closed: the table
+   * is only rendered when the rows re-add to the engine's own income tax, so a
+   * display-side decomposition can never contradict the headline figure. */
+  const decomposition = (() => {
+    if (!brackets || !output) return null;
+    const taxable = moneyToDecimal(output.liability.taxableIncome) as DecimalValue;
+    let total = new Dec(0) as DecimalValue;
+    const rows = brackets.map((bracket) => {
+      const over = new Dec(bracket.over);
+      const upTo = bracket.upTo === null ? null : new Dec(bracket.upTo);
+      const slice = (upTo === null ? taxable : (Dec.min(taxable, upTo) as DecimalValue)).minus(
+        over,
+      ) as DecimalValue;
+      const dollars = (slice.greaterThan(0) ? slice : new Dec(0)) as DecimalValue;
+      const tax = dollars.times(new Dec(bracket.rate)) as DecimalValue;
+      total = total.plus(tax) as DecimalValue;
+      return {
+        key: bracket.over,
+        range:
+          bracket.upTo === null
+            ? `Over $${Number(bracket.over).toLocaleString("en-AU")}`
+            : `$${Number(bracket.over).toLocaleString("en-AU")} – $${Number(bracket.upTo).toLocaleString("en-AU")}`,
+        rate: bracket.rate,
+        dollars,
+        tax,
+      };
+    });
+    const rounded = total.toDecimalPlaces(2, Dec.ROUND_HALF_UP);
+    const gross = moneyToDecimal(output.liability.grossIncomeTax) as DecimalValue;
+    if (!rounded.equals(gross)) return null;
+    return { rows, total: moneyFromDecimalString("AUD", rounded.toFixed(2), 2) };
+  })();
 
   return (
     <>
@@ -224,6 +341,18 @@ export function IncomeTaxExplorer() {
                       : { label: "Current", tone: "neutral" }
                     : { label: "Rules unavailable", tone: "warn" },
             }}
+            methodologyHref={`/methodology/${entry.slug}`}
+            actions={
+              <ScenarioActions
+                onSave={scenario.onSave}
+                onShare={scenario.onShare}
+                onReset={() => {
+                  setFinancialYear("2026-27");
+                  setResidency("resident");
+                  setSalaryRaw("90000");
+                }}
+              />
+            }
           />
         }
         inputs={
@@ -360,6 +489,125 @@ export function IncomeTaxExplorer() {
                   </table>
                 </div>
               </section>
+
+              {decomposition ? (
+                <section
+                  aria-label="Bracket decomposition"
+                  className="nexus-panel-soft @container grid min-w-0 gap-4 p-6 md:p-8"
+                >
+                  <div className="flex min-w-0 flex-wrap items-baseline justify-between gap-x-6 gap-y-2">
+                    <h2 className="font-mono text-[11px] tracking-[0.16em] text-[var(--pc-accent-text)]">
+                      Where your income tax comes from
+                    </h2>
+                    <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-ink-3">
+                      Dollars in each band × that band&rsquo;s rate
+                    </span>
+                  </div>
+                  <div className="min-w-0 overflow-x-auto">
+                    <table className="w-full min-w-[340px] border-collapse text-left">
+                      <caption className="sr-only">
+                        Dollars of taxable income falling in each statutory band and the tax on them,
+                        totalling the income tax shown above
+                      </caption>
+                      <thead>
+                        <tr className="border-b border-hairline font-mono text-[10px] uppercase tracking-[0.14em] text-ink-3">
+                          <th scope="col" className="py-2 pe-4 font-normal">Band</th>
+                          <th scope="col" className="py-2 pe-4 text-right font-normal">Dollars taxed</th>
+                          <th scope="col" className="hidden py-2 pe-4 text-right font-normal @sm:table-cell">Rate</th>
+                          <th scope="col" className="py-2 text-right font-normal">Tax</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {decomposition.rows.map((row) => {
+                          const used = row.dollars.greaterThan(0);
+                          return (
+                            <tr key={row.key} className="border-b border-hairline">
+                              <th
+                                scope="row"
+                                className={`py-2 pe-4 font-mono text-[13px] font-normal tabular-nums ${used ? "text-ink-2" : "text-ink-3"}`}
+                              >
+                                {row.range}
+                              </th>
+                              <td
+                                className={`py-2 pe-4 text-right font-mono text-[13px] tabular-nums ${used ? "text-ink-2" : "text-ink-3"}`}
+                              >
+                                {formatMoney(moneyFromDecimalString("AUD", row.dollars.toFixed(2), 2))}
+                              </td>
+                              <td className="hidden py-2 pe-4 text-right font-mono text-[13px] tabular-nums text-ink-3 @sm:table-cell">
+                                {formatRatePercent(row.rate)}
+                              </td>
+                              <td
+                                className={`py-2 text-right font-mono text-[13px] tabular-nums ${used ? "text-ink" : "text-ink-3"}`}
+                              >
+                                {formatMoney(moneyFromDecimalString("AUD", row.tax.toFixed(2), 2))}
+                              </td>
+                            </tr>
+                          );
+                        })}
+                        <tr className="border-b-2 border-hairline-strong">
+                          <th scope="row" className="py-2 pe-4 text-[13px] font-normal text-ink">
+                            Income tax
+                          </th>
+                          <td className="py-2 pe-4" />
+                          <td className="hidden py-2 pe-4 @sm:table-cell" />
+                          <td className="py-2 text-right font-mono text-[13px] tabular-nums text-[var(--pc-accent-text)]">
+                            {formatMoney(decomposition.total)}
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                  <p className="text-[12px] leading-5 text-ink-3">
+                    The rows are shown only because they re-add to the engine&rsquo;s own income tax figure.
+                    Offsets and levies are not part of this decomposition.
+                  </p>
+                </section>
+              ) : null}
+
+              {residencyRows ? (
+                <section
+                  aria-label="Residency comparison"
+                  className="nexus-panel-soft @container grid min-w-0 gap-4 p-6 md:p-8"
+                >
+                  <div className="flex min-w-0 flex-wrap items-baseline justify-between gap-x-6 gap-y-2">
+                    <h2 className="font-mono text-[11px] tracking-[0.16em] text-[var(--pc-accent-text)]">
+                      The same income under each tax category
+                    </h2>
+                    <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-ink-3">
+                      Income tax before offsets and levies
+                    </span>
+                  </div>
+                  <div className="grid gap-px border border-hairline bg-hairline @md:grid-cols-3">
+                    {residencyRows.map((row) => {
+                      const selected = row.residency === residency;
+                      return (
+                        <div
+                          key={row.residency}
+                          aria-current={selected ? "true" : undefined}
+                          className={`grid content-start gap-1 p-5 ${selected ? "bg-surface" : "bg-surface-2"}`}
+                        >
+                          <span className="font-mono text-[10px] uppercase tracking-[0.16em] text-ink-3">
+                            {row.label}
+                            {selected ? (
+                              <span className="ms-2 text-[var(--pc-accent-text)]">Selected</span>
+                            ) : null}
+                          </span>
+                          {row.grossIncomeTax ? (
+                            <span className="font-mono text-[15px] tabular-nums text-ink">
+                              {formatMoney(row.grossIncomeTax)}
+                            </span>
+                          ) : (
+                            <span className="text-[12px] leading-5 text-ink-3">
+                              The ATO has not published brackets for this category in FY {financialYear},
+                              so no figure is shown rather than a guess.
+                            </span>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                </section>
+              ) : null}
 
               <section aria-label="Marginal rate curve" className="nexus-panel-soft grid gap-4 p-6 md:p-8">
                 <h2 className="font-mono text-[11px] tracking-[0.16em] text-[var(--pc-accent-text)]">

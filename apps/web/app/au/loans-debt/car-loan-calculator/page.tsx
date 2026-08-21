@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { getRegistryEntry } from "@paymentcalcs/calculator-registry";
 import { LoanCalculator } from "../../../../components/breadth/loan-calculator";
+import { CalculatorStructuredData } from "../../../../components/structured-data";
 
 const entry = getRegistryEntry("AU-DEBT-003")!;
 
@@ -12,5 +13,10 @@ export const metadata: Metadata = {
 };
 
 export default function Page() {
-  return <LoanCalculator variant="car" />;
+  return (
+    <>
+      <CalculatorStructuredData id="AU-DEBT-003" />
+      <LoanCalculator variant="car" />
+    </>
+  );
 }

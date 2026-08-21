@@ -2,10 +2,14 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import {
+  Dec,
   isZeroMoney,
+  moneyFromDecimalString,
   subtractMoney,
   sumMoney,
+  type CalculationRequestV1,
   type CalculationResultV1,
+  type DecimalValue,
   type Money,
 } from "@paymentcalcs/calculation-core";
 import {
@@ -19,18 +23,23 @@ import {
   PrimaryResult,
   ResultMetric,
   RuleUnavailableState,
+  ScenarioActions,
   SegmentedControl,
   UniversalDisclosure,
+  downloadCsv,
   formatMoney,
   formatRatePercent,
+  toCsv,
 } from "@paymentcalcs/calculation-ui";
 import { getRegistryEntry } from "@paymentcalcs/calculator-registry";
 import {
   calculateGst,
+  computeGst,
   type GstInput,
   type GstOutput,
   type GstResolution,
 } from "@paymentcalcs/engine-business";
+import { bisect, defaultSolverOptions } from "@paymentcalcs/financial-solvers";
 import { resolveRulePack, type ResolveOutcome } from "@paymentcalcs/rule-schema";
 import { allAuRulePacks, auIntegrityManifest, type GstRulePack } from "@paymentcalcs/rules-au";
 import { decodeUrlState, encodeUrlState } from "@paymentcalcs/scenario-schema";
@@ -93,7 +102,8 @@ export function GstCalculator() {
   const [items, setItems] = useState<DraftLineItem[]>([emptyLine("line-1")]);
   const [roundingLevel, setRoundingLevel] = useState<"per_line" | "invoice_total">("per_line");
   const [result, setResult] = useState<CalculationResultV1<GstOutput> | null>(null);
-  const [savedFlash, setSavedFlash] = useState<string | null>(null);
+  /** Reverse-target entry is a local what-if; it is never written to the share URL. */
+  const [targetNetRaw, setTargetNetRaw] = useState("");
   // URL hydration must complete before the URL-write effect may run, and must
   // run exactly once (StrictMode double-invokes effects in development).
   const [hydrated, setHydrated] = useState(false);
@@ -270,7 +280,7 @@ export function GstCalculator() {
     window.history.replaceState(null, "", url);
   }, [hydrated, uiMode, simpleMode, amountRaw, items, roundingLevel]);
 
-  async function onSave() {
+  async function onSave(): Promise<string> {
     const now = new Date().toISOString();
     const scenarioId = `sc_${crypto.randomUUID().slice(0, 8)}`;
     try {
@@ -287,23 +297,21 @@ export function GstCalculator() {
         selectedRulePacks: resolution !== "pending" && resolution.ok ? [resolution.pack.rulePackId] : [],
         consent: { storage: "local" },
       });
-      setSavedFlash("Saved on this device");
       analytics.track("scenario_action", { calculator_id: entry.id, action: "save" });
+      return "Saved on this device";
     } catch {
-      setSavedFlash("Saving is unavailable in this browser");
+      return "Saving is unavailable in this browser";
     }
-    setTimeout(() => setSavedFlash(null), 2500);
   }
 
-  async function onShare() {
+  async function onShare(): Promise<string> {
     try {
       await navigator.clipboard.writeText(window.location.href);
-      setSavedFlash("Link copied");
       analytics.track("scenario_action", { calculator_id: entry.id, action: "share" });
+      return "Link copied";
     } catch {
-      setSavedFlash("Copy the address bar URL to share");
+      return "Copy the address bar URL to share";
     }
-    setTimeout(() => setSavedFlash(null), 2500);
   }
 
   function onReset() {
@@ -311,6 +319,7 @@ export function GstCalculator() {
     setItems([emptyLine("line-1")]);
     setSimpleMode("add");
     setRoundingLevel("per_line");
+    setTargetNetRaw("");
     setResult(null);
     analytics.track("scenario_action", { calculator_id: entry.id, action: "reset" });
   }
@@ -348,6 +357,118 @@ export function GstCalculator() {
     };
   }, [output]);
 
+  const targetNet = useMemo(() => parseMoneyInput(targetNetRaw), [targetNetRaw]);
+
+  /**
+   * Reverse target (E24): the invoice amount whose GST-exclusive remainder is
+   * the net you want to keep. Monotonic bisection re-runs the same forward GST
+   * engine at every iteration — the solved figure is then recomputed forward
+   * and shown, so nothing is displayed that the forward engine does not agree
+   * with. A solver that does not converge yields no number at all.
+   */
+  const reverseTarget = useMemo(() => {
+    if (resolution === "pending" || !resolution.ok || !targetNet.ok) return null;
+    const target = new Dec(targetNet.money.minorUnits).div(100) as DecimalValue;
+    if (target.lessThanOrEqualTo(0)) return null;
+
+    const gstResolution: GstResolution = {
+      pack: resolution.pack as GstRulePack,
+      manifestRef: resolution.manifestRef,
+    };
+    const forward = (inclusiveMajor: string) => {
+      const request: CalculationRequestV1<GstInput> = {
+        requestId: "web-reverse",
+        calculatorId: entry.id,
+        calculatorSchemaVersion: entry.inputSchemaVersion,
+        jurisdiction: { country: "AU" },
+        locale: "en-AU",
+        currency: "AUD",
+        valuationDate: todayIso(),
+        input: { mode: "remove", amount: moneyFromDecimalString("AUD", inclusiveMajor, 2) },
+        options: { traceLevel: "none" },
+      };
+      return computeGst(request, gstResolution).output ?? null;
+    };
+    const toCents = (value: DecimalValue) => value.toDecimalPlaces(2, Dec.ROUND_HALF_UP).toFixed(2);
+
+    let objectiveFailed = false;
+    const objective = (candidate: DecimalValue): DecimalValue => {
+      const output = forward(toCents(candidate));
+      if (!output) {
+        objectiveFailed = true;
+        return new Dec(0) as DecimalValue;
+      }
+      return new Dec(output.exclusiveAmount.minorUnits).div(100).minus(target) as DecimalValue;
+    };
+
+    const upper = Number(target.times(10).plus(100).toFixed(2));
+    const solved = bisect(objective, {
+      ...defaultSolverOptions(0, upper),
+      monotonicity: "monotone_increasing",
+      preference: "smallest_meeting_target",
+    });
+    if (objectiveFailed || solved.status !== "converged") {
+      return {
+        ok: false as const,
+        target,
+        reason:
+          solved.status === "unattainable"
+            ? "No invoice amount in the searched range leaves that net amount after GST, so no figure is shown."
+            : "The solver did not converge on an invoice amount for that net target, so no figure is shown.",
+      };
+    }
+    const invoiceMajor = toCents(solved.value);
+    const verified = forward(invoiceMajor);
+    if (!verified) {
+      return {
+        ok: false as const,
+        target,
+        reason: "The forward recomputation did not return a result, so no figure is shown.",
+      };
+    }
+    const net = new Dec(verified.exclusiveAmount.minorUnits).div(100) as DecimalValue;
+    return {
+      ok: true as const,
+      target,
+      verified,
+      overshoot: net.minus(target) as DecimalValue,
+      iterations: solved.iterations,
+      discontinuity: solved.discontinuity,
+    };
+  }, [resolution, targetNet]);
+
+  function onDownloadInvoiceCsv() {
+    const lines = output?.lines;
+    if (!output || !lines || lines.length === 0) return;
+    const major = (amount: Money) => new Dec(amount.minorUnits).div(10 ** amount.scale).toFixed(amount.scale);
+    downloadCsv(
+      "gst-invoice.csv",
+      toCsv(
+        ["line", "label", "treatment", "quantity", "exclusive", "gst", "inclusive"],
+        [
+          ...lines.map((line, index) => [
+            index + 1,
+            line.label ?? `Line ${index + 1}`,
+            line.treatment,
+            line.quantity,
+            major(line.exclusiveAmount),
+            major(line.gstAmount),
+            major(line.inclusiveAmount),
+          ]),
+          [
+            "",
+            "Totals",
+            `rate ${output.rate}`,
+            "",
+            major(output.exclusiveAmount),
+            major(output.gstAmount),
+            major(output.inclusiveAmount),
+          ],
+        ],
+      ),
+    );
+  }
+
   return (
     <>
       {draft ? <DraftRulesBanner /> : null}
@@ -371,32 +492,8 @@ export function GstCalculator() {
                       : { label: "Current", tone: "neutral" }
                     : { label: "Rules unavailable", tone: "warn" },
             }}
-            actions={
-              <span className="no-print flex max-w-full flex-wrap items-center gap-2">
-                {savedFlash ? (
-                  <span role="status" className="font-mono text-[10px] uppercase tracking-[0.14em] text-positive">
-                    {savedFlash}
-                  </span>
-                ) : null}
-                {(
-                  [
-                    ["Save", onSave],
-                    ["Share", onShare],
-                    ["Print", () => window.print()],
-                    ["Reset", onReset],
-                  ] as const
-                ).map(([label, handler]) => (
-                  <button
-                    key={label}
-                    type="button"
-                    onClick={handler}
-                    className="nexus-quiet-button min-h-11 px-3 font-mono text-[10px] uppercase tracking-[0.14em] text-ink-2 hover:border-hairline-strong hover:text-ink focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-focus"
-                  >
-                    {label}
-                  </button>
-                ))}
-              </span>
-            }
+            methodologyHref={`/methodology/${entry.slug}`}
+            actions={<ScenarioActions onSave={onSave} onShare={onShare} onReset={onReset} />}
           />
         }
         inputs={
@@ -440,7 +537,21 @@ export function GstCalculator() {
                     onChange={setAmountRaw}
                     error={parsed.amountError}
                   />
+                  <div className="grid gap-4 border-t border-hairline pt-5">
+                    <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-[var(--pc-accent-text)]">
+                      Work back from a net amount
+                    </span>
+                    <MoneyField
+                      id="gst-target-net"
+                      label="Net amount you want to keep"
+                      description="Solves for the invoice total whose GST-exclusive remainder is this amount. Leave it blank to ignore it."
+                      value={targetNetRaw}
+                      onChange={setTargetNetRaw}
+                      error={!targetNet.ok && targetNet.error ? targetNet.error : undefined}
+                    />
+                  </div>
                 </>
+
               ) : (
                 <>
                   <div className="grid justify-items-start gap-1.5">
@@ -466,7 +577,9 @@ export function GstCalculator() {
             <EmptyState>
               No result can be shown while the required rule set is unavailable.
             </EmptyState>
-          ) : result && !output && result.errors.length > 0 ? (
+          ) : (
+            <>
+              {result && !output && result.errors.length > 0 ? (
             <EngineFailureState referenceId={result.calculationId} />
           ) : !output ? (
             <EmptyState>
@@ -503,6 +616,56 @@ export function GstCalculator() {
                 </ul>
               ) : null}
             </div>
+          )}
+              {uiMode === "simple" && reverseTarget ? (
+                <section
+                  aria-label="Invoice amount for a net target"
+                  className="nexus-panel @container grid min-w-0 gap-5 p-6 md:p-8"
+                >
+                  <h2 className="font-mono text-[11px] tracking-[0.16em] text-[var(--pc-accent-text)]">
+                    To keep {formatMoney(moneyFromDecimalString("AUD", reverseTarget.target.toFixed(2), 2))} after GST
+                  </h2>
+                  {reverseTarget.ok ? (
+                    <>
+                      <div className="flex min-w-0 flex-col gap-2">
+                        <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-ink-3">
+                          Invoice this amount
+                        </span>
+                        <span
+                          role="status"
+                          aria-live="polite"
+                          data-money
+                          className="break-words font-mono text-[length:var(--pc-text-result-xl)] font-medium leading-none tracking-tight tabular-nums text-ink"
+                        >
+                          {formatMoney(reverseTarget.verified.inclusiveAmount)}
+                        </span>
+                      </div>
+                      <div className="grid gap-4 @sm:grid-cols-3">
+                        <ResultMetric label="Excluding GST" amount={reverseTarget.verified.exclusiveAmount} />
+                        <ResultMetric label="GST" amount={reverseTarget.verified.gstAmount} />
+                        <ResultMetric label="Including GST" amount={reverseTarget.verified.inclusiveAmount} />
+                      </div>
+                      <p className="text-[12px] leading-5 text-ink-2">
+                        Verified forward: running the GST engine on{" "}
+                        {formatMoney(reverseTarget.verified.inclusiveAmount)} at{" "}
+                        {formatRatePercent(reverseTarget.verified.rate)} leaves{" "}
+                        {formatMoney(reverseTarget.verified.exclusiveAmount)} excluding GST
+                        {reverseTarget.overshoot.isZero()
+                          ? ", exactly the net amount entered"
+                          : ` — ${formatMoney(moneyFromDecimalString("AUD", reverseTarget.overshoot.toFixed(2), 2))} above the net amount entered, because invoice amounts move in whole cents`}
+                        . The solver reached this in {reverseTarget.iterations}{" "}
+                        {reverseTarget.iterations === 1 ? "iteration" : "iterations"}
+                        {reverseTarget.discontinuity ? ", stopping at the cent boundary inside the bracket" : ""}.
+                      </p>
+                    </>
+                  ) : (
+                    <p role="status" className="border-l-2 border-warn pl-3 text-[13px] leading-5 text-ink-2">
+                      {reverseTarget.reason}
+                    </p>
+                  )}
+                </section>
+              ) : null}
+            </>
           )
         }
         explanation={
@@ -526,6 +689,19 @@ export function GstCalculator() {
               breakdown={
                 output.lines && output.lines.length > 0 ? (
                   <div className="grid min-w-0 gap-4">
+                  <div className="flex min-w-0 flex-wrap items-center justify-between gap-x-6 gap-y-3">
+                    <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-ink-3">
+                      {output.lines.length} {output.lines.length === 1 ? "line" : "lines"} ·{" "}
+                      {output.roundingLevel === "per_line" ? "rounded per line" : "rounded at the invoice total"}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={onDownloadInvoiceCsv}
+                      className="nexus-quiet-button no-print inline-flex min-h-11 items-center px-4 font-mono text-[10px] uppercase tracking-[0.14em] text-ink-2 hover:text-ink focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-focus"
+                    >
+                      Download invoice CSV
+                    </button>
+                  </div>
                   <div className="nexus-table max-w-full overflow-x-auto p-4 md:p-6">
                     <table className="w-full min-w-[560px] border-collapse text-left">
                       <caption className="sr-only">GST breakdown per invoice line</caption>

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { getRegistryEntry } from "@paymentcalcs/calculator-registry";
 import { ContractorCalculator } from "../../../../components/breadth/contractor-calculator";
+import { CalculatorStructuredData } from "../../../../components/structured-data";
 
 const entry = getRegistryEntry("AU-BIZ-006")!;
 
@@ -12,5 +13,10 @@ export const metadata: Metadata = {
 };
 
 export default function Page() {
-  return <ContractorCalculator />;
+  return (
+    <>
+      <CalculatorStructuredData id="AU-BIZ-006" />
+      <ContractorCalculator />
+    </>
+  );
 }

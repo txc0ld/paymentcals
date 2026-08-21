@@ -32,6 +32,13 @@ export function scaleMajor(value: string, numerator: number, denominator: number
   return plain(dec(value).times(numerator).div(denominator).toFixed(2));
 }
 
+/** Exact `a ÷ b` over major-unit decimal strings, at 2dp. Zero denominator → null. */
+export function divideMajor(a: string, b: string): string | null {
+  const denominator = dec(b);
+  if (denominator.isZero()) return null;
+  return plain(dec(a).div(denominator).toFixed(2));
+}
+
 /** `part ÷ whole` as a whole-percent display string. */
 export function sharePct(part: string, whole: string): string {
   const total = dec(whole);
