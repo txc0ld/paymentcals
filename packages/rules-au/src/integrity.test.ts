@@ -3,36 +3,29 @@ import { computePackHash, manifestKey, resolveRulePack } from "@paymentcalcs/rul
 import { allAuRulePacks, auIntegrityManifest, gstPack } from "./index";
 
 describe("pack governance invariants", () => {
-  /* Owner approved activation via chat on 2026-08-21 (PROGRESS.md D-016).
-   * The invariant is now: a pack may only be active with an approval record,
-   * and a pack whose rules carry null values may never be active. */
-  /* Note: an ACTIVE pack may still carry null sub-tables (e.g. foreign
-   * brackets not authored for a year); the engine fails closed on those
-   * specific paths. Packs that are null-only (the unauthored duty states)
-   * must never be active at all. */
-  const NEVER_ACTIVE = [
-    "au-stamp-duty-vic",
-    "au-stamp-duty-wa",
-    "au-stamp-duty-sa",
-    "au-stamp-duty-act",
-    "au-stamp-duty-nt",
-  ];
-
-  it("active packs carry an approval record; null-only packs stay in_review", () => {
+  /* Owner approved activation on 2026-08-21 (PROGRESS.md D-016, extended by
+   * the get-everything-working directive). The invariant: a pack may only be
+   * active with an approval record, and an active duty pack must carry at
+   * least one populated rule shape. Null SUB-tables inside otherwise-sourced
+   * packs are allowed — the engines fail closed on those specific paths
+   * (e.g. FY2026-27 foreign-resident brackets, unpublished by the ATO). */
+  it("active packs carry an approval record and at least one populated rule shape", () => {
     for (const pack of allAuRulePacks) {
       if (pack.status === "active") {
-        expect(pack.review.approvedBy).toBeTruthy();
-        expect(pack.review.approvedAt).toBeTruthy();
-        expect(NEVER_ACTIVE).not.toContain(pack.rulePackId);
+        expect(pack.review.approvedBy, pack.rulePackId).toBeTruthy();
+        expect(pack.review.approvedAt, pack.rulePackId).toBeTruthy();
+        if (pack.domain === "stamp-duty") {
+          const rules = pack.rules as { general: unknown; generalPercent?: unknown; generalFormula?: unknown };
+          expect(
+            rules.general !== null || rules.generalPercent != null || rules.generalFormula != null,
+            pack.rulePackId,
+          ).toBe(true);
+        }
       } else {
         expect(pack.status).toBe("in_review");
         expect(pack.review.approvedBy).toBeNull();
         expect(pack.verifiedAt).toBeNull();
       }
-    }
-    for (const id of NEVER_ACTIVE) {
-      const pack = allAuRulePacks.find((candidate) => candidate.rulePackId === id);
-      expect(pack?.status).toBe("in_review");
     }
   });
 
@@ -67,29 +60,36 @@ describe("fail-closed resolution", () => {
     }
   });
 
-  /* The VIC duty pack (null values, still in_review) is the fixture for the
-   * fail-closed path now that the sourced packs are owner-activated. */
+  /* Every shipped pack is now active, so a synthetic in_review pack (a clone
+   * of the GST pack with its status reverted) exercises the fail-closed path.
+   * Its hash is computed live so integrity passes and only status gates it. */
   const inReviewQuery = {
-    domain: "stamp-duty",
+    domain: "synthetic-review",
     jurisdiction: "AU",
-    subdivision: "VIC",
     valuationDate: "2026-08-20",
   } as const;
+  async function syntheticInReview() {
+    const pack = { ...gstPack, rulePackId: "au-synthetic-review", domain: "synthetic-review", status: "in_review" as const };
+    const manifest = { ...auIntegrityManifest, [manifestKey(pack)]: await computePackHash(pack) };
+    return { pack, manifest };
+  }
 
   it("refuses to run an in_review pack in production mode (PC-RULE-0002)", async () => {
-    const outcome = await resolveRulePack(allAuRulePacks, auIntegrityManifest, inReviewQuery);
+    const { pack, manifest } = await syntheticInReview();
+    const outcome = await resolveRulePack([...allAuRulePacks, pack], manifest, inReviewQuery);
     expect(outcome).toMatchObject({ ok: false, code: "PC-RULE-0002" });
   });
 
   it("runs an in_review pack only under allowDraftRules, flagged as draft", async () => {
-    const outcome = await resolveRulePack(allAuRulePacks, auIntegrityManifest, {
+    const { pack, manifest } = await syntheticInReview();
+    const outcome = await resolveRulePack([...allAuRulePacks, pack], manifest, {
       ...inReviewQuery,
       allowDraftRules: true,
     });
     expect(outcome.ok).toBe(true);
     if (outcome.ok) {
       expect(outcome.draft).toBe(true);
-      expect(outcome.pack.rulePackId).toBe("au-stamp-duty-vic");
+      expect(outcome.pack.rulePackId).toBe("au-synthetic-review");
     }
   });
 

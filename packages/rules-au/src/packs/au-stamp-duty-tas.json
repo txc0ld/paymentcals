@@ -35,47 +35,56 @@
           "over": "0",
           "upTo": "3000",
           "baseAmount": "50",
-          "ratePer100": "0"
+          "ratePer100": "0",
+          "appliesTo": "excess"
         },
         {
           "over": "3000",
           "upTo": "25000",
           "baseAmount": "50",
-          "ratePer100": "1.75"
+          "ratePer100": "1.75",
+          "appliesTo": "excess"
         },
         {
           "over": "25000",
           "upTo": "75000",
           "baseAmount": "435",
-          "ratePer100": "2.25"
+          "ratePer100": "2.25",
+          "appliesTo": "excess"
         },
         {
           "over": "75000",
           "upTo": "200000",
           "baseAmount": "1560",
-          "ratePer100": "3.50"
+          "ratePer100": "3.50",
+          "appliesTo": "excess"
         },
         {
           "over": "200000",
           "upTo": "375000",
           "baseAmount": "5935",
-          "ratePer100": "4.00"
+          "ratePer100": "4.00",
+          "appliesTo": "excess"
         },
         {
           "over": "375000",
           "upTo": "725000",
           "baseAmount": "12935",
-          "ratePer100": "4.25"
+          "ratePer100": "4.25",
+          "appliesTo": "excess"
         },
         {
           "over": "725000",
           "upTo": null,
           "baseAmount": "27810",
-          "ratePer100": "4.50"
+          "ratePer100": "4.50",
+          "appliesTo": "excess"
         }
       ],
       "per100Rounding": "part_thereof_up",
       "minimumDuty": "50"
-    }
+    },
+    "generalPercent": null,
+    "generalFormula": null
   }
 }

@@ -5,28 +5,72 @@
   "domain": "stamp-duty",
   "effectiveFrom": "2026-07-01",
   "effectiveTo": null,
-  "status": "in_review",
+  "status": "active",
   "schemaVersion": 1,
   "rulesVersion": "0.1.0",
   "sources": [
     {
-      "sourceId": "sro-vic-rates-unfetchable-2026-08-20",
+      "sourceId": "srovic-general-rates-2026-08-21",
       "authority": "State Revenue Office Victoria",
-      "title": "Land transfer duty current rates (fetch blocked)",
-      "url": "https://www.sro.vic.gov.au/land-transfer-duty-current-rates",
+      "title": "Land transfer duty — non-principal place of residence (general) current rates",
+      "url": "https://www.sro.vic.gov.au/about-us/rates-and-statistics/current-rates/land-transfer-duty-non-principal-place-residence-current-rates",
       "jurisdiction": "AU",
       "domain": "stamp-duty",
-      "retrievedAt": "2026-08-20T22:45:00+08:00",
-      "notes": "Automated fetch returned HTTP 403 (bot protection). Rules left null; the calculator renders VIC as not yet supported until a human transcribes the official table."
+      "retrievedAt": "2026-08-21T11:35:00+08:00",
+      "archivedSnapshotRef": "compliance-archive/sources/state-revenue/vic-land-transfer-duty-non-ppr-current-rates.2026-08-21.html",
+      "contentHash": "1e601915f3477fa5b57d4269d3b7b0a7a35611ca36a638603610ed4e827d0cab",
+      "notes": "General rates for contracts on or after 1 July 2021 (page updated 10 July 2026). Percentage-of-value table, NOT per-$100: the $960,000–$2,000,000 band is a flat 5.5% of the WHOLE dutiable value (slab). The PPR concessional table is archived separately and NOT modelled at P0. No cent-rounding convention stated on the page; half-up cent rounding applied and queued for verification. Marginal-row continuity and the $2M slab/base equality verified exactly."
     }
   ],
   "review": {
     "preparedBy": "claude-build-agent",
-    "approvedBy": null,
-    "approvedAt": null
+    "approvedBy": "owner (goal directive: get everything working, 2026-08-21)",
+    "approvedAt": "2026-08-21T07:00:00Z"
   },
   "verifiedAt": null,
   "rules": {
-    "general": null
+    "general": null,
+    "generalPercent": {
+      "brackets": [
+        {
+          "over": "0",
+          "upTo": "25000",
+          "baseAmount": "0",
+          "percent": "0.014",
+          "appliesTo": "excess"
+        },
+        {
+          "over": "25000",
+          "upTo": "130000",
+          "baseAmount": "350",
+          "percent": "0.024",
+          "appliesTo": "excess"
+        },
+        {
+          "over": "130000",
+          "upTo": "960000",
+          "baseAmount": "2870",
+          "percent": "0.06",
+          "appliesTo": "excess"
+        },
+        {
+          "over": "960000",
+          "upTo": "2000000",
+          "baseAmount": "0",
+          "percent": "0.055",
+          "appliesTo": "total"
+        },
+        {
+          "over": "2000000",
+          "upTo": null,
+          "baseAmount": "110000",
+          "percent": "0.065",
+          "appliesTo": "excess"
+        }
+      ],
+      "rounding": "half_up_cents",
+      "minimumDuty": null
+    },
+    "generalFormula": null
   }
 }

@@ -61,9 +61,15 @@ test.describe("breadth routes", () => {
     await page.getByLabel("Dutiable value (usually the price)").fill("850000");
     await expect(page.getByRole("status").filter({ hasText: "$31,275.00" })).toBeVisible();
 
+    // VIC computes on the percentage table: $650,000 → $2,870 + 6% × $520,000.
     await page.getByLabel("State or territory").selectOption("VIC");
-    await expect(page.getByText("VIC not yet supported").first()).toBeVisible();
-    await expect(page.getByText(/never substitutes another state/)).toBeVisible();
+    await page.getByLabel("Dutiable value (usually the price)").fill("650000");
+    await expect(page.getByRole("status").filter({ hasText: "$34,070.00" })).toBeVisible();
+
+    // NT computes on the statutory quadratic: $500,000 → $23,928.60.
+    await page.getByLabel("State or territory").selectOption("NT");
+    await page.getByLabel("Dutiable value (usually the price)").fill("500000");
+    await expect(page.getByRole("status").filter({ hasText: "$23,928.60" })).toBeVisible();
   });
 
   test("buying costs adds duty to entered costs", async ({ page }) => {

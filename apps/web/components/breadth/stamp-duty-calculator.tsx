@@ -155,7 +155,21 @@ export function StampDutyCalculator({ variant }: { variant: "duty" | "buying_cos
                 )}
                 qualifier={
                   variant === "duty"
-                    ? `Bracket over ${formatMajor(duty.bracketOver)}: ${formatMajor(duty.bracketBase.toFixed(2))} plus ${duty.ratePer100.toFixed(2)} per $100 or part thereof.${duty.minimumApplied ? " The statutory minimum applied." : ""}`
+                    ? `${
+                        duty.method === "per100" && duty.bracketOver !== null && duty.bracketBase && duty.ratePer100
+                          ? duty.appliedToTotal
+                            ? `Flat ${duty.ratePer100.toFixed(2)} per $100 or part thereof of the whole value.`
+                            : `Bracket over ${formatMajor(duty.bracketOver)}: ${formatMajor(duty.bracketBase.toFixed(2))} plus ${duty.ratePer100.toFixed(2)} per $100 or part thereof.`
+                          : duty.method === "percent" && duty.percent
+                            ? duty.appliedToTotal
+                              ? `Flat ${duty.percent.times(100).toFixed(2)}% of the whole dutiable value.`
+                              : `Band over ${formatMajor(duty.bracketOver ?? "0")}: ${formatMajor((duty.bracketBase ?? duty.duty).toFixed(2))} plus ${duty.percent.times(100).toFixed(2)}% of the excess.`
+                            : duty.formulaText
+                              ? `Statutory formula: ${duty.formulaText}.`
+                              : duty.percent
+                                ? `Statutory slab: ${duty.percent.times(100).toFixed(2)}% of the whole dutiable value.`
+                                : ""
+                      }${duty.minimumApplied ? " The statutory minimum applied." : ""}`
                     : `Includes ${formatMajor(duty.duty.toFixed(2))} estimated ${state} transfer duty at general rates plus the costs you entered.`
                 }
               />
@@ -165,41 +179,58 @@ export function StampDutyCalculator({ variant }: { variant: "duty" | "buying_cos
                   <ResultMetric label="Your entered costs" amount={moneyFromDecimalString("AUD", extras.toFixed(2), 2)} />
                 </div>
               ) : null}
-              {/* The bracket actually applied, read straight from the resolved
+              {/* The rate actually applied, read straight from the resolved
                 * duty pack — never a rate held in this component. */}
               <div className="grid min-w-0 gap-4 border-t border-hairline pt-6">
                 <h3 className="font-mono text-[10px] uppercase tracking-[0.18em] text-[var(--pc-accent-text)]">
-                  Bracket applied from the {state} duty rules
+                  Applied from the {state} duty rules
                 </h3>
-                <div className="overflow-x-auto">
-                  <table className="nexus-table w-full min-w-[360px] border-collapse text-left">
-                    <caption className="sr-only">The general transfer duty bracket applied to this value</caption>
-                    <thead>
-                      <tr className="border-b border-hairline font-mono text-[10px] uppercase tracking-[0.14em] text-ink-3">
-                        <th scope="col" className="py-2 pe-4 font-normal">Value over</th>
-                        <th scope="col" className="py-2 pe-4 text-right font-normal">Base duty</th>
-                        <th scope="col" className="py-2 text-right font-normal">Per $100</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr>
-                        <td className="py-2 pe-4 font-mono text-[13px] tabular-nums text-ink">
-                          {formatMajor(duty.bracketOver)}
-                        </td>
-                        <td className="py-2 pe-4 text-right font-mono text-[13px] tabular-nums text-ink">
-                          {formatMajor(duty.bracketBase.toFixed(2))}
-                        </td>
-                        <td className="py-2 text-right font-mono text-[13px] tabular-nums text-ink">
-                          {formatMajor(duty.ratePer100.toFixed(2))}
-                        </td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
+                {duty.method !== "formula" && duty.bracketOver !== null ? (
+                  <div className="overflow-x-auto">
+                    <table className="nexus-table w-full border-collapse text-left">
+                      <caption className="sr-only">The general transfer duty band applied to this value</caption>
+                      <thead>
+                        <tr className="border-b border-hairline font-mono text-[10px] uppercase tracking-[0.14em] text-ink-3">
+                          <th scope="col" className="py-2 pe-4 font-normal">
+                            {duty.appliedToTotal ? "Whole value" : "Value over"}
+                          </th>
+                          <th scope="col" className="py-2 pe-4 text-right font-normal">Base duty</th>
+                          <th scope="col" className="py-2 text-right font-normal">
+                            {duty.method === "per100" ? "Per $100" : "Percent"}
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr>
+                          <td className="py-2 pe-4 font-mono text-[13px] tabular-nums text-ink">
+                            {duty.appliedToTotal ? "—" : formatMajor(duty.bracketOver)}
+                          </td>
+                          <td className="py-2 pe-4 text-right font-mono text-[13px] tabular-nums text-ink">
+                            {formatMajor((duty.bracketBase ?? new Dec(0)).toFixed(2))}
+                          </td>
+                          <td className="py-2 text-right font-mono text-[13px] tabular-nums text-ink">
+                            {duty.method === "per100" && duty.ratePer100
+                              ? formatMajor(duty.ratePer100.toFixed(2))
+                              : duty.percent
+                                ? `${duty.percent.times(100).toFixed(2)}%`
+                                : "—"}
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                ) : null}
                 <p className="text-[12px] leading-5 text-ink-3">
-                  {duty.hundredsCounted.toFixed(0)} whole or part hundreds counted above the bracket
-                  threshold.
-                  {duty.minimumApplied ? " The statutory minimum duty applied instead of the bracket calculation." : ""}
+                  {duty.method === "per100" && duty.hundredsCounted
+                    ? `${duty.hundredsCounted.toFixed(0)} whole or part hundreds counted ${duty.appliedToTotal ? "across the whole value" : "above the band threshold"}.`
+                    : duty.method === "percent"
+                      ? duty.appliedToTotal
+                        ? "This band applies its percentage to the whole dutiable value, not just the excess."
+                        : "The percentage applies to the value above the band threshold, exact to the cent."
+                      : duty.formulaText
+                        ? `${duty.formulaText}; the result is floored to the nearest 5 cents, matching the Territory Revenue Office calculator.`
+                        : "Statutory percentage of the whole dutiable value, floored to the nearest 5 cents."}
+                  {duty.minimumApplied ? " The statutory minimum duty applied instead." : ""}
                 </p>
               </div>
             </div>

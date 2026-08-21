@@ -279,8 +279,10 @@ export function IncomeTaxExplorer() {
             <EmptyState>No result can be shown while the required rule packs are unavailable.</EmptyState>
           ) : rows === null || !brackets ? (
             <EmptyState>
-              The statutory brackets for this residency and year have not been authored from an
-              official source yet, so nothing is shown rather than a guess.
+              The ATO has not yet published the statutory brackets for this residency and year
+              (forward-year tables for non-residents typically arrive later), so nothing is shown
+              rather than a guess. The latest published year for this residency is available in the
+              year selector.
             </EmptyState>
           ) : (
             <div className="grid gap-6">

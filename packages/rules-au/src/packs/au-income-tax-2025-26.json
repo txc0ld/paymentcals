@@ -42,6 +42,18 @@
       "archivedSnapshotRef": "compliance-archive/sources/ato/lito.2026-08-20.html",
       "contentHash": "6b57242f38597c7b7504844148b1d64fd6313215cbb2aee2ae3b06e1c495c1bb",
       "notes": "Page states current values without a financial-year label; per-FY applicability requires human verification."
+    },
+    {
+      "sourceId": "ato-whm-rates-2025–26-2026-08-21",
+      "authority": "Australian Taxation Office",
+      "title": "Tax rates – working holiday maker (2025–26 table)",
+      "url": "https://www.ato.gov.au/tax-rates-and-codes/tax-rates-working-holiday-makers",
+      "jurisdiction": "AU",
+      "domain": "income-tax",
+      "retrievedAt": "2026-08-21T12:10:00+08:00",
+      "archivedSnapshotRef": "compliance-archive/sources/ato/whm-rates.2026-08-21.html",
+      "contentHash": "ac9dccb5708afde224568b00e3218ed3da6c6369785aa2fbc7e14b39d9ae4aa8",
+      "notes": "Working holiday maker tax rates 2025–26, machine-parsed; the page's cumulative bases reproduce exactly from the bracket rates."
     }
   ],
   "review": {
@@ -95,7 +107,28 @@
         "rate": "0.45"
       }
     ],
-    "workingHolidayMaker": null,
+    "workingHolidayMaker": [
+      {
+        "over": "0",
+        "upTo": "45000",
+        "rate": "0.15"
+      },
+      {
+        "over": "45000",
+        "upTo": "135000",
+        "rate": "0.30"
+      },
+      {
+        "over": "135000",
+        "upTo": "190000",
+        "rate": "0.37"
+      },
+      {
+        "over": "190000",
+        "upTo": null,
+        "rate": "0.45"
+      }
+    ],
     "lito": {
       "maxOffset": "700",
       "fullUpTo": "37500",

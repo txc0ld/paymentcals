@@ -54,6 +54,30 @@
       "retrievedAt": "2026-08-20T21:30:00+08:00",
       "archivedSnapshotRef": "compliance-archive/sources/ato/resident-rates.2026-08-20.html",
       "contentHash": "43f19b929706165331a9956f14710e06fb680dce2b94d3983a601687b6507841"
+    },
+    {
+      "sourceId": "ato-mytax2025-medicare-2026-08-21",
+      "authority": "Australian Taxation Office",
+      "title": "myTax 2025 — Medicare levy reduction or exemption (2024-25 thresholds)",
+      "url": "https://www.ato.gov.au/individuals-and-families/your-tax-return/instructions-to-complete-your-tax-return/mytax-instructions/2025/medicare-and-private-health-insurance/medicare-levy-reduction-or-exemption",
+      "jurisdiction": "AU",
+      "domain": "medicare",
+      "retrievedAt": "2026-08-21T12:15:00+08:00",
+      "archivedSnapshotRef": "compliance-archive/sources/ato/medicare-mytax-2025.2026-08-21.html",
+      "contentHash": "136bce1b07c8761b276bc8f3868f77ebae5fb41ad32e5aa5c8dc88cbfec53f8f",
+      "notes": "Table 2 single thresholds for 2024-25; family upper limits corroborated by the same page's Worksheet 2."
+    },
+    {
+      "sourceId": "ato-family-2024-25-wayback-2026-08-21",
+      "authority": "Australian Taxation Office (via web.archive.org capture 2025-09-19)",
+      "title": "Medicare levy reduction — family income (2024-25)",
+      "url": "https://web.archive.org/web/20250919061603id_/https://www.ato.gov.au/individuals-and-families/medicare-and-private-health-insurance/medicare-levy/medicare-levy-reduction/medicare-levy-reduction-family-income",
+      "jurisdiction": "AU",
+      "domain": "medicare",
+      "retrievedAt": "2026-08-21T12:15:00+08:00",
+      "archivedSnapshotRef": "compliance-archive/sources/ato/medicare-family-2024-25.wayback-20250919.2026-08-21.html",
+      "contentHash": "3af07811e25f659fb49a0858b1e512e81b264f7a4955b2e76b0ca0256ac82c9f",
+      "notes": "Wayback capture of the official ATO family page ('Last updated 12 June 2025', states 2024-25). Figures corroborated by the live myTax 2025 worksheet and the floor(lower ÷ 0.8) phase-in identity."
     }
   ],
   "review": {
@@ -64,8 +88,21 @@
   "verifiedAt": null,
   "rules": {
     "levyRate": "0.02",
-    "lowIncomeSingle": null,
-    "lowIncomeFamily": null,
+    "lowIncomeSingle": {
+      "lower": "27222",
+      "upper": "34027",
+      "phaseInRate": "0.10",
+      "saptoLower": "43020",
+      "saptoUpper": "53775"
+    },
+    "lowIncomeFamily": {
+      "lower": "45907",
+      "upper": "57383",
+      "saptoLower": "59886",
+      "saptoUpper": "74857",
+      "perDependentChildLowerIncrease": "4216",
+      "perDependentChildUpperIncrease": "5270"
+    },
     "mls": {
       "tiers": [
         {

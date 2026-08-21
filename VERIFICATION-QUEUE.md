@@ -98,3 +98,17 @@ Pack: `au-cpi-quarterly` (activated on owner directive 2026-08-21; series GCPIAG
 
 - [ ] Spot-check three quarters against the RBA/ABS published table (suggest first, 2021-12-31 and last)
 - [ ] Confirm the pack refresh cadence note (quarterly, after each ABS CPI release) and re-run the authoring script on refresh
+
+## Update 2026-08-21 (D-019): remaining jurisdictions authored and activated
+
+VIC/WA/SA/ACT/NT duty are now authored from archived official sources (SRO Victoria general
+non-PPR rates; RevenueWA transfer duty page; RevenueSA rate-of-stamp-duty incl. its own two
+worked examples reproduced in tests; ACT Revenue Table 2 cross-checked against determination
+DI2026-155 PDF; NT Stamp Duty Act 1978 Sch 1 + official calculator JS for rounding). All
+snapshots + sha256 hashes in compliance-archive/sources/state-revenue/. Owner spot-checks:
+
+- [ ] VIC: confirm general (non-PPR) is the intended table for this calculator and the cent-rounding convention (page states none)
+- [ ] ACT: confirm using Table 2 (non-owner-occupier) as the general rate; the owner-occupier concession is not modelled
+- [ ] NT: confirm floor-to-5-cents rounding and the unmodelled $5 joint-tenant addition
+- [ ] WHM 2024-25/2025-26 brackets and Medicare 2024-25 thresholds (one source is an archived Wayback capture of the official ATO family page, corroborated by the live myTax worksheet)
+- NOT PUBLISHED by the ATO as of 2026-08-21 (stays fail-closed, evidence in the archived pages): foreign-resident brackets FY2026-27; Medicare low-income thresholds FY2026-27
