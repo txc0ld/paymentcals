@@ -75,6 +75,8 @@ export interface PayFormState {
   spouseIncomeRaw: string;
   payCycle: "weekly" | "fortnightly" | "monthly" | "quarterly";
   additionalWithholdingRaw: string;
+  /** Annual gross to compare against, same settings. Empty = no comparison. */
+  compareRaw: string;
 }
 
 const DEFAULT_STATE: PayFormState = {
@@ -102,6 +104,7 @@ const DEFAULT_STATE: PayFormState = {
   spouseIncomeRaw: "",
   payCycle: "fortnightly",
   additionalWithholdingRaw: "",
+  compareRaw: "",
 };
 
 const LIMITATIONS = [
@@ -235,14 +238,14 @@ const CYCLE_LABEL: Record<PayFormState["payCycle"], string> = {
   quarterly: "per quarter",
 };
 
-/** Display-only period for annualised figures. `annual` is the neutral default. */
-const DISPLAY_PERIODS = {
-  annual: { label: "per year", divisor: 1 },
-  monthly: { label: "per month", divisor: 12 },
-  fortnightly: { label: "per fortnight", divisor: 26 },
-  weekly: { label: "per week", divisor: 52 },
-} as const;
-type DisplayPeriod = keyof typeof DISPLAY_PERIODS;
+/** Columns of the pay-cycle grid: display divisions of annualised figures.
+ * Withholding is never shown this way — it stays schedule-true per cycle. */
+const GRID_COLUMNS = [
+  { label: "Weekly", divisor: 52 },
+  { label: "Fortnightly", divisor: 26 },
+  { label: "Monthly", divisor: 12 },
+  { label: "Annually", divisor: 1 },
+] as const;
 
 /** Annual Money → the selected display period. Decimal only, never floats. */
 function perPeriod(annual: Money, divisor: number): Money {
@@ -292,13 +295,61 @@ function StatCell({ label, value, detail }: { label: string; value: string; deta
   );
 }
 
+/** Where the gross cash goes: proportional bar + text legend. The legend
+ * carries the exact figures, so colour is never the only cue. */
+function NetSplitBar({ output }: { output: AuPayOutput }) {
+  const net = moneyToDecimal(output.netAnnualCash) as DecimalValue;
+  const incomeTax = (moneyToDecimal(output.liability.grossIncomeTax) as DecimalValue).minus(
+    moneyToDecimal(output.liability.litoOffset) as DecimalValue,
+  );
+  const medicare = (moneyToDecimal(output.liability.medicareLevy) as DecimalValue).plus(
+    moneyToDecimal(output.liability.medicareLevySurcharge) as DecimalValue,
+  );
+  const study = moneyToDecimal(output.liability.studyLoanRepayment) as DecimalValue;
+  const segments = [
+    { label: "Net cash", value: net, className: "bg-accent" },
+    { label: "Income tax", value: incomeTax, className: "bg-ink/70" },
+    { label: "Medicare", value: medicare, className: "bg-ink/40" },
+    { label: "Study loan", value: study, className: "bg-ink/20" },
+  ].filter((segment) => segment.value.greaterThan(0));
+  const total = segments.reduce((sum, segment) => sum.plus(segment.value), new Dec(0));
+  if (total.lessThanOrEqualTo(0)) return null;
+  return (
+    <div className="grid gap-3 border-t border-hairline pt-6">
+      <span className="font-mono text-[10px] uppercase tracking-[0.16em] text-ink-3">
+        Where the gross cash goes
+      </span>
+      <div aria-hidden="true" className="flex h-3 w-full overflow-hidden border border-hairline">
+        {segments.map((segment) => (
+          <div
+            key={segment.label}
+            className={segment.className}
+            style={{ width: `${segment.value.div(total).times(100).toFixed(2)}%` }}
+          />
+        ))}
+      </div>
+      <dl className="flex flex-wrap gap-x-6 gap-y-2">
+        {segments.map((segment) => (
+          <div key={segment.label} className="flex items-baseline gap-2">
+            <span aria-hidden="true" className={`h-2 w-2 self-center ${segment.className}`} />
+            <dt className="font-mono text-[10px] uppercase tracking-[0.14em] text-ink-3">{segment.label}</dt>
+            <dd className="font-mono text-[12px] tabular-nums text-ink-2">
+              {segment.value.div(total).times(100).toFixed(1)}%
+            </dd>
+          </div>
+        ))}
+      </dl>
+    </div>
+  );
+}
+
 export function PayCalculator({ variant }: { variant: PayVariant }) {
   const entry = getRegistryEntry(variant.calculatorId)!;
   const [state, setState] = useState<PayFormState>({ ...DEFAULT_STATE, ...variant.defaults });
   const [uiMode, setUiMode] = useState<"simple" | "advanced">("simple");
-  const [displayPeriod, setDisplayPeriod] = useState<DisplayPeriod>("annual");
   const [resolution, setResolution] = useState<PayResolutionOutcome | "pending">("pending");
   const [result, setResult] = useState<CalculationResultV1<AuPayOutput> | null>(null);
+  const [compareResult, setCompareResult] = useState<CalculationResultV1<AuPayOutput> | null>(null);
   const [savedFlash, setSavedFlash] = useState<string | null>(null);
   const [hydrated, setHydrated] = useState(false);
   const hydratedOnce = useRef(false);
@@ -344,6 +395,10 @@ export function PayCalculator({ variant }: { variant: PayVariant }) {
   }, [entry.id]);
 
   const { input, errors } = useMemo(() => buildInput(state), [state]);
+  const compareInput = useMemo(() => {
+    if (!state.compareRaw.trim()) return null;
+    return buildInput({ ...state, amountRaw: state.compareRaw, frequency: "annually" }).input;
+  }, [state]);
 
   useEffect(() => {
     if (resolution === "pending" || !resolution.ok || !input) {
@@ -352,21 +407,27 @@ export function PayCalculator({ variant }: { variant: PayVariant }) {
     }
     let cancelled = false;
     const started = performance.now();
-    calculateAuPay(
-      {
-        requestId: "web-live",
-        calculatorId: entry.id,
-        calculatorSchemaVersion: entry.inputSchemaVersion,
-        jurisdiction: { country: "AU" },
-        locale: "en-AU",
-        currency: "AUD",
-        valuationDate: `${state.financialYear.slice(0, 4)}-10-01`,
-        input,
-        options: { traceLevel: "full" },
-      },
-      resolution.resolution,
-      { now: new Date().toISOString() },
-    ).then((calculated) => {
+    const request = (calcInput: AuPayInput) => ({
+      requestId: "web-live",
+      calculatorId: entry.id,
+      calculatorSchemaVersion: entry.inputSchemaVersion,
+      jurisdiction: { country: "AU" as const },
+      locale: "en-AU",
+      currency: "AUD",
+      valuationDate: `${state.financialYear.slice(0, 4)}-10-01`,
+      input: calcInput,
+      options: { traceLevel: "full" as const },
+    });
+    if (compareInput) {
+      calculateAuPay(request(compareInput), resolution.resolution, { now: new Date().toISOString() }).then(
+        (calculated) => {
+          if (!cancelled) setCompareResult(calculated);
+        },
+      );
+    } else {
+      setCompareResult(null);
+    }
+    calculateAuPay(request(input), resolution.resolution, { now: new Date().toISOString() }).then((calculated) => {
       if (cancelled) return;
       setResult(calculated);
       const succeeded = calculated.status === "success" || calculated.status === "success_with_warnings";
@@ -382,7 +443,7 @@ export function PayCalculator({ variant }: { variant: PayVariant }) {
     return () => {
       cancelled = true;
     };
-  }, [resolution, input, uiMode, entry.id, entry.inputSchemaVersion, state.financialYear]);
+  }, [resolution, input, compareInput, uiMode, entry.id, entry.inputSchemaVersion, state.financialYear]);
 
   useEffect(() => {
     if (!hydrated) return;
@@ -432,10 +493,11 @@ export function PayCalculator({ variant }: { variant: PayVariant }) {
 
   const draft = resolution !== "pending" && resolution.ok && resolution.draft;
   const output = result?.output;
+  const compareOutput =
+    compareResult && (compareResult.status === "success" || compareResult.status === "success_with_warnings")
+      ? compareResult.output
+      : undefined;
   const showHours = state.frequency === "hourly" || variant.simpleShowsHours === true;
-  const period = DISPLAY_PERIODS[displayPeriod];
-  const isAnnual = period.divisor === 1;
-  const shown = (annual: Money) => perPeriod(annual, period.divisor);
   const bracket =
     output && resolution !== "pending" && resolution.ok
       ? activeBracket(
@@ -445,6 +507,30 @@ export function PayCalculator({ variant }: { variant: PayVariant }) {
           output.liability.marginalBracketRate,
         )
       : null;
+  /* Full ladder from the pack; a row is marked active only when it both
+   * contains the taxable income AND its rate matches the engine's marginal
+   * rate — a display-side lookup can never contradict the calculation. */
+  const bracketLadder = (() => {
+    if (!output || resolution === "pending" || !resolution.ok) return null;
+    const rules = resolution.resolution.incomeTax.pack.rules;
+    const brackets =
+      state.residency === "resident"
+        ? rules.resident
+        : state.residency === "foreign_resident"
+          ? rules.foreignResident
+          : rules.workingHolidayMaker;
+    if (!brackets || brackets.length === 0) return null;
+    const taxable = moneyToDecimal(output.liability.taxableIncome) as DecimalValue;
+    return brackets.map((row) => ({
+      over: row.over,
+      upTo: row.upTo,
+      rate: row.rate,
+      active:
+        row.rate === output.liability.marginalBracketRate &&
+        taxable.greaterThanOrEqualTo(new Dec(row.over)) &&
+        (row.upTo === null || taxable.lessThanOrEqualTo(new Dec(row.upTo))),
+    }));
+  })();
 
   return (
     <>
@@ -742,24 +828,6 @@ export function PayCalculator({ variant }: { variant: PayVariant }) {
             </EmptyState>
           ) : (
             <div className="grid gap-6">
-              <div className="no-print flex min-w-0 flex-wrap items-center justify-between gap-4">
-                <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-ink-3">
-                  Annualised amounts shown
-                </span>
-                <SegmentedControl
-                  label="Amounts shown per"
-                  size="sm"
-                  value={displayPeriod}
-                  onChange={setDisplayPeriod}
-                  options={[
-                    { value: "weekly", label: "Weekly" },
-                    { value: "fortnightly", label: "Fortnightly" },
-                    { value: "monthly", label: "Monthly" },
-                    { value: "annual", label: "Annual" },
-                  ]}
-                />
-              </div>
-
               <div className="nexus-result grid gap-6 p-6 md:p-8">
                 <PrimaryResult
                   label={
@@ -771,17 +839,17 @@ export function PayCalculator({ variant }: { variant: PayVariant }) {
                   qualifier={`Annual estimate under FY ${state.financialYear} rules. Marginal bracket ${formatRatePercent(output.liability.marginalBracketRate)}; the next $1,000 of gross is worth ${formatMoney(output.netValueOfNextThousand)} after obligations.`}
                 />
                 <div className="grid auto-rows-fr gap-4 border-t border-hairline pt-6 sm:grid-cols-3">
-                  <ResultMetric label={`Net ${period.label}`} amount={shown(output.netAnnualCash)} />
+                  <ResultMetric label="Net per year" amount={output.netAnnualCash} />
+                  <ResultMetric label="Base salary" amount={output.annualised.baseSalary} />
                   <ResultMetric
-                    label={isAnnual ? "Base salary" : `Base salary ${period.label}`}
-                    amount={shown(output.annualised.baseSalary)}
-                  />
-                  <ResultMetric
-                    label={isAnnual ? "Employer super" : `Employer super ${period.label}`}
-                    amount={shown(output.annualised.employerSuper)}
+                    label="Employer super"
+                    amount={output.annualised.employerSuper}
                     detail="Paid to your fund, not cash"
                   />
                 </div>
+
+                {/* Where each gross dollar goes: visual + text legend (non-colour cues). */}
+                <NetSplitBar output={output} />
                 <div className="grid auto-rows-fr gap-4 sm:grid-cols-2">
                   <StatCell
                     label="Effective rate on taxable income"
@@ -805,21 +873,25 @@ export function PayCalculator({ variant }: { variant: PayVariant }) {
               <section aria-label="Annual tax position" className="nexus-panel-soft grid gap-4 p-6 md:p-8">
                 <div className="flex min-w-0 flex-wrap items-baseline justify-between gap-x-6 gap-y-2">
                   <h2 className="font-mono text-[11px] tracking-[0.16em] text-ink-2">
-                    {isAnnual ? "Annual tax position (estimate)" : "Tax position (estimate)"}
+                    Annual tax position (estimate)
                   </h2>
                   <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-[var(--pc-accent-text)]">
-                    Shown {period.label}
+                    All pay cycles
                   </span>
                 </div>
                 <div className="overflow-x-auto">
-                  <table className="w-full min-w-[320px] border-collapse text-left">
+                  <table className="w-full min-w-[560px] border-collapse text-left">
                     <caption className="sr-only">
-                      Gross package through to net cash under the resolved rule packs
+                      Gross package through to net cash at each pay cycle, under the resolved rule packs
                     </caption>
                     <thead>
                       <tr className="border-b border-hairline font-mono text-[10px] uppercase tracking-[0.14em] text-ink-3">
                         <th scope="col" className="py-2 pe-4 font-normal">Line</th>
-                        <th scope="col" className="py-2 text-right font-normal">Amount {period.label}</th>
+                        {GRID_COLUMNS.map((column) => (
+                          <th key={column.label} scope="col" className="py-2 ps-4 text-right font-normal">
+                            {column.label}
+                          </th>
+                        ))}
                       </tr>
                     </thead>
                     <tbody>
@@ -834,11 +906,7 @@ export function PayCalculator({ variant }: { variant: PayVariant }) {
                           ["Medicare levy", output.liability.medicareLevy, false],
                           ["Medicare levy surcharge", output.liability.medicareLevySurcharge, false],
                           ["Study loan repayment", output.liability.studyLoanRepayment, false],
-                          [
-                            isAnnual ? "Total annual liability" : "Total liability",
-                            output.liability.totalAnnualLiability,
-                            true,
-                          ],
+                          ["Total annual liability", output.liability.totalAnnualLiability, true],
                           ["Net cash", output.netAnnualCash, true],
                         ] as const
                       ).map(([label, amount, emphasis]) => (
@@ -853,22 +921,131 @@ export function PayCalculator({ variant }: { variant: PayVariant }) {
                           <th scope="row" className="py-2 pe-4 text-[13px] font-normal text-ink-2">
                             {label}
                           </th>
-                          <td
-                            className={`py-2 text-right font-mono text-[14px] tabular-nums ${
-                              emphasis ? "text-ink" : "text-ink-2"
-                            }`}
-                          >
-                            {formatMoney(shown(amount))}
-                          </td>
+                          {GRID_COLUMNS.map((column) => (
+                            <td
+                              key={column.label}
+                              className={`py-2 ps-4 text-right font-mono text-[13px] tabular-nums ${
+                                emphasis ? "text-ink" : "text-ink-2"
+                              } ${column.divisor === 1 && emphasis ? "text-[var(--pc-accent-text)]" : ""}`}
+                            >
+                              {formatMoney(perPeriod(amount, column.divisor))}
+                            </td>
+                          ))}
                         </tr>
                       ))}
                     </tbody>
                   </table>
                 </div>
                 <p className="text-[12px] leading-5 text-ink-3">
-                  The headline figure and the withholding below come straight from the engine&rsquo;s
-                  pay-cycle outputs and are never rescaled by this control.
+                  Weekly, fortnightly and monthly columns are display divisions of the annual
+                  position. The headline figure and the withholding below come straight from the
+                  engine&rsquo;s pay-cycle outputs and are never derived this way.
                 </p>
+              </section>
+
+              {bracketLadder ? (
+                <section aria-label="Tax brackets" className="nexus-panel-soft grid gap-4 p-6 md:p-8">
+                  <div className="flex min-w-0 flex-wrap items-baseline justify-between gap-x-6 gap-y-2">
+                    <h2 className="font-mono text-[11px] tracking-[0.16em] text-ink-2">
+                      FY {state.financialYear} bracket ladder
+                    </h2>
+                    <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-ink-3">
+                      From the resolved rule pack
+                    </span>
+                  </div>
+                  <div className="overflow-x-auto">
+                    <table className="w-full min-w-[420px] border-collapse text-left">
+                      <caption className="sr-only">
+                        Statutory income tax brackets for the selected residency; your bracket is marked
+                      </caption>
+                      <thead>
+                        <tr className="border-b border-hairline font-mono text-[10px] uppercase tracking-[0.14em] text-ink-3">
+                          <th scope="col" className="py-2 pe-4 font-normal">Taxable income</th>
+                          <th scope="col" className="py-2 ps-4 text-right font-normal">Marginal rate</th>
+                          <th scope="col" className="py-2 ps-4 text-right font-normal">Position</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {bracketLadder.map((row) => (
+                          <tr
+                            key={row.over}
+                            aria-current={row.active ? "true" : undefined}
+                            className={row.active ? "border-b-2 border-[var(--pc-accent)]" : "border-b border-hairline"}
+                          >
+                            <td className="py-2 pe-4 font-mono text-[13px] tabular-nums text-ink-2">
+                              {row.upTo === null
+                                ? `Above ${formatBound(row.over)}`
+                                : `${formatBound(row.over)} – ${formatBound(row.upTo)}`}
+                            </td>
+                            <td className="py-2 ps-4 text-right font-mono text-[13px] tabular-nums text-ink-2">
+                              {formatRatePercent(row.rate)}
+                            </td>
+                            <td className="py-2 ps-4 text-right font-mono text-[10px] uppercase tracking-[0.14em]">
+                              {row.active ? (
+                                <span className="text-[var(--pc-accent-text)]">Your bracket</span>
+                              ) : (
+                                <span className="text-ink-3">—</span>
+                              )}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </section>
+              ) : null}
+
+              <section aria-label="Compare another salary" className="nexus-panel-soft grid gap-4 p-6 md:p-8">
+                <h2 className="font-mono text-[11px] tracking-[0.16em] text-ink-2">
+                  Compare another salary
+                </h2>
+                <div className="grid items-start gap-4 sm:grid-cols-2">
+                  <MoneyField
+                    id="pay-compare"
+                    label="Annual gross to compare"
+                    description="Same settings, different salary — a pay-rise check."
+                    value={state.compareRaw}
+                    onChange={(compareRaw) => patch({ compareRaw })}
+                  />
+                  {compareOutput ? (
+                    <dl className="grid content-start gap-2 border-l border-hairline ps-4">
+                      {(
+                        [
+                          ["Net per year", output.netAnnualCash, compareOutput.netAnnualCash],
+                          [
+                            "Total tax per year",
+                            output.liability.totalAnnualLiability,
+                            compareOutput.liability.totalAnnualLiability,
+                          ],
+                        ] as const
+                      ).map(([label, current, compared]) => {
+                        const delta = (moneyToDecimal(compared) as DecimalValue).minus(
+                          moneyToDecimal(current) as DecimalValue,
+                        );
+                        const word = delta.isZero() ? "no change" : delta.greaterThan(0) ? "more" : "less";
+                        return (
+                          <div key={label} className="flex min-w-0 flex-wrap items-baseline justify-between gap-x-4">
+                            <dt className="font-mono text-[10px] uppercase tracking-[0.14em] text-ink-3">{label}</dt>
+                            <dd className="font-mono text-[13px] tabular-nums text-ink">
+                              {formatMoney(compared)}{" "}
+                              <span className="text-ink-3">
+                                ({delta.isZero() ? "" : delta.greaterThan(0) ? "▲" : "▼"}
+                                {formatMoney(
+                                  moneyFromDecimalString(current.currency, delta.abs().toFixed(2), 2),
+                                )}{" "}
+                                {word})
+                              </span>
+                            </dd>
+                          </div>
+                        );
+                      })}
+                    </dl>
+                  ) : state.compareRaw.trim() ? (
+                    <p className="self-center text-[13px] leading-5 text-ink-3">
+                      Enter a valid annual amount to compare.
+                    </p>
+                  ) : null}
+                </div>
               </section>
 
               <section aria-label="Estimated employer withholding" className="nexus-panel-soft grid gap-4 p-6 md:p-8">
