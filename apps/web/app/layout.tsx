@@ -24,10 +24,10 @@ export const metadata: Metadata = {
     type: "website",
     siteName: SITE_NAME,
     locale: "en_AU",
-    // Deliberately no `url`. Next does not derive og:url from
-    // `alternates.canonical`, so a value set here would stamp the site root on
-    // every page and tell scrapers each shared link is the homepage. Omitting
-    // it lets them fall back to the request URL and rel=canonical.
+    // Relative "./" resolves against metadataBase PER ROUTE, giving each page
+    // its own og:url — an absolute value here would stamp the site root on
+    // every page. Verified in the build output before shipping.
+    url: "./",
   },
   twitter: { card: "summary_large_image" },
   robots: { index: true, follow: true, "max-image-preview": "large" },
