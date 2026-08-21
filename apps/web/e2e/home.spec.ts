@@ -7,7 +7,7 @@ test.describe("mortgage routes (scheduled ledger)", () => {
     await page.getByLabel("Loan amount").fill("500000");
     await page.getByLabel("Interest rate % p.a.").fill("6");
     await expect(page.getByRole("status").filter({ hasText: "$2,997.75" })).toBeVisible();
-    await expect(page.getByText("Total interest")).toBeVisible();
+    await expect(page.getByText("Total interest", { exact: true })).toBeVisible();
     await expect(page.getByText("Schedule by year", { exact: false })).toBeVisible();
     // Let the dynamically imported chart finish mounting before the axe scan.
     await expect(page.getByText("Balance over time", { exact: false })).toBeVisible();
@@ -32,7 +32,7 @@ test.describe("mortgage routes (scheduled ledger)", () => {
     await page.getByLabel("Loan amount").fill("500000");
     await page.getByLabel("Interest rate % p.a.").fill("6");
     await page.getByLabel("Extra repayment (per repayment period)").fill("500");
-    await expect(page.getByText("Time saved")).toBeVisible();
+    await expect(page.getByText("Time saved", { exact: true })).toBeVisible();
     await expect(page.getByRole("status").filter({ hasText: "$" })).toBeVisible();
   });
 

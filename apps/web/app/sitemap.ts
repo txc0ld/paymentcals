@@ -1,8 +1,9 @@
 import type { MetadataRoute } from "next";
 import { calculatorRegistry, routePath } from "@paymentcalcs/calculator-registry";
+import { SITE_URL } from "../lib/site";
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const base = "https://paymentcalcs.com";
+  const base = SITE_URL;
   const staticPages = [
     "",
     "/calculators",

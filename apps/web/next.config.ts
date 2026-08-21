@@ -24,6 +24,18 @@ const nextConfig: NextConfig = {
     "@paymentcalcs/rules-au",
     "@paymentcalcs/scenario-schema",
   ],
+  // Canonical-host consolidation: every non-canonical production host
+  // permanently redirects to www.paymentcalcs.com.au, path preserved.
+  redirects: async () => {
+    const canonical = "https://www.paymentcalcs.com.au";
+    const hosts = ["paymentcalcs.com", "www.paymentcalcs.com", "paymentcalcs.com.au", "paymentcals.vercel.app"];
+    return hosts.map((host) => ({
+      source: "/:path*",
+      has: [{ type: "host" as const, value: host }],
+      destination: `${canonical}/:path*`,
+      permanent: true,
+    }));
+  },
   headers: async () => [
     {
       source: "/:path*",

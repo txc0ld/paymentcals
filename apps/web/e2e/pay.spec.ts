@@ -47,7 +47,7 @@ test.describe("pay calculator (draft rules dev preview)", () => {
     await page.getByLabel("Gross earnings per pay").fill("2000");
     // Fortnightly $2,000 → weekly x=1000.99, scale 2 → $138/week → $276.
     await expect(page.getByRole("status").filter({ hasText: "$276.00" })).toBeVisible();
-    await expect(page.getByText(/statement-of-formulas|y = a·x − b/)).toBeVisible();
+    await expect(page.getByText(/statement-of-formulas|y = a·x − b/).first()).toBeVisible();
   });
 
   test("HELP repayment reproduces the marginal system", async ({ page }) => {

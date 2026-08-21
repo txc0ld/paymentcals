@@ -1,4 +1,9 @@
 import { calculatorRegistry, routePath } from "@paymentcalcs/calculator-registry";
+import { FINANCIAL_YEARS } from "../../lib/pay-packs";
+import { SITE_URL } from "../../lib/site";
+
+/** Oldest to newest, so the coverage line reads as a range rather than a stack. */
+const COVERED_YEARS = [...FINANCIAL_YEARS].reverse().join(", ");
 
 /** §24.10 answer-engine surface: a plain-text map for LLM crawlers. */
 export function GET(): Response {
@@ -12,17 +17,58 @@ export function GET(): Response {
     "",
     "## Calculators",
     ...calculatorRegistry.map(
-      (entry) => `- [${entry.displayName}](https://paymentcalcs.com${routePath(entry)}): ${entry.seo.description}`,
+      (entry) => `- [${entry.displayName}](${SITE_URL}${routePath(entry)}): ${entry.seo.description}`,
     ),
+    "",
+    "## How the numbers are produced",
+    "",
+    "- Statutory values live in versioned rule packs, never in code or copy. Each pack records",
+    "  its source URL, the authority that published it, the date it was retrieved and a content",
+    "  hash of the retrieved document, so any figure on this site can be traced to a document.",
+    "- Calculation engines are pure functions of (request, rule packs). They perform no network",
+    "  access and read no clock, so the same inputs and the same pack versions always produce the",
+    "  same result. Money is held in integer minor units; rate arithmetic uses decimal maths.",
+    "- Annual tax liability and per-pay withholding are computed by separate engines and labelled",
+    "  separately. Withholding is never annual liability divided by the number of pay periods; it",
+    "  follows the official schedule method for the pay frequency.",
+    "- Mortgage and loan results come from a scheduled ledger run one repayment period at a time,",
+    "  not a single closed-form figure. Every period is reconciled — opening balance plus interest",
+    "  less repayment must equal the closing balance — and a reconciliation failure fails the",
+    "  calculation rather than being reported as a warning.",
+    "- Reverse calculations (solving an input for a target output) use monotonic bisection with",
+    "  explicit bounds, tolerances and iteration caps. If a solver does not converge, no number is",
+    "  produced.",
+    "- Fail closed: if a rule pack cannot be resolved for the selected jurisdiction and date, or",
+    "  fails its integrity check, the calculator shows a rule-unavailable state. It never",
+    "  substitutes another jurisdiction's rates, another year's rules, or a remembered value.",
+    "- No large language model takes part in any calculation path.",
+    "",
+    "## Coverage",
+    "",
+    `- Pay and tax: the selectable Australian financial years are ${COVERED_YEARS}, covering income`,
+    "  tax, Medicare, study and training loan repayments, employer super and PAYG withholding. The",
+    "  financial year in use is stated on every result.",
+    "- Transfer duty: all eight states and territories — NSW, VIC, QLD, WA, SA, TAS, ACT and NT —",
+    "  each from its own revenue-office rule pack, applying that jurisdiction's own bracket method.",
+    "- Duty concessions: published buyer-type concession schedules are priced for NSW, QLD, VIC and",
+    "  ACT from separate concessions packs, shown beside the general rate for the same value.",
+    "  Eligibility is assessed by the revenue office, not by this site.",
+    "- Business: GST arithmetic and registration turnover thresholds from Australian Taxation",
+    "  Office packs; contractor rate economics from your own capacity and cost inputs.",
+    "- Property, mortgage, loan and savings calculators take rates and terms as user inputs. This",
+    "  site holds no lender pricing and makes no forecast of future interest rates.",
+    "- Not covered at this release: superannuation and retirement projections, daily-accrual",
+    "  mortgage contracts, foreign-purchaser duty surcharges, and jurisdictions outside Australia",
+    "  except where a calculator is marked as general-purpose.",
     "",
     "## Method",
     ...calculatorRegistry.map(
-      (entry) => `- [${entry.displayName} methodology](https://paymentcalcs.com/methodology/${entry.slug})`,
+      (entry) => `- [${entry.displayName} methodology](${SITE_URL}/methodology/${entry.slug})`,
     ),
     "",
     "## Governance",
-    "- [Sources and rule packs](https://paymentcalcs.com/sources)",
-    "- [Changelog](https://paymentcalcs.com/changelog)",
+    `- [Sources and rule packs](${SITE_URL}/sources)`,
+    `- [Changelog](${SITE_URL}/changelog)`,
   ];
   return new Response(lines.join("\n"), { headers: { "Content-Type": "text/plain; charset=utf-8" } });
 }

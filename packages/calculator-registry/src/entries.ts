@@ -102,9 +102,9 @@ const breadthEntries: RegistryEntry[] = [
     category: "savings-investing",
     scope: "global",
     engines: ["E14"],
-    title: "Compound Interest Calculator with Yearly Breakdown",
+    title: "Compound Interest Calculator: Monthly and Yearly Growth",
     description:
-      "See how savings grow with compound interest and regular deposits, with a year-by-year breakdown, exact formulas and every assumption editable.",
+      "Project how savings grow with compound interest and regular deposits. See the year-by-year breakdown, the exact formula used and every assumption you can edit.",
   }),
   simpleEntry({
     id: "GL-SAVE-003",
@@ -113,9 +113,9 @@ const breadthEntries: RegistryEntry[] = [
     category: "savings-investing",
     scope: "global",
     engines: ["E14", "E24"],
-    title: "Savings Goal Calculator: Reach a Target Amount",
+    title: "Savings Goal Calculator: How Much to Save Each Month",
     description:
-      "Work out the regular deposit needed to reach a savings target by a chosen date, verified by re-running the forward calculation.",
+      "Work out the deposit needed each week, fortnight or month to reach a savings target by your chosen date, verified by re-running the forward calculation.",
   }),
   simpleEntry({
     id: "AU-DEBT-001",
@@ -123,9 +123,9 @@ const breadthEntries: RegistryEntry[] = [
     displayName: "Loan Calculator",
     category: "loans-debt",
     engines: ["E11"],
-    title: "Personal Loan Repayment Calculator Australia",
+    title: "Loan Repayment Calculator Australia: Personal Loans",
     description:
-      "Estimate loan repayments, total interest and payoff date for personal loans with a full amortisation schedule and optional monthly fees.",
+      "Calculate personal loan repayments, total interest and payoff date, with a full amortisation schedule, optional monthly fees and the working behind every figure.",
   }),
   simpleEntry({
     id: "AU-DEBT-003",
@@ -133,9 +133,9 @@ const breadthEntries: RegistryEntry[] = [
     displayName: "Car Loan Calculator",
     category: "loans-debt",
     engines: ["E11"],
-    title: "Car Loan Repayment Calculator with Balloon Payment",
+    title: "Car Loan Calculator Australia: Repayments and Balloon",
     description:
-      "Estimate car loan repayments including balloon or residual payments, with total cost, interest and the schedule shown in full.",
+      "Calculate car loan repayments with or without a balloon or residual payment. See total cost, total interest and the full schedule, period by period.",
   }),
   simpleEntry({
     id: "AU-DEBT-012",
@@ -145,7 +145,7 @@ const breadthEntries: RegistryEntry[] = [
     engines: ["E12"],
     title: "Credit Card Payoff Calculator: Minimum vs Fixed Payments",
     description:
-      "See how long a credit card takes to pay off on minimum payments versus a fixed amount, cycle by cycle, with promotional-rate expiry modelled.",
+      "Compare how long a credit card takes to clear on minimum payments versus a fixed amount. Promotional-rate expiry is modelled and every cycle is shown.",
   }),
   simpleEntry({
     id: "AU-HOME-019",
@@ -153,9 +153,9 @@ const breadthEntries: RegistryEntry[] = [
     displayName: "Home Deposit Calculator",
     category: "property-mortgage",
     engines: ["E01"],
-    title: "Home Deposit Calculator Australia",
+    title: "Home Deposit Calculator Australia: How Much You Need",
     description:
-      "Work out the deposit needed for a property price at your chosen loan-to-value ratio, alongside the upfront costs you enter.",
+      "Work out the house deposit needed at your chosen loan-to-value ratio, plus the upfront costs you enter, with the savings gap and every step of the arithmetic.",
   }),
   simpleEntry({
     id: "AU-HOME-020",
@@ -163,9 +163,9 @@ const breadthEntries: RegistryEntry[] = [
     displayName: "LVR Calculator",
     category: "property-mortgage",
     engines: ["E01"],
-    title: "LVR Calculator: Loan to Value Ratio",
+    title: "LVR Calculator Australia: Loan to Value Ratio",
     description:
-      "Calculate your loan-to-value ratio from a property value and loan amount, with the standard LVR bands lenders commonly reference.",
+      "Calculate your loan-to-value ratio from a property value and loan amount, alongside the standard LVR bands Australian lenders reference. Full working shown.",
   }),
   simpleEntry({
     id: "AU-HOME-022",
@@ -175,9 +175,9 @@ const breadthEntries: RegistryEntry[] = [
     calculationClass: "C",
     engines: ["E10"],
     disclosures: ["universal-footer-v2.0", "affordability-addendum-v2.0"],
-    title: "Home Loan Affordability Estimate Australia",
+    title: "Borrowing Power Calculator Australia: Affordability Range",
     description:
-      "An indicative borrowing range from your income, expenses and commitments under generic assumptions with an editable rate buffer. Not pre-approval.",
+      "An indicative borrowing range from your income, expenses and commitments under generic assumptions with an editable rate buffer. Not an offer or pre-approval.",
   }),
   simpleEntry({
     id: "AU-HOME-017",
@@ -187,9 +187,9 @@ const breadthEntries: RegistryEntry[] = [
     calculationClass: "B",
     engines: ["E08"],
     rulePacks: ["stamp-duty"],
-    title: "Stamp Duty Calculator Australia: All States",
+    title: "Stamp Duty Calculator Australia: NSW, VIC, QLD, All States",
     description:
-      "Estimate general transfer duty by state from official revenue-office rate tables, with unsupported states clearly blocked rather than guessed.",
+      "Estimate general transfer duty on a property purchase from official state revenue-office rate tables. Unsupported states are clearly blocked, never guessed.",
   }),
   simpleEntry({
     id: "AU-HOME-018",
@@ -199,9 +199,9 @@ const breadthEntries: RegistryEntry[] = [
     calculationClass: "B",
     engines: ["E08"],
     rulePacks: ["stamp-duty"],
-    title: "Complete Property Buying Costs Calculator Australia",
+    title: "Property Purchase Costs Calculator Australia: Upfront Cash",
     description:
-      "Add general transfer duty to your conveyancing, inspection and other upfront costs for a complete picture of the cash needed to buy.",
+      "Add transfer duty to conveyancing, inspection, loan and registration costs for the total cash needed to buy. Duty comes from official state rate tables.",
   }),
   simpleEntry({
     id: "AU-BIZ-006",
@@ -211,9 +211,9 @@ const breadthEntries: RegistryEntry[] = [
     calculationClass: "B",
     engines: ["E19", "E20"],
     rulePacks: ["gst"],
-    title: "Contractor Day Rate Calculator Australia",
+    title: "Contractor Day Rate Calculator Australia: Rate from Salary",
     description:
-      "Convert a target income into a contractor day rate covering super replacement, leave, overheads and utilisation, with GST quoted separately.",
+      "Convert a target income into a contractor day rate covering super replacement, leave, overheads and utilisation, with GST quoted separately and working shown.",
   }),
 ];
 
@@ -224,9 +224,9 @@ const entries: RegistryEntry[] = [
     slug: "mortgage-repayment-calculator",
     displayName: "Mortgage Repayment Calculator",
     engines: ["E11"],
-    title: "Mortgage Repayment Calculator Australia",
+    title: "Mortgage Repayment Calculator Australia: Weekly or Monthly",
     description:
-      "Estimate mortgage repayments with a full amortisation schedule, interest totals, payoff date and every assumption shown, at weekly, fortnightly or monthly frequency.",
+      "Calculate home loan repayments weekly, fortnightly or monthly, with a full amortisation schedule, total interest, payoff date and every assumption on show.",
   }),
   homeEntry({
     id: "AU-HOME-002",
@@ -235,100 +235,100 @@ const entries: RegistryEntry[] = [
     engines: ["E07"],
     title: "Mortgage Simulator: Rates, Offsets and Extra Repayments",
     description:
-      "Simulate a mortgage through dated rate changes, extra repayments, offset balances and fees on a scheduled ledger, with reconciliation on every period.",
+      "Run a mortgage through dated rate changes, extra repayments, offset balances and fees on a scheduled ledger that reconciles on every single period.",
   }),
   homeEntry({
     id: "AU-HOME-004",
     slug: "extra-repayments-calculator",
     displayName: "Extra Repayments Calculator",
     engines: ["E07"],
-    title: "Extra Mortgage Repayments Calculator Australia",
+    title: "Extra Repayments Calculator: Pay Off Your Home Loan Sooner",
     description:
-      "See the interest and years saved by regular or one-off extra mortgage repayments, computed on a dated schedule rather than a shortcut formula.",
+      "See the interest and years saved by regular or one-off extra mortgage repayments, computed on a dated schedule rather than a shortcut formula. Working shown.",
   }),
   homeEntry({
     id: "AU-HOME-006",
     slug: "offset-account-calculator",
     displayName: "Offset Account Calculator",
     engines: ["E07"],
-    title: "Offset Account Calculator Australia",
+    title: "Offset Account Calculator Australia: Interest and Time Saved",
     description:
-      "Model an offset balance and regular deposits against your mortgage: interest saved, time saved and the cash that stays available, kept distinct from principal.",
+      "Model an offset balance and regular deposits against your mortgage: interest saved, time saved and the cash that stays available, kept apart from principal.",
   }),
   homeEntry({
     id: "AU-HOME-007",
     slug: "rate-change-calculator",
     displayName: "Rate Change Calculator",
     engines: ["E07"],
-    title: "Interest Rate Change Calculator: Mortgage Repayments",
+    title: "Interest Rate Change Calculator: Mortgage Repayment Impact",
     description:
-      "See how a rate rise or cut changes your mortgage repayment and lifetime interest, under keep-repayment or recalculate-to-term policies.",
+      "See how a rate rise or cut changes your mortgage repayment and total interest, under either a keep-repayment or recalculate-to-term policy. Working shown.",
   }),
   homeEntry({
     id: "AU-HOME-012",
     slug: "refinance-calculator",
     displayName: "Refinance Break-Even Calculator",
     engines: ["E07", "E11"],
-    title: "Refinance Break-Even Calculator Australia",
+    title: "Refinance Calculator Australia: Break-Even and Savings",
     description:
-      "Compare your current loan with a refinance offer on cumulative cash flows including switching costs, cashback timing and residual balances, never repayments alone.",
+      "Compare your current home loan against a refinance offer on cumulative cash flows including switching costs, cashback timing and the residual balance.",
   }),
   payEntry({
     id: "AU-PAY-001",
     slug: "pay-calculator",
     displayName: "Pay Calculator",
-    title: "Pay Calculator Australia: Tax, Super and Take-Home Pay",
+    title: "Pay Calculator Australia: Take-Home Pay FY 2026-27",
     description:
-      "Australian pay calculator showing annual tax, Medicare, study-loan repayments, employer super and PAYG withholding separately, with full working.",
+      "Australian pay calculator showing income tax, Medicare levy, study-loan repayments, employer super and PAYG withholding separately, each with its working.",
   }),
   payEntry({
     id: "AU-PAY-002",
     slug: "take-home-pay-calculator",
     displayName: "Take-Home Pay Calculator",
-    title: "Take-Home Pay Calculator Australia",
+    title: "Take-Home Pay Calculator Australia FY 2026-27",
     description:
-      "Work out your take-home pay per week, fortnight or month after tax, Medicare and study-loan repayments, with every step of the working shown.",
+      "Work out your take-home pay per week, fortnight or month after income tax, Medicare and study-loan repayments, from ATO-sourced rates with the working shown.",
   }),
   payEntry({
     id: "AU-PAY-003",
     slug: "gross-to-net-calculator",
     displayName: "Gross to Net Calculator",
-    title: "Gross to Net Salary Calculator Australia",
+    title: "Gross to Net Salary Calculator Australia FY 2026-27",
     description:
-      "Convert a gross Australian salary to net pay at every pay frequency under the selected financial year's tax rules, with sources cited.",
+      "Convert a gross Australian salary into net pay at every pay frequency under the financial year you select, with each rate traced to its official source.",
   }),
   payEntry({
     id: "AU-PAY-004",
     slug: "net-to-gross-calculator",
     displayName: "Net to Gross Calculator",
     engines: ["E02", "E04", "E24"],
-    title: "Net to Gross Salary Calculator Australia",
+    title: "Net to Gross Salary Calculator Australia FY 2026-27",
     description:
-      "Solve the gross salary needed for a target take-home amount using a verified reverse calculation over the full Australian tax rules.",
+      "Find the gross salary needed for a target take-home amount, solved against the full Australian tax rules and verified by re-running the forward calculation.",
   }),
   payEntry({
     id: "AU-PAY-005",
     slug: "salary-including-super-calculator",
     displayName: "Salary Including Super Calculator",
-    title: "Salary Package Including Super Calculator Australia",
+    title: "Salary Including Super Calculator: Package to Base Pay",
     description:
-      "Split a total remuneration package into base salary and employer super, including the maximum contribution base, then estimate tax and take-home pay.",
+      "Split a total remuneration package into base salary and employer super, applying the maximum contribution base, then see the tax and take-home pay that follow.",
   }),
   payEntry({
     id: "AU-PAY-006",
     slug: "hourly-to-salary-calculator",
     displayName: "Hourly to Salary Calculator",
-    title: "Hourly Rate to Salary Calculator Australia",
+    title: "Hourly to Salary Calculator Australia: Annual and Take-Home",
     description:
-      "Convert an hourly rate into annual salary and take-home pay using your hours per week and weeks paid per year, under current Australian tax rules.",
+      "Convert an hourly rate into annual salary and take-home pay from your hours per week and weeks paid per year, under current Australian tax rules. Working shown.",
   }),
   payEntry({
     id: "AU-PAY-007",
     slug: "salary-to-hourly-calculator",
     displayName: "Salary to Hourly Calculator",
-    title: "Salary to Hourly Rate Calculator Australia",
+    title: "Salary to Hourly Calculator Australia: Your Real Hourly Rate",
     description:
-      "See the hourly rate implied by an annual salary for your working pattern, alongside tax, super and take-home pay under the selected financial year.",
+      "See the hourly rate an annual salary works out to for your working pattern, alongside income tax, super and take-home pay for the financial year you select.",
   }),
   payEntry({
     id: "AU-PAY-011",
@@ -336,18 +336,18 @@ const entries: RegistryEntry[] = [
     displayName: "PAYG Withholding Calculator",
     calculationClass: "A",
     engines: ["E03"],
-    title: "PAYG Withholding Calculator: ATO Schedule Formulas",
+    title: "PAYG Withholding Calculator: Official ATO Schedule Formulas",
     description:
-      "Calculate PAYG withholding per pay from the official ATO statement-of-formulas coefficients, including the study-loan component, never annual tax divided by periods.",
+      "Calculate tax withheld each pay from the official ATO statement-of-formulas coefficients, including the study-loan component. Never annual tax split by periods.",
   }),
   payEntry({
     id: "AU-PAY-013",
     slug: "help-repayment-calculator",
     displayName: "HELP Repayment Calculator",
     engines: ["E02"],
-    title: "HELP and Study Loan Repayment Calculator Australia",
+    title: "HECS and HELP Repayment Calculator Australia FY 2026-27",
     description:
-      "Estimate your compulsory HELP or study-loan repayment from repayment income under the marginal repayment system, with thresholds from official sources.",
+      "Estimate your compulsory HECS or HELP repayment from repayment income under the marginal repayment system, with every threshold from official ATO rule packs.",
   }),
   zRegistryEntry.parse({
     id: "AU-PAY-016",
@@ -365,7 +365,7 @@ const entries: RegistryEntry[] = [
     disclosureSet: ["universal-footer-v2.0"],
     sourceSet: ["ato-concessional-cap-2026-08-21"],
     seo: {
-      title: "Super Contributions Calculator: SG, Caps and Balance Ranges",
+      title: "Salary Sacrifice and Super Contributions Calculator 2026-27",
       description:
         "Employer super on your salary, concessional cap headroom with salary sacrifice, the Division 293 threshold, and balance ranges across Australian age groups.",
     },
@@ -389,7 +389,7 @@ const entries: RegistryEntry[] = [
     seo: {
       title: "Inflation Calculator Australia: Your Salary in Real Terms",
       description:
-        "See what inflation has done to your salary since your last pay rise, using the official ABS consumer price index, and the salary needed to keep its purchasing power.",
+        "See what inflation has done to your salary since your last pay rise, from the official ABS consumer price index, and the salary that holds its buying power.",
     },
     ownership: { owner: "tmayorx@gmail.com", reviewCadence: "quarterly CPI release" },
   }),
@@ -398,9 +398,9 @@ const entries: RegistryEntry[] = [
     slug: "income-tax-calculator",
     displayName: "Income Tax Calculator",
     engines: ["E02"],
-    title: "Australian Income Tax Calculator and Bracket Explorer",
+    title: "Income Tax Calculator Australia: Brackets and Rates 2026-27",
     description:
-      "Explore Australian income tax brackets by year and residency, slide a salary along the marginal-rate curve and see the tax at every step, from official rule packs.",
+      "Calculate Australian income tax by year and residency, and slide a salary along the marginal-rate curve to see the tax at every step, from official rule packs.",
   }),
   zRegistryEntry.parse({
     id: "AU-BIZ-001",
@@ -421,7 +421,7 @@ const entries: RegistryEntry[] = [
       // Rate-neutral by design: statutory numbers live only in rule packs.
       title: "GST Calculator Australia: Add, Remove or Split GST",
       description:
-        "Add GST, remove GST or split a GST-inclusive amount using the current Australian GST rate, with full working shown and sources cited.",
+        "Add GST to a price, remove GST from a total or split a GST-inclusive amount at the current Australian GST rate, with full working shown and sources cited.",
     },
     ownership: {
       owner: "tmayorx@gmail.com",

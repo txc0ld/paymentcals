@@ -6,18 +6,31 @@ import "./globals.css";
 import { ThemeToggle } from "../components/theme-toggle";
 import { RevealObserver } from "../components/reveal-observer";
 import { PageViewTracker } from "../components/page-view-tracker";
+import { SITE_NAME, SITE_URL } from "../lib/site";
 
 const jakarta = Plus_Jakarta_Sans({ subsets: ["latin"], variable: "--font-jakarta" });
 const geistMono = Geist_Mono({ subsets: ["latin"], variable: "--font-geist-mono" });
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://paymentcalcs.com"),
+  metadataBase: new URL(SITE_URL),
   title: {
     default: "PaymentCalcs: Australian financial calculators that show their working",
     template: "%s · PaymentCalcs",
   },
   description:
     "Deterministic Australian pay, tax, mortgage and business calculators. Every result shows its working, assumptions, sources and limitations.",
+  alternates: { canonical: "./" },
+  openGraph: {
+    type: "website",
+    siteName: SITE_NAME,
+    locale: "en_AU",
+    // Deliberately no `url`. Next does not derive og:url from
+    // `alternates.canonical`, so a value set here would stamp the site root on
+    // every page and tell scrapers each shared link is the homepage. Omitting
+    // it lets them fall back to the request URL and rel=canonical.
+  },
+  twitter: { card: "summary_large_image" },
+  robots: { index: true, follow: true, "max-image-preview": "large" },
 };
 
 export const viewport: Viewport = {
@@ -31,6 +44,31 @@ export const viewport: Viewport = {
  * a stored light preference is honoured with no flash. */
 const THEME_INIT = `(function(){try{var s=localStorage.getItem("pc-theme");document.documentElement.setAttribute("data-theme",s==="light"?"light":"dark");}catch(e){document.documentElement.setAttribute("data-theme","dark");}})();`;
 
+/**
+ * Sitewide entity graph. Static and server-rendered: no user input, no
+ * fabricated claims. Deliberately carries no SearchAction — there is no
+ * site-search endpoint to point one at.
+ */
+const SITE_JSON_LD = JSON.stringify({
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": `${SITE_URL}/#organization`,
+      name: SITE_NAME,
+      url: SITE_URL,
+    },
+    {
+      "@type": "WebSite",
+      "@id": `${SITE_URL}/#website`,
+      name: SITE_NAME,
+      url: SITE_URL,
+      inLanguage: "en-AU",
+      publisher: { "@id": `${SITE_URL}/#organization` },
+    },
+  ],
+});
+
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en-AU" suppressHydrationWarning className="scroll-smooth">
@@ -40,6 +78,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body
         className={`${jakarta.variable} ${geistMono.variable} min-h-[100dvh] bg-canvas text-ink selection:bg-accent selection:text-accent-contrast`}
       >
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: SITE_JSON_LD }} />
+
         <a
           href="#main"
           className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[60] focus:min-h-11 focus:border focus:border-hairline-strong focus:bg-surface focus:px-4 focus:py-3 focus:font-mono focus:text-xs focus:uppercase focus:tracking-[0.14em]"
