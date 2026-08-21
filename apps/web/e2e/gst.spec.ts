@@ -17,11 +17,12 @@ test.describe("homepage", () => {
 });
 
 test.describe("GST calculator (draft rules dev preview)", () => {
-  test("shows the draft banner — never a silently active draft pack", async ({ page }) => {
+  test("active pack renders without a draft banner and shows Current status", async ({ page }) => {
+    /* The GST pack is owner-approved active (D-016): no draft banner may
+     * appear, and the header badge must state the current-rules status. */
     await page.goto("/au/business/gst-calculator");
-    await expect(
-      page.getByRole("status").filter({ hasText: "Development preview only" }),
-    ).toBeVisible();
+    await expect(page.getByText("Current", { exact: true })).toBeVisible();
+    await expect(page.getByText("Development preview only")).toHaveCount(0);
   });
 
   test("add mode calculates $100 → $110.00 with working shown", async ({ page }) => {

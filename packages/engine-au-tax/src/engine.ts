@@ -298,7 +298,7 @@ export function computeAuPay(input: AuPayInput, resolution: AuPayResolution): Li
   if (typeof scale !== "string") {
     withholdingUnavailableReason = scale.unsupported;
   } else if (!resolution.payg) {
-    withholdingUnavailableReason = `The official PAYG withholding schedule for ${input.financialYear} is not available in this build; the annual liability estimate above is unaffected.`;
+    withholdingUnavailableReason = `The official PAYG withholding schedule for ${input.financialYear} is not available in this build — the ATO publishes withholding schedules for the current year, and only FY 2026-27 is packaged. Select FY 2026-27 to see withholding; the annual liability estimate above is unaffected.`;
   } else {
     // Schedule 1 applies to ordinary period earnings only. Bonuses and other
     // non-payroll income withhold under separate schedules not yet modelled,

@@ -46,10 +46,10 @@ export function TimelineEditor({
         in order — rate changes first, then offset movements, repayments and fees. Mid-period timing
         is not modelled.
       </p>
-      <ol className="grid gap-3">
+      <ol className="grid gap-4">
         {sorted.map((event) => (
-          <li key={event.id} className="nexus-line-item grid min-w-0 gap-3 bg-surface-2 p-4">
-            <div className="flex items-center justify-between gap-3">
+          <li key={event.id} className="nexus-line-item grid min-w-0 gap-4 bg-surface-2 p-4">
+            <div className="flex flex-wrap items-center justify-between gap-4">
               <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-ink-3">
                 {EVENT_LABEL[event.kind]}
               </span>
@@ -61,8 +61,8 @@ export function TimelineEditor({
                 Remove
               </button>
             </div>
-            <div className="grid gap-3 sm:grid-cols-2">
-              <label className="grid gap-1">
+            <div className="grid items-start gap-4 sm:grid-cols-2">
+              <label className="grid gap-1.5">
                 <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-ink-2">
                   {event.kind === "extra_recurring" || event.kind === "fee_annual" ? "Starts" : "Date"}
                 </span>
@@ -73,7 +73,7 @@ export function TimelineEditor({
                   className="nexus-input min-h-11 bg-surface px-3 font-mono text-[14px] text-ink outline-none focus:border-focus"
                 />
               </label>
-              <label className="grid gap-1">
+              <label className="grid gap-1.5">
                 <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-ink-2">
                   {event.kind === "rate_change" ? "New rate % p.a." : "Amount"}
                 </span>

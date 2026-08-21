@@ -75,6 +75,15 @@ export function SavingsCalculator({ variant }: { variant: "compound" | "goal" })
     );
   }, [variant, settings, target]);
 
+  // Time to goal: the first simulated year boundary at which the balance
+  // reaches the target. Read from the same simulation that produced the
+  // headline, so the readout can never disagree with the table.
+  const timeToGoal = useMemo(() => {
+    if (variant !== "goal" || !result || !target.ok) return null;
+    const targetDec = new Dec(moneyToDecimalString(target.money));
+    return result.years.find((row) => row.closingBalance.greaterThanOrEqualTo(targetDec)) ?? null;
+  }, [variant, result, target]);
+
   return (
     <CalculatorShell
       header={
@@ -115,7 +124,7 @@ export function SavingsCalculator({ variant }: { variant: "compound" | "goal" })
               error={!contribution.ok && contribution.error ? contribution.error : undefined}
             />
           ) : null}
-          <div className="grid gap-4 sm:grid-cols-2">
+          <div className="grid items-start gap-4 sm:grid-cols-2">
             <div className="grid gap-1.5">
               <label htmlFor="save-rate" className="font-mono text-[11px] uppercase tracking-[0.14em] text-ink-2">
                 Interest rate % p.a.
@@ -173,7 +182,7 @@ export function SavingsCalculator({ variant }: { variant: "compound" | "goal" })
               : "Enter a rate and timeframe to see the balance grow with compound interest."}
           </EmptyState>
         ) : (
-          <div className="nexus-result grid gap-6 p-6">
+          <div className="nexus-result grid min-w-0 gap-6 p-6 md:p-8">
             {variant === "goal" && perPeriodNeeded ? (
               <PrimaryResult
                 label={`Deposit needed per ${compounding === "monthly" ? "month" : compounding === "quarterly" ? "quarter" : "year"}`}
@@ -187,11 +196,26 @@ export function SavingsCalculator({ variant }: { variant: "compound" | "goal" })
                 qualifier={`Simulated period by period; the §13.11 closed form gives ${formatMajor(result.closedFormValue.toFixed(2))} and the simulation reconciles within rounding.`}
               />
             )}
-            <div className="grid gap-3 border-t border-hairline pt-4 sm:grid-cols-2">
+            <div
+              className={`grid gap-4 border-t border-hairline pt-6 ${
+                timeToGoal ? "sm:grid-cols-3" : "sm:grid-cols-2"
+              }`}
+            >
               <ResultMetric label="Total deposits" amount={moneyFromDecimalString("AUD", result.totalContributions.toFixed(2), 2)} />
               <ResultMetric label="Total interest earned" amount={moneyFromDecimalString("AUD", result.totalInterest.toFixed(2), 2)} />
+              {timeToGoal ? (
+                <div className="nexus-panel-soft flex min-w-0 flex-col gap-1 p-4">
+                  <span className="font-mono text-[10px] uppercase tracking-[0.16em] text-ink-3">Time to goal</span>
+                  <span className="font-mono text-xl tabular-nums text-ink">
+                    {timeToGoal.year} {timeToGoal.year === 1 ? "year" : "years"}
+                  </span>
+                  <span className="text-[12px] leading-4 text-ink-3">
+                    first year boundary at or above the target ({formatMoney(moneyFromDecimalString("AUD", timeToGoal.closingBalance.toFixed(2), 2))})
+                  </span>
+                </div>
+              ) : null}
             </div>
-            <div className="overflow-x-auto border-t border-hairline pt-4">
+            <div className="overflow-x-auto border-t border-hairline pt-6">
               <table className="nexus-table w-full min-w-[420px] border-collapse text-left">
                 <caption className="sr-only">Year-by-year savings growth</caption>
                 <thead>

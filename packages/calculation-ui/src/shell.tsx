@@ -29,7 +29,9 @@ export function CalculatorHeader({
   return (
     <header className="nexus-panel grid min-w-0 gap-5 p-6 md:p-8">
       <div className="flex min-w-0 flex-wrap items-center justify-between gap-x-6 gap-y-4">
-        <h1 className="text-balance text-[length:var(--pc-text-h2)] font-semibold leading-[0.98] tracking-[var(--pc-tracking-tight)] text-ink">
+        {/* Accent titles (owner directive): display-size text, so the 3.75:1
+         * light-theme ratio meets the WCAG large-text threshold. */}
+        <h1 className="text-balance text-[length:var(--pc-text-h2)] font-semibold leading-[0.98] tracking-[var(--pc-tracking-tight)] text-accent">
           {meta.title}
         </h1>
         {modeControl}
@@ -70,7 +72,7 @@ export function CalculatorShell({
     <div className="mx-auto grid w-full max-w-[100rem] gap-8 px-4 py-10 md:gap-12 md:px-8 md:py-16">
       {header}
       <div className="grid min-w-0 gap-8 lg:grid-cols-[minmax(360px,440px)_1fr] lg:items-start lg:gap-12">
-        <section aria-label="Inputs" className="nexus-panel grid min-w-0 gap-6 p-5 md:p-8">
+        <section aria-label="Inputs" className="nexus-panel grid min-w-0 gap-6 p-6 md:p-8">
           {inputs}
         </section>
         <section aria-label="Results" className="grid min-w-0 gap-6 lg:sticky lg:top-24">

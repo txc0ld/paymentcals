@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import dynamic from "next/dynamic";
 import type { SLedgerRow } from "../../lib/ledger-serialize";
 import { formatMajor } from "../../lib/format-major";
+import { extremeMajor } from "./result-parts";
 
 const AreaChartInner = dynamic(() => import("./balance-chart-inner"), {
   ssr: false,
@@ -34,9 +35,19 @@ export function BalanceChart({ rows, periodsPerYear }: { rows: SLedgerRow[]; per
     return Array.from(byYear.entries()).map(([year, v]) => ({ year, ...v }));
   }, [rows]);
 
+  /** Min / max / end of the same year-end series that is plotted. */
+  const summary = useMemo(() => {
+    if (yearly.length === 0) return null;
+    const balances = yearly.map((point) => point.balance);
+    const highest = yearly[extremeMajor(balances, "max")]!;
+    const lowest = yearly[extremeMajor(balances, "min")]!;
+    const end = yearly[yearly.length - 1]!;
+    return { highest, lowest, end };
+  }, [yearly]);
+
   return (
-    <figure aria-label="Loan balance over time" className="grid min-w-0 gap-3">
-      <div className="flex flex-wrap items-center justify-between gap-3">
+    <figure aria-label="Loan balance over time" className="grid min-w-0 gap-4">
+      <div className="flex flex-wrap items-center justify-between gap-4">
         <figcaption className="font-mono text-[11px] uppercase tracking-[0.16em] text-ink-2">
           Balance over time (AUD, end of each year)
         </figcaption>
@@ -48,10 +59,6 @@ export function BalanceChart({ rows, periodsPerYear }: { rows: SLedgerRow[]; per
           {view === "chart" ? "View as table" : "View as chart"}
         </button>
       </div>
-      <p className="sr-only">
-        The loan balance declines from {formatMajor(rows[0]?.closingBalance ?? "0")} to zero across
-        the schedule. A full table alternative is available with the toggle button.
-      </p>
       {view === "chart" ? (
         <AreaChartInner data={yearly} />
       ) : (
@@ -81,7 +88,27 @@ export function BalanceChart({ rows, periodsPerYear }: { rows: SLedgerRow[]; per
           </table>
         </div>
       )}
-      <span className="sr-only">{periodsPerYear} repayment periods per year.</span>
+      {summary ? (
+        <dl className="grid gap-4 border-t border-hairline pt-4 sm:grid-cols-3">
+          {[
+            { term: "Highest year-end balance", point: summary.highest },
+            { term: "Lowest year-end balance", point: summary.lowest },
+            { term: "Balance at the end", point: summary.end },
+          ].map(({ term, point }) => (
+            <div key={term} className="grid min-w-0 gap-1">
+              <dt className="font-mono text-[10px] uppercase tracking-[0.16em] text-ink-3">{term}</dt>
+              <dd className="font-mono text-[15px] tabular-nums text-ink">
+                {formatMajor(point.balance)}
+                <span className="ps-2 text-[12px] text-ink-3">{point.year}</span>
+              </dd>
+            </div>
+          ))}
+        </dl>
+      ) : null}
+      <span className="sr-only">
+        {periodsPerYear} repayment periods per year. A full table alternative is available with the
+        toggle button above.
+      </span>
     </figure>
   );
 }

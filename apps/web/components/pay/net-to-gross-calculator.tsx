@@ -22,7 +22,13 @@ import {
   zAuPayInput,
   type NetToGrossResult,
 } from "@paymentcalcs/engine-au-tax";
-import { Dec, moneyFromDecimalString, moneyToDecimal, type DecimalValue } from "@paymentcalcs/calculation-core";
+import {
+  Dec,
+  moneyFromDecimalString,
+  moneyToDecimal,
+  type DecimalValue,
+  type Money,
+} from "@paymentcalcs/calculation-core";
 import { analytics } from "../../lib/analytics";
 import { parseMoneyInput } from "../../lib/money-input";
 import { FINANCIAL_YEARS, resolvePayPacks, type FinancialYear, type PayResolutionOutcome } from "../../lib/pay-packs";
@@ -40,6 +46,8 @@ export function NetToGrossCalculator() {
   const [includesSuper, setIncludesSuper] = useState(false);
   const [resolution, setResolution] = useState<PayResolutionOutcome | "pending">("pending");
   const [solved, setSolved] = useState<NetToGrossResult | null>(null);
+  /** The annual target the displayed solution was solved against. */
+  const [solvedTarget, setSolvedTarget] = useState<Money | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -61,6 +69,7 @@ export function NetToGrossCalculator() {
   useEffect(() => {
     if (resolution === "pending" || !resolution.ok || !target.ok) {
       setSolved(null);
+      setSolvedTarget(null);
       return;
     }
     const annualTarget = (moneyToDecimal(target.money) as DecimalValue).times(PERIODS[frequency]);
@@ -73,12 +82,10 @@ export function NetToGrossCalculator() {
       taxpayer: { residency: "resident" },
       studyLoans: { enabled: helpDebt },
     });
-    const result = solveGrossForNet(
-      moneyFromDecimalString("AUD", annualTarget.toFixed(2), 2),
-      template,
-      resolution.resolution,
-    );
+    const annualTargetMoney = moneyFromDecimalString("AUD", annualTarget.toFixed(2), 2);
+    const result = solveGrossForNet(annualTargetMoney, template, resolution.resolution);
     setSolved(result);
+    setSolvedTarget(annualTargetMoney);
     analytics.track(result.status === "solved" ? "calculation_completed" : "calculation_failed", {
       calculator_id: entry.id,
       mode: "simple",
@@ -173,27 +180,80 @@ export function NetToGrossCalculator() {
           ) : !solved ? (
             <EmptyState>Enter a target take-home amount to solve the gross salary that produces it.</EmptyState>
           ) : solved.status !== "solved" ? (
-            <div className="nexus-panel-soft grid gap-3 p-6">
+            <div className="nexus-panel-soft grid gap-4 p-6 md:p-8">
               <h2 className="text-lg font-semibold tracking-tight text-ink">No solution in range</h2>
               <p className="text-[14px] leading-6 text-ink-2">{solved.reason}</p>
             </div>
           ) : (
-            <div className="nexus-result grid gap-6 p-6">
+            <div className="nexus-result grid gap-6 p-6 md:p-8">
               <PrimaryResult
                 label={includesSuper ? "Required package (incl. super)" : "Required gross salary"}
                 amount={solved.grossAnnual!}
                 qualifier={`Re-running the forward calculator on this gross produces ${formatMoney(solved.achievedNetAnnual!)} net per year (residual ${formatMoney(solved.residual!)}). ${NET_TO_GROSS_TOLERANCE_NOTE}`}
               />
-              <div className="grid gap-3 border-t border-hairline pt-4 sm:grid-cols-2">
+              <div className="grid auto-rows-fr gap-4 border-t border-hairline pt-6 sm:grid-cols-2">
                 <ResultMetric
                   label={`Gross ${frequency === "annually" ? "per year" : `per ${frequency.replace("ly", "").replace("annual", "year")}`}`}
                   amount={perPeriod(moneyToDecimal(solved.grossAnnual!) as DecimalValue)}
                 />
                 <ResultMetric label="Achieved net (annual)" amount={solved.achievedNetAnnual!} />
               </div>
-              <p className="font-mono text-[11px] uppercase tracking-[0.14em] text-ink-3">
-                Solved by bisection over the full forward engine in {solved.iterations} iterations
-              </p>
+
+              {solvedTarget ? (
+                <section aria-label="Verification round-trip" className="grid gap-4 border-t border-hairline pt-6">
+                  <div className="flex min-w-0 flex-wrap items-baseline justify-between gap-x-6 gap-y-2">
+                    <h2 className="font-mono text-[11px] tracking-[0.16em] text-ink-2">
+                      Verification round-trip
+                    </h2>
+                    <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-[var(--pc-accent-text)]">
+                      Solved by bisection over the full forward engine in {solved.iterations} iterations
+                    </span>
+                  </div>
+                  <div className="overflow-x-auto">
+                    <table className="w-full min-w-[320px] border-collapse text-left">
+                      <caption className="sr-only">
+                        Target net compared with the net recomputed from the solved gross
+                      </caption>
+                      <thead>
+                        <tr className="border-b border-hairline font-mono text-[10px] uppercase tracking-[0.14em] text-ink-3">
+                          <th scope="col" className="py-2 pe-4 font-normal">Step</th>
+                          <th scope="col" className="py-2 text-right font-normal">Annual amount</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {(
+                          [
+                            ["Target net", solvedTarget, false],
+                            ["Solved gross", solved.grossAnnual!, false],
+                            ["Recomputed net from that gross", solved.achievedNetAnnual!, false],
+                            ["Difference from target", solved.residual!, true],
+                          ] as const
+                        ).map(([label, amount, emphasis]) => (
+                          <tr
+                            key={label}
+                            className={emphasis ? "border-b-2 border-hairline-strong" : "border-b border-hairline"}
+                          >
+                            <th scope="row" className="py-2 pe-4 text-[13px] font-normal text-ink-2">
+                              {label}
+                            </th>
+                            <td
+                              className={`py-2 text-right font-mono text-[14px] tabular-nums ${
+                                emphasis ? "text-ink" : "text-ink-2"
+                              }`}
+                            >
+                              {formatMoney(amount)}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                  <p className="text-[12px] leading-5 text-ink-3">
+                    The solved gross is fed back through the full forward engine; the difference above
+                    is the residual left by bisection, not a rounding allowance.
+                  </p>
+                </section>
+              ) : null}
               {solved.discontinuity ? (
                 <p className="border-l-2 border-warn pl-3 text-[13px] leading-5 text-ink-2">
                   Dollar-rounding creates small steps in net pay, so the smallest gross meeting the

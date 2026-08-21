@@ -85,8 +85,8 @@ export function LoanBasicsFields({
         onChange={(principalRaw) => onChange({ principalRaw })}
         error={errors.principal}
       />
-      <div className="grid gap-4 sm:grid-cols-2">
-        <div className="grid gap-1.5">
+      <div className="grid items-start gap-4 sm:grid-cols-2">
+        <div className="grid content-start gap-1.5">
           <label htmlFor="loan-rate" className="font-mono text-[11px] uppercase tracking-[0.14em] text-ink-2">
             Interest rate % p.a.
           </label>
@@ -105,7 +105,7 @@ export function LoanBasicsFields({
             </span>
           ) : null}
         </div>
-        <div className="grid gap-1.5">
+        <div className="grid content-start gap-1.5">
           <label htmlFor="loan-term" className="font-mono text-[11px] uppercase tracking-[0.14em] text-ink-2">
             Term (years)
           </label>

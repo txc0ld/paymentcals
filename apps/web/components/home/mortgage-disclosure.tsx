@@ -6,7 +6,7 @@ import { UniversalDisclosure } from "@paymentcalcs/calculation-ui";
  */
 export function MortgageDisclosure() {
   return (
-    <div className="grid gap-3">
+    <div className="grid gap-4">
       <aside
         aria-label="Model limitations"
         data-disclosure-version="mortgage-model-v2.0"

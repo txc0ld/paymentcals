@@ -1,7 +1,14 @@
 # Verification Queue
 
 Every rule pack and every fixture value awaiting human verification, grouped by source URL.
-A pack may only move from `in_review` to `approved`/`active` after the owner checks each box and records `verifiedAt`.
+
+> **Status note (2026-08-21, D-016):** the owner activated all 17 sourced packs by chat
+> approval before the box-by-box check below was performed. The packs now run in
+> production. The checklist REMAINS OPEN: each unchecked box is a value the owner has
+> approved on the strength of automated cross-checks (source hashes + regulator worked
+> examples reproduced in tests) but has not yet personally verified against the source.
+> `verifiedAt` stays null until that happens. Pack statuses below reflect the pre-activation
+> state and are retained as the audit trail of what was activated.
 
 ## ATO — How GST works
 

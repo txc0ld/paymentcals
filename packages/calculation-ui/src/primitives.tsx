@@ -71,12 +71,15 @@ export function Badge({
   tone: "neutral" | "warn" | "error" | "positive" | "draft";
   children: ReactNode;
 }) {
+  /* Status badges render in the brand accent (owner directive); the label
+   * text remains the non-colour cue. Error/positive keep semantic colour. */
   const tones: Record<string, string> = {
-    neutral: "border-hairline text-ink-2",
-    warn: "border-warn text-warn",
+    neutral: "border-[var(--pc-accent)] text-[var(--pc-accent-text)]",
+    warn: "border-[var(--pc-accent)] text-[var(--pc-accent-text)]",
     error: "border-error text-error",
     positive: "border-positive text-positive",
-    draft: "border-warn bg-warn-surface text-warn",
+    draft:
+      "border-[var(--pc-accent)] bg-[color-mix(in_srgb,var(--pc-accent)_10%,transparent)] text-[var(--pc-accent-text)]",
   };
   return (
     <span

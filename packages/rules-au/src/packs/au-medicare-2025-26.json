@@ -5,7 +5,7 @@
   "domain": "medicare",
   "effectiveFrom": "2025-07-01",
   "effectiveTo": "2026-06-30",
-  "status": "in_review",
+  "status": "active",
   "schemaVersion": 1,
   "rulesVersion": "0.1.0",
   "sources": [
@@ -58,8 +58,8 @@
   ],
   "review": {
     "preparedBy": "claude-build-agent",
-    "approvedBy": null,
-    "approvedAt": null
+    "approvedBy": "owner (chat approval, 2026-08-21)",
+    "approvedAt": "2026-08-21T03:00:00Z"
   },
   "verifiedAt": null,
   "rules": {

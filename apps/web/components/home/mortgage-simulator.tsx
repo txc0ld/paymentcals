@@ -19,6 +19,7 @@ import type { SLedgerResult } from "../../lib/ledger-serialize";
 import { parseMoneyInput } from "../../lib/money-input";
 import { useLedgerJob } from "../../lib/use-ledger";
 import { MortgageDisclosure } from "./mortgage-disclosure";
+import { DeltaCell, MetricCell, diffMajor } from "./result-parts";
 import { ScheduleView } from "./schedule-view";
 import { TimelineEditor, type DraftEvent } from "./timeline-editor";
 import { LOAN_BASICS_DEFAULTS, LoanBasicsFields, PPY, parseLoanBasics, type LoanBasicsState } from "./loan-fields";
@@ -142,7 +143,7 @@ export function MortgageSimulator() {
       inputs={
         <div className="grid gap-6">
           {mode === "compare" ? (
-            <div className="flex items-center justify-between gap-3">
+            <div className="flex flex-wrap items-center justify-between gap-4">
               <SegmentedControl
                 label="Scenario being edited"
                 value={active}
@@ -179,8 +180,8 @@ export function MortgageSimulator() {
             fees on a scheduled ledger.
           </EmptyState>
         ) : (
-          <div className="grid gap-5">
-            <div className="nexus-result grid gap-6 p-6">
+          <div className="grid gap-6">
+            <div className="nexus-result grid gap-6 p-6 md:p-8">
               <div className="flex items-start justify-between gap-4">
                 <PrimaryResult
                   label={mode === "compare" ? "Scenario A · total interest" : "Total interest over the loan"}
@@ -190,28 +191,36 @@ export function MortgageSimulator() {
                 <Badge tone="neutral">Scheduled model</Badge>
               </div>
               {mode === "compare" && resultB.result ? (
-                <div className="grid gap-3 border-t border-hairline pt-4 sm:grid-cols-3">
+                <div className="grid gap-4 border-t border-hairline pt-6 sm:grid-cols-3">
                   <ResultMetric
                     label="Scenario B · total interest"
                     amount={moneyFromDecimalString("AUD", resultB.result.totalInterest, 2)}
+                    detail={`paid off ${resultB.result.payoffDate ?? "beyond term"}`}
                   />
-                  <ResultMetric
+                  {/* Exact decimal subtraction of the two serialized totals — never floats. */}
+                  <DeltaCell
                     label="Interest difference (A − B)"
-                    amount={moneyFromDecimalString(
-                      "AUD",
-                      (Number.parseFloat(resultA.result.totalInterest) - Number.parseFloat(resultB.result.totalInterest)).toFixed(2),
-                      2,
-                    )}
+                    signedValue={diffMajor(resultA.result.totalInterest, resultB.result.totalInterest)}
+                    detail={
+                      resultA.result.totalInterest === resultB.result.totalInterest
+                        ? "the two scenarios cost the same in interest"
+                        : `A pays ${diffMajor(resultA.result.totalInterest, resultB.result.totalInterest).startsWith("-") ? "less" : "more"} interest than B`
+                    }
                   />
-                  <div className="grid gap-1 rounded-[var(--pc-radius-control)] border border-hairline bg-surface p-4">
-                    <span className="font-mono text-[10px] uppercase tracking-[0.16em] text-ink-3">Time difference</span>
-                    <span className="font-mono text-xl tabular-nums text-ink">
-                      {periodsToYearsLabel(Math.abs(resultA.result.periodsUsed - resultB.result.periodsUsed), PPY[scenarioA.basics.frequency])}
-                    </span>
-                    <span className="text-[12px] leading-4 text-ink-3">
-                      {resultA.result.periodsUsed >= resultB.result.periodsUsed ? "B pays off sooner" : "A pays off sooner"}
-                    </span>
-                  </div>
+                  <MetricCell
+                    label="Time difference"
+                    value={periodsToYearsLabel(
+                      Math.abs(resultA.result.periodsUsed - resultB.result.periodsUsed),
+                      PPY[scenarioA.basics.frequency],
+                    )}
+                    detail={
+                      resultA.result.periodsUsed === resultB.result.periodsUsed
+                        ? "both pay off on the same schedule"
+                        : resultA.result.periodsUsed > resultB.result.periodsUsed
+                          ? "B pays off sooner"
+                          : "A pays off sooner"
+                    }
+                  />
                 </div>
               ) : null}
               {resultA.result.negativeAmortisation ? (
@@ -226,7 +235,7 @@ export function MortgageSimulator() {
       }
       explanation={
         resultA.result ? (
-          <div className="nexus-panel-soft min-w-0 p-5 md:p-6">
+          <div className="nexus-panel-soft min-w-0 p-6 md:p-8">
             <ScheduleView
               result={mode === "compare" && active === "B" && resultB.result ? resultB.result : resultA.result}
               calculatorId={entry.id}

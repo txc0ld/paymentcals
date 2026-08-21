@@ -58,8 +58,8 @@ export function LineItemsEditor({
                   </button>
                 ) : null}
               </div>
-              <div className="grid gap-3 sm:grid-cols-[1fr_auto]">
-                <label className="grid gap-1">
+              <div className="grid gap-4 sm:grid-cols-[1fr_auto]">
+                <label className="grid gap-1.5">
                   <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-ink-2">
                     Description (optional)
                   </span>
@@ -70,7 +70,7 @@ export function LineItemsEditor({
                     className="nexus-input min-h-11 min-w-0 bg-surface px-3 text-sm text-ink outline-none placeholder:text-ink-3 focus:border-focus"
                   />
                 </label>
-                <label className="grid gap-1">
+                <label className="grid gap-1.5">
                   <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-ink-2">Qty</span>
                   <input
                     inputMode="numeric"
@@ -81,8 +81,8 @@ export function LineItemsEditor({
                   />
                 </label>
               </div>
-              <div className="grid gap-3 lg:grid-cols-[1fr_auto_auto]">
-                <label className="grid gap-1">
+              <div className="grid gap-4 lg:grid-cols-[1fr_auto_auto]">
+                <label className="grid gap-1.5">
                   <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-ink-2">
                     Unit amount
                   </span>
@@ -102,7 +102,7 @@ export function LineItemsEditor({
                     <span role="alert" className="text-[12px] text-error">{error}</span>
                   ) : null}
                 </label>
-                <div className="grid content-end gap-1">
+                <div className="grid content-end gap-1.5">
                   <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-ink-2">Amount is</span>
                   <SegmentedControl
                     size="sm"
@@ -115,7 +115,7 @@ export function LineItemsEditor({
                     ]}
                   />
                 </div>
-                <div className="grid content-end gap-1">
+                <div className="grid content-end gap-1.5">
                   <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-ink-2">Treatment</span>
                   <SegmentedControl
                     size="sm"

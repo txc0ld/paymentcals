@@ -11,6 +11,7 @@ import {
   ResultMetric,
   ToggleField,
   UniversalDisclosure,
+  formatMoney,
 } from "@paymentcalcs/calculation-ui";
 import { getRegistryEntry } from "@paymentcalcs/calculator-registry";
 import { moneyFromDecimalString, moneyToDecimalString } from "@paymentcalcs/calculation-core";
@@ -54,22 +55,39 @@ export function ContractorCalculator() {
       ? ((gstResolution.pack as GstRulePack).rules.standardRate ?? null)
       : null;
 
-  const result = useMemo(() => {
-    if (!income.ok || !utilisationValid) return null;
-    return contractorRates({
+  const runAtUtilisation = useMemo(() => {
+    if (!income.ok) return null;
+    const base = {
       targetIncome: moneyToDecimalString(income.money),
       superReplacementRate: "0.12",
       annualLeaveDays: 20,
       personalLeaveDays: 10,
       publicHolidays: 11,
       nonBillableDays: 20,
-      utilisation: (Number.parseFloat(utilisationPctRaw) / 100).toString(),
       hoursPerBillableDay: "7.6",
       overheadsAnnual: overheads.ok ? moneyToDecimalString(overheads.money) : "0",
       profitMargin: "0.1",
       gstRate,
-    });
-  }, [income, utilisationValid, utilisationPctRaw, overheads, gstRate]);
+    };
+    return (utilisationPct: number) =>
+      contractorRates({ ...base, utilisation: (utilisationPct / 100).toString() });
+  }, [income, overheads, gstRate]);
+
+  const result = useMemo(() => {
+    if (!runAtUtilisation || !utilisationValid) return null;
+    return runAtUtilisation(Number.parseFloat(utilisationPctRaw));
+  }, [runAtUtilisation, utilisationValid, utilisationPctRaw]);
+
+  // Rate sensitivity: the same engine re-run at ±10 percentage points of
+  // utilisation, clamped to the 1–100% domain. All figures exclude GST.
+  const sensitivity = useMemo(() => {
+    if (!runAtUtilisation || !utilisationValid) return null;
+    const chosen = Number.parseFloat(utilisationPctRaw);
+    const points = [chosen - 10, chosen, chosen + 10]
+      .map((pct) => Math.min(100, Math.max(1, Math.round(pct * 100) / 100)))
+      .filter((pct, index, all) => all.indexOf(pct) === index);
+    return points.map((pct) => ({ pct, run: runAtUtilisation(pct), chosen: pct === chosen }));
+  }, [runAtUtilisation, utilisationValid, utilisationPctRaw]);
 
   const draft = gstResolution !== "pending" && gstResolution.ok && gstResolution.draft && gstRegistered;
 
@@ -139,13 +157,13 @@ export function ContractorCalculator() {
           !result ? (
             <EmptyState>Enter a target income to see the day rate that actually covers it.</EmptyState>
           ) : (
-            <div className="nexus-result grid gap-6 p-6">
+            <div className="nexus-result grid min-w-0 gap-6 p-6 md:p-8">
               <PrimaryResult
                 label="Target day rate (excluding GST)"
                 amount={moneyFromDecimalString("AUD", result.targetDayRate.toFixed(2), 2)}
                 qualifier={`${result.billableDays.toFixed(0)} billable days from ${result.capacityDays} available. Break-even is ${formatMajor(result.breakEvenDayRate.toFixed(2))} per day; the target adds the risk margin.`}
               />
-              <div className="grid gap-3 border-t border-hairline pt-4 sm:grid-cols-3">
+              <div className="grid gap-4 border-t border-hairline pt-6 sm:grid-cols-3">
                 <ResultMetric label="Hourly equivalent" amount={moneyFromDecimalString("AUD", result.targetHourlyRate.toFixed(2), 2)} />
                 <ResultMetric
                   label="Super replacement"
@@ -159,12 +177,58 @@ export function ContractorCalculator() {
                     detail="including GST, which is not revenue"
                   />
                 ) : (
-                  <div className="grid gap-1 rounded-[var(--pc-radius-control)] border border-hairline bg-surface p-4">
+                  <div className="nexus-panel-soft flex min-w-0 flex-col gap-1 p-4">
                     <span className="font-mono text-[10px] uppercase tracking-[0.16em] text-ink-3">GST</span>
                     <span className="text-[13px] leading-5 text-ink-2">Not registered; no GST added to the quote.</span>
                   </div>
                 )}
               </div>
+              {sensitivity && sensitivity.length > 1 ? (
+                <div className="grid min-w-0 gap-4 border-t border-hairline pt-6">
+                  <h3 className="font-mono text-[10px] uppercase tracking-[0.18em] text-ink-3">
+                    Rate sensitivity to utilisation (excluding GST)
+                  </h3>
+                  <div className="overflow-x-auto">
+                    <table className="nexus-table w-full min-w-[360px] border-collapse text-left">
+                      <caption className="sr-only">
+                        Target day rate at utilisation ten points below, at, and ten points above the
+                        chosen figure
+                      </caption>
+                      <thead>
+                        <tr className="border-b border-hairline font-mono text-[10px] uppercase tracking-[0.14em] text-ink-3">
+                          <th scope="col" className="py-2 pe-4 font-normal">Utilisation</th>
+                          <th scope="col" className="py-2 pe-4 text-right font-normal">Billable days</th>
+                          <th scope="col" className="py-2 text-right font-normal">Day rate ex GST</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {sensitivity.map((row) => (
+                          <tr key={row.pct} className="border-b border-hairline last:border-b-0">
+                            <td className="py-2 pe-4 font-mono text-[13px] tabular-nums text-ink">
+                              {row.pct}%
+                              {row.chosen ? (
+                                <span className="ms-2 border-b-2 border-accent pb-0.5 font-mono text-[10px] uppercase tracking-[0.14em] text-ink">
+                                  chosen
+                                </span>
+                              ) : null}
+                            </td>
+                            <td className="py-2 pe-4 text-right font-mono text-[13px] tabular-nums text-ink">
+                              {row.run.billableDays.toFixed(0)}
+                            </td>
+                            <td className="py-2 text-right font-mono text-[13px] tabular-nums text-ink">
+                              {formatMoney(moneyFromDecimalString("AUD", row.run.targetDayRate.toFixed(2), 2))}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                  <p className="text-[12px] leading-5 text-ink-3">
+                    GST is quoted separately from every figure in this table; it is never treated as
+                    revenue.
+                  </p>
+                </div>
+              ) : null}
               {result.warnings.map((warning) => (
                 <p key={warning} className="border-l-2 border-warn pl-3 text-[13px] leading-5 text-ink-2">
                   {warning}

@@ -135,7 +135,7 @@ export function StampDutyCalculator({ variant }: { variant: "duty" | "buying_cos
         }
         results={
           unsupported ? (
-            <div className="nexus-panel-soft grid gap-3 p-8 text-center">
+            <div className="nexus-panel-soft grid min-w-0 gap-4 p-6 text-center md:p-8">
               <Badge tone="warn">{state} not yet supported</Badge>
               <p className="mx-auto max-w-md text-[14px] leading-6 text-ink-2">
                 The official {state} duty rates have not been transcribed and verified yet, so no
@@ -145,7 +145,7 @@ export function StampDutyCalculator({ variant }: { variant: "duty" | "buying_cos
           ) : !duty ? (
             <EmptyState>Enter the property value to estimate the general transfer duty.</EmptyState>
           ) : (
-            <div className="nexus-result grid gap-6 p-6">
+            <div className="nexus-result grid min-w-0 gap-6 p-6 md:p-8">
               <PrimaryResult
                 label={variant === "duty" ? `Estimated ${state} transfer duty` : "Estimated upfront costs"}
                 amount={moneyFromDecimalString(
@@ -160,11 +160,48 @@ export function StampDutyCalculator({ variant }: { variant: "duty" | "buying_cos
                 }
               />
               {variant === "buying_costs" ? (
-                <div className="grid gap-3 border-t border-hairline pt-4 sm:grid-cols-2">
+                <div className="grid gap-4 border-t border-hairline pt-6 sm:grid-cols-2">
                   <ResultMetric label="Transfer duty" amount={moneyFromDecimalString("AUD", duty.duty.toFixed(2), 2)} />
                   <ResultMetric label="Your entered costs" amount={moneyFromDecimalString("AUD", extras.toFixed(2), 2)} />
                 </div>
               ) : null}
+              {/* The bracket actually applied, read straight from the resolved
+                * duty pack — never a rate held in this component. */}
+              <div className="grid min-w-0 gap-4 border-t border-hairline pt-6">
+                <h3 className="font-mono text-[10px] uppercase tracking-[0.18em] text-ink-3">
+                  Bracket applied from the {state} duty rules
+                </h3>
+                <div className="overflow-x-auto">
+                  <table className="nexus-table w-full min-w-[360px] border-collapse text-left">
+                    <caption className="sr-only">The general transfer duty bracket applied to this value</caption>
+                    <thead>
+                      <tr className="border-b border-hairline font-mono text-[10px] uppercase tracking-[0.14em] text-ink-3">
+                        <th scope="col" className="py-2 pe-4 font-normal">Value over</th>
+                        <th scope="col" className="py-2 pe-4 text-right font-normal">Base duty</th>
+                        <th scope="col" className="py-2 text-right font-normal">Per $100</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td className="py-2 pe-4 font-mono text-[13px] tabular-nums text-ink">
+                          {formatMajor(duty.bracketOver)}
+                        </td>
+                        <td className="py-2 pe-4 text-right font-mono text-[13px] tabular-nums text-ink">
+                          {formatMajor(duty.bracketBase.toFixed(2))}
+                        </td>
+                        <td className="py-2 text-right font-mono text-[13px] tabular-nums text-ink">
+                          {formatMajor(duty.ratePer100.toFixed(2))}
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+                <p className="text-[12px] leading-5 text-ink-3">
+                  {duty.hundredsCounted.toFixed(0)} whole or part hundreds counted above the bracket
+                  threshold.
+                  {duty.minimumApplied ? " The statutory minimum duty applied instead of the bracket calculation." : ""}
+                </p>
+              </div>
             </div>
           )
         }

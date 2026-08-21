@@ -1,7 +1,13 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import type { CalculationResultV1, Money } from "@paymentcalcs/calculation-core";
+import {
+  isZeroMoney,
+  subtractMoney,
+  sumMoney,
+  type CalculationResultV1,
+  type Money,
+} from "@paymentcalcs/calculation-core";
 import {
   CalculatorHeader,
   CalculatorShell,
@@ -312,6 +318,36 @@ export function GstCalculator() {
   const draft = resolution !== "pending" && resolution.ok && resolution.draft;
   const output = result?.output;
 
+  /**
+   * Invoice reconciliation: the rendered lines summed against the invoice
+   * totals the engine reported. A difference is stated in full, never hidden —
+   * with invoice-total rounding the two can legitimately differ by cents.
+   */
+  const reconciliation = useMemo(() => {
+    const lines = output?.lines;
+    if (!output || !lines || lines.length === 0) return null;
+    const { currency, scale } = output.inclusiveAmount;
+    const sums = {
+      exclusive: sumMoney(currency, scale, lines.map((line) => line.exclusiveAmount)),
+      gst: sumMoney(currency, scale, lines.map((line) => line.gstAmount)),
+      inclusive: sumMoney(currency, scale, lines.map((line) => line.inclusiveAmount)),
+    };
+    const differences = {
+      exclusive: subtractMoney(sums.exclusive, output.exclusiveAmount),
+      gst: subtractMoney(sums.gst, output.gstAmount),
+      inclusive: subtractMoney(sums.inclusive, output.inclusiveAmount),
+    };
+    return {
+      sums,
+      differences,
+      lineCount: lines.length,
+      matched:
+        isZeroMoney(differences.exclusive) &&
+        isZeroMoney(differences.gst) &&
+        isZeroMoney(differences.inclusive),
+    };
+  }, [output]);
+
   return (
     <>
       {draft ? <DraftRulesBanner /> : null}
@@ -400,7 +436,7 @@ export function GstCalculator() {
             </div>
           ) : (
             <div className="grid gap-6">
-              <div className="grid gap-1">
+              <div className="grid gap-1.5">
                 <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-ink-2">Rounding</span>
                 <SegmentedControl
                   label="Rounding level"
@@ -429,7 +465,7 @@ export function GstCalculator() {
               below the result.
             </EmptyState>
           ) : (
-            <div className="nexus-result grid min-w-0 gap-6 p-5 md:p-7">
+            <div className="nexus-result grid min-w-0 gap-6 p-6 md:p-8">
               <PrimaryResult
                 label={output.mode === "line_items" ? "Invoice total (inc GST)" : PRIMARY_LABELS[output.mode as SimpleMode]}
                 amount={
@@ -443,13 +479,13 @@ export function GstCalculator() {
                 }
                 qualifier={`At the standard GST rate of ${formatRatePercent(output.rate)} under the resolved rule pack.`}
               />
-              <div className="grid gap-3 sm:grid-cols-3">
+              <div className="grid gap-4 sm:grid-cols-3">
                 <ResultMetric label="Excluding GST" amount={output.exclusiveAmount} />
                 <ResultMetric label="GST" amount={output.gstAmount} />
                 <ResultMetric label="Including GST" amount={output.inclusiveAmount} />
               </div>
               {result && result.warnings.length > 0 ? (
-                <ul className="grid gap-3">
+                <ul className="grid gap-4">
                   {result.warnings.map((warning) => (
                     <li key={warning.code} className="nexus-panel-soft border-warn bg-warn-surface p-4 text-[13px] leading-5 text-ink-2">
                       {warning.message}
@@ -465,7 +501,7 @@ export function GstCalculator() {
             <ExplainabilityTabs
               result={result}
               summary={
-                <div className="grid gap-3">
+                <div className="grid gap-4">
                   <p className="max-w-2xl text-[14px] leading-6 text-ink">
                     {output.mode === "add"
                       ? `Adding ${formatRatePercent(output.rate)} GST to ${formatMoney(output.exclusiveAmount)} gives ${formatMoney(output.inclusiveAmount)}. The GST component is ${formatMoney(output.gstAmount)}.`
@@ -480,7 +516,8 @@ export function GstCalculator() {
               }
               breakdown={
                 output.lines && output.lines.length > 0 ? (
-                  <div className="nexus-table max-w-full overflow-x-auto p-4">
+                  <div className="grid min-w-0 gap-4">
+                  <div className="nexus-table max-w-full overflow-x-auto p-4 md:p-6">
                     <table className="w-full min-w-[560px] border-collapse text-left">
                       <caption className="sr-only">GST breakdown per invoice line</caption>
                       <thead>
@@ -531,8 +568,44 @@ export function GstCalculator() {
                       </tbody>
                     </table>
                   </div>
+                  {reconciliation ? (
+                    <div
+                      className={`nexus-panel-soft grid min-w-0 gap-2 p-4 md:p-6 ${
+                        reconciliation.matched ? "" : "border-warn bg-warn-surface"
+                      }`}
+                    >
+                      <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-ink-3">
+                        Totals reconciliation
+                      </span>
+                      <dl className="grid gap-1.5">
+                        {(
+                          [
+                            ["Lines excluding GST", reconciliation.sums.exclusive, reconciliation.differences.exclusive],
+                            ["Lines GST", reconciliation.sums.gst, reconciliation.differences.gst],
+                            ["Lines including GST", reconciliation.sums.inclusive, reconciliation.differences.inclusive],
+                          ] as const
+                        ).map(([label, sum, difference]) => (
+                          <div key={label} className="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1">
+                            <dt className="text-[13px] leading-5 text-ink-2">{label}</dt>
+                            <dd className="font-mono text-[13px] tabular-nums text-ink">
+                              {formatMoney(sum)}
+                              {isZeroMoney(difference) ? null : (
+                                <span className="ps-2 text-ink-2">({formatMoney(difference)} against the invoice total)</span>
+                              )}
+                            </dd>
+                          </div>
+                        ))}
+                      </dl>
+                      <p className="text-[12px] leading-5 text-ink-2">
+                        {reconciliation.matched
+                          ? `The ${reconciliation.lineCount} ${reconciliation.lineCount === 1 ? "line" : "lines"} sum to the invoice totals to the cent.`
+                          : `The ${reconciliation.lineCount} lines differ from the invoice totals by the amounts shown, because rounding is applied at the invoice total rather than per line.`}
+                      </p>
+                    </div>
+                  ) : null}
+                  </div>
                 ) : (
-                  <dl className="nexus-table grid max-w-sm gap-2 p-4">
+                  <dl className="nexus-table grid max-w-sm gap-2 p-4 md:p-6">
                     {(
                       [
                         ["Excluding GST", output.exclusiveAmount],

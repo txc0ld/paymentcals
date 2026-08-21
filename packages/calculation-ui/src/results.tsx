@@ -56,7 +56,7 @@ export function PrimaryResult({
   const swept = useSweptValue(amount);
   const exact = formatMoney(amount);
   return (
-    <div className="flex min-w-0 flex-col gap-3 border border-hairline-strong bg-surface p-5 md:p-6">
+    <div className="flex min-w-0 flex-col gap-3 border border-hairline-strong bg-surface p-6 md:p-8">
       <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-ink-3">{label}</span>
       {/* Visual sweep is aria-hidden; the true value is announced immediately. */}
       <span aria-hidden="true" data-money className="break-words font-mono text-[length:var(--pc-text-result-xl)] font-medium leading-none tracking-tight tabular-nums text-ink">
@@ -80,7 +80,7 @@ export function ResultMetric({
   detail?: string;
 }) {
   return (
-    <div className="nexus-panel-soft flex min-w-0 flex-col gap-1 p-4">
+    <div className="nexus-panel-soft flex min-w-0 flex-col gap-1 p-5">
       <span className="font-mono text-[10px] uppercase tracking-[0.16em] text-ink-3">{label}</span>
       <span className="font-mono text-xl tabular-nums text-ink">{formatMoney(amount)}</span>
       {detail ? <span className="text-[12px] leading-4 text-ink-3">{detail}</span> : null}

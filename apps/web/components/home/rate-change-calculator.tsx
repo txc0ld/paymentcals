@@ -15,9 +15,21 @@ import { formatMajor } from "../../lib/format-major";
 import type { SLedgerResult } from "../../lib/ledger-serialize";
 import { useLedgerJob } from "../../lib/use-ledger";
 import { MortgageDisclosure } from "./mortgage-disclosure";
-import { LOAN_BASICS_DEFAULTS, LoanBasicsFields, parseLoanBasics, type LoanBasicsState } from "./loan-fields";
+import {
+  DeltaCell,
+  MetricCell,
+  PanelHeading,
+  diffMajor,
+  directionOf,
+  formatSignedMajor,
+  scaleMajor,
+} from "./result-parts";
+import { LOAN_BASICS_DEFAULTS, LoanBasicsFields, PPY, parseLoanBasics, type LoanBasicsState } from "./loan-fields";
 
 const entry = getRegistryEntry("AU-HOME-007")!;
+
+const CYCLE_NOUN = { weekly: "week", fortnightly: "fortnight", monthly: "month" } as const;
+const DIRECTION_WORD = { up: "more", down: "less", flat: "no change" } as const;
 
 export function RateChangeCalculator() {
   const [state, setState] = useState<LoanBasicsState>(LOAN_BASICS_DEFAULTS);
@@ -78,6 +90,21 @@ export function RateChangeCalculator() {
     return row?.payment ?? null;
   }, [changed.result]);
 
+  /** Signed deltas over amounts the ledger already produced — no new maths on the loan. */
+  const delta = useMemo(() => {
+    if (!changed.result || !baseline.result || newRepayment === null) return null;
+    const before = changed.result.scheduledPaymentInitial;
+    const perRepayment = diffMajor(newRepayment, before);
+    return {
+      before,
+      after: newRepayment,
+      perRepayment,
+      perRepaymentDirection: directionOf(perRepayment),
+      perMonth: scaleMajor(perRepayment, PPY[state.frequency], 12),
+      lifetimeInterest: diffMajor(changed.result.totalInterest, baseline.result.totalInterest),
+    };
+  }, [changed.result, baseline.result, newRepayment, state.frequency]);
+
   return (
     <CalculatorShell
       header={
@@ -120,32 +147,64 @@ export function RateChangeCalculator() {
         </div>
       }
       results={
-        !changed.result || !baseline.result || newRepayment === null ? (
+        !changed.result || !baseline.result || newRepayment === null || delta === null ? (
           <EmptyState>Enter your loan and the new rate to see the repayment change and lifetime effect.</EmptyState>
         ) : (
-          <div className="nexus-result grid gap-6 p-6">
+          <div className="nexus-result grid gap-6 p-6 md:p-8">
             <PrimaryResult
               label="Repayment after the change"
               amount={moneyFromDecimalString("AUD", newRepayment, 2)}
               qualifier={`Was ${formatMajor(changed.result.scheduledPaymentInitial)} before the change. Under the "${policy === "keep_amount" ? "keep the repayment" : "recalculate to term"}" policy.`}
             />
-            <div className="grid gap-3 border-t border-hairline pt-4 sm:grid-cols-2">
+            <div className="grid min-w-0 gap-4 border-t border-hairline pt-6">
+              <PanelHeading>What changes</PanelHeading>
+              <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+                <MetricCell
+                  label="Before the change"
+                  value={formatMajor(delta.before)}
+                  detail={`per ${CYCLE_NOUN[state.frequency]}, from the first repayment`}
+                />
+                <MetricCell
+                  label="After the change"
+                  value={formatMajor(delta.after)}
+                  detail={`per ${CYCLE_NOUN[state.frequency]}, from 1 Jan 2027`}
+                />
+                <DeltaCell
+                  label="Repayment difference"
+                  signedValue={delta.perRepayment}
+                  detail={`${DIRECTION_WORD[delta.perRepaymentDirection]} per ${CYCLE_NOUN[state.frequency]}${
+                    state.frequency === "monthly"
+                      ? ""
+                      : ` · ${formatSignedMajor(delta.perMonth)} per month equivalent`
+                  }`}
+                />
+                <DeltaCell
+                  label="Interest difference"
+                  signedValue={delta.lifetimeInterest}
+                  detail={`${DIRECTION_WORD[directionOf(delta.lifetimeInterest)]} in interest over the whole schedule, against the unchanged rate`}
+                />
+              </div>
+            </div>
+            <div className="grid gap-4 border-t border-hairline pt-6 sm:grid-cols-2">
               <ResultMetric
                 label="Lifetime interest at new rate"
                 amount={moneyFromDecimalString("AUD", changed.result.totalInterest, 2)}
                 detail={`vs ${formatMajor(baseline.result.totalInterest)} unchanged`}
               />
-              <div className="grid gap-1 rounded-[var(--pc-radius-control)] border border-hairline bg-surface p-4">
-                <span className="font-mono text-[10px] uppercase tracking-[0.16em] text-ink-3">Paid off</span>
-                <span className="font-mono text-xl tabular-nums text-ink">
-                  {changed.result.payoffDate ?? "beyond term"}
-                </span>
-                {changed.result.unresolvedBalance ? (
-                  <span className="text-[12px] leading-4 text-warn">
-                    {formatMajor(changed.result.unresolvedBalance)} unpaid at term under this policy
-                  </span>
-                ) : null}
-              </div>
+              <MetricCell
+                label="Paid off"
+                value={changed.result.payoffDate ?? "beyond term"}
+                detail={
+                  changed.result.unresolvedBalance ? (
+                    <span className="text-warn">
+                      {formatMajor(changed.result.unresolvedBalance)} unpaid at term under this
+                      policy
+                    </span>
+                  ) : (
+                    `${changed.result.rows.length} repayments in total`
+                  )
+                }
+              />
             </div>
           </div>
         )

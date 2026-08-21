@@ -2,7 +2,12 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { CalculationResultV1, Money } from "@paymentcalcs/calculation-core";
-import { Dec, moneyToDecimal, type DecimalValue } from "@paymentcalcs/calculation-core";
+import {
+  Dec,
+  moneyFromDecimalString,
+  moneyToDecimal,
+  type DecimalValue,
+} from "@paymentcalcs/calculation-core";
 import {
   CalculatorHeader,
   CalculatorShell,
@@ -29,6 +34,7 @@ import {
   type AuPayInput,
   type AuPayOutput,
 } from "@paymentcalcs/engine-au-tax";
+import type { IncomeTaxRules, TaxBracket } from "@paymentcalcs/rules-au";
 import { decodeUrlState, encodeUrlState } from "@paymentcalcs/scenario-schema";
 import { analytics } from "../../lib/analytics";
 import { parseMoneyInput } from "../../lib/money-input";
@@ -229,10 +235,68 @@ const CYCLE_LABEL: Record<PayFormState["payCycle"], string> = {
   quarterly: "per quarter",
 };
 
+/** Display-only period for annualised figures. `annual` is the neutral default. */
+const DISPLAY_PERIODS = {
+  annual: { label: "per year", divisor: 1 },
+  monthly: { label: "per month", divisor: 12 },
+  fortnightly: { label: "per fortnight", divisor: 26 },
+  weekly: { label: "per week", divisor: 52 },
+} as const;
+type DisplayPeriod = keyof typeof DISPLAY_PERIODS;
+
+/** Annual Money → the selected display period. Decimal only, never floats. */
+function perPeriod(annual: Money, divisor: number): Money {
+  if (divisor === 1) return annual;
+  const value = (moneyToDecimal(annual) as DecimalValue).div(divisor);
+  return moneyFromDecimalString(annual.currency, value.toFixed(2), 2);
+}
+
+/** Whole-dollar bracket bound from the rule pack, formatted for display. */
+function formatBound(dollars: string): string {
+  return formatMoney(moneyFromDecimalString("AUD", dollars, 0));
+}
+
+/**
+ * The pack bracket the taxable income sits in. Fails closed: the band is only
+ * described when its rate agrees with the rate the engine reported, so a
+ * display-side lookup can never contradict the calculated result.
+ */
+function activeBracket(
+  rules: IncomeTaxRules,
+  residency: PayFormState["residency"],
+  taxableIncome: DecimalValue,
+  engineRate: string,
+): TaxBracket | null {
+  const brackets =
+    residency === "resident"
+      ? rules.resident
+      : residency === "foreign_resident"
+        ? rules.foreignResident
+        : rules.workingHolidayMaker;
+  if (!brackets) return null;
+  let active: TaxBracket | null = null;
+  for (const bracket of brackets) {
+    if (taxableIncome.greaterThan(new Dec(bracket.over))) active = bracket;
+  }
+  return active && active.rate === engineRate ? active : null;
+}
+
+/** Non-money readout, structurally identical to ResultMetric so rows align. */
+function StatCell({ label, value, detail }: { label: string; value: string; detail?: string }) {
+  return (
+    <div className="nexus-panel-soft flex min-w-0 flex-col gap-1 p-5">
+      <span className="font-mono text-[10px] uppercase tracking-[0.16em] text-ink-3">{label}</span>
+      <span className="font-mono text-xl tabular-nums text-ink">{value}</span>
+      {detail ? <span className="text-[12px] leading-4 text-ink-3">{detail}</span> : null}
+    </div>
+  );
+}
+
 export function PayCalculator({ variant }: { variant: PayVariant }) {
   const entry = getRegistryEntry(variant.calculatorId)!;
   const [state, setState] = useState<PayFormState>({ ...DEFAULT_STATE, ...variant.defaults });
   const [uiMode, setUiMode] = useState<"simple" | "advanced">("simple");
+  const [displayPeriod, setDisplayPeriod] = useState<DisplayPeriod>("annual");
   const [resolution, setResolution] = useState<PayResolutionOutcome | "pending">("pending");
   const [result, setResult] = useState<CalculationResultV1<AuPayOutput> | null>(null);
   const [savedFlash, setSavedFlash] = useState<string | null>(null);
@@ -369,6 +433,18 @@ export function PayCalculator({ variant }: { variant: PayVariant }) {
   const draft = resolution !== "pending" && resolution.ok && resolution.draft;
   const output = result?.output;
   const showHours = state.frequency === "hourly" || variant.simpleShowsHours === true;
+  const period = DISPLAY_PERIODS[displayPeriod];
+  const isAnnual = period.divisor === 1;
+  const shown = (annual: Money) => perPeriod(annual, period.divisor);
+  const bracket =
+    output && resolution !== "pending" && resolution.ok
+      ? activeBracket(
+          resolution.resolution.incomeTax.pack.rules,
+          state.residency,
+          moneyToDecimal(output.liability.taxableIncome) as DecimalValue,
+          output.liability.marginalBracketRate,
+        )
+      : null;
 
   return (
     <>
@@ -420,7 +496,7 @@ export function PayCalculator({ variant }: { variant: PayVariant }) {
                     key={label}
                     type="button"
                     onClick={handler}
-                    className="nexus-quiet-button min-h-11 px-2.5 font-mono text-[10px] uppercase tracking-[0.14em] text-ink-2 hover:text-ink focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-focus"
+                    className="nexus-quiet-button min-h-11 px-4 font-mono text-[10px] uppercase tracking-[0.14em] text-ink-2 hover:text-ink focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-focus"
                   >
                     {label}
                   </button>
@@ -449,7 +525,7 @@ export function PayCalculator({ variant }: { variant: PayVariant }) {
                 onChange={(amountRaw) => patch({ amountRaw })}
                 error={errors.amount}
               />
-              <div className="grid gap-4 sm:grid-cols-2">
+              <div className="grid items-start gap-4 sm:grid-cols-2">
                 <SelectField
                   id="pay-frequency"
                   label="Amount is per"
@@ -476,7 +552,7 @@ export function PayCalculator({ variant }: { variant: PayVariant }) {
                 />
               </div>
               {showHours ? (
-                <div className="grid gap-4 sm:grid-cols-2">
+                <div className="grid items-start gap-4 sm:grid-cols-2">
                   <div className="grid gap-1.5">
                     <label htmlFor="pay-hours" className="font-mono text-[11px] uppercase tracking-[0.14em] text-ink-2">
                       Ordinary hours per week
@@ -665,8 +741,26 @@ export function PayCalculator({ variant }: { variant: PayVariant }) {
               employer withholding, each shown separately.
             </EmptyState>
           ) : (
-            <div className="grid gap-5">
-              <div className="nexus-result grid gap-6 p-6">
+            <div className="grid gap-6">
+              <div className="no-print flex min-w-0 flex-wrap items-center justify-between gap-4">
+                <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-ink-3">
+                  Annualised amounts shown
+                </span>
+                <SegmentedControl
+                  label="Amounts shown per"
+                  size="sm"
+                  value={displayPeriod}
+                  onChange={setDisplayPeriod}
+                  options={[
+                    { value: "weekly", label: "Weekly" },
+                    { value: "fortnightly", label: "Fortnightly" },
+                    { value: "monthly", label: "Monthly" },
+                    { value: "annual", label: "Annual" },
+                  ]}
+                />
+              </div>
+
+              <div className="nexus-result grid gap-6 p-6 md:p-8">
                 <PrimaryResult
                   label={
                     variant.primaryMetric === "netPerCycle"
@@ -676,56 +770,158 @@ export function PayCalculator({ variant }: { variant: PayVariant }) {
                   amount={primaryAmount(variant, output, state)}
                   qualifier={`Annual estimate under FY ${state.financialYear} rules. Marginal bracket ${formatRatePercent(output.liability.marginalBracketRate)}; the next $1,000 of gross is worth ${formatMoney(output.netValueOfNextThousand)} after obligations.`}
                 />
-                <div className="grid gap-3 border-t border-hairline pt-4 sm:grid-cols-3">
-                  <ResultMetric label="Net per year" amount={output.netAnnualCash} />
-                  <ResultMetric label="Base salary" amount={output.annualised.baseSalary} />
-                  <ResultMetric label="Employer super" amount={output.annualised.employerSuper} detail="Paid to your fund, not cash" />
+                <div className="grid auto-rows-fr gap-4 border-t border-hairline pt-6 sm:grid-cols-3">
+                  <ResultMetric label={`Net ${period.label}`} amount={shown(output.netAnnualCash)} />
+                  <ResultMetric
+                    label={isAnnual ? "Base salary" : `Base salary ${period.label}`}
+                    amount={shown(output.annualised.baseSalary)}
+                  />
+                  <ResultMetric
+                    label={isAnnual ? "Employer super" : `Employer super ${period.label}`}
+                    amount={shown(output.annualised.employerSuper)}
+                    detail="Paid to your fund, not cash"
+                  />
+                </div>
+                <div className="grid auto-rows-fr gap-4 sm:grid-cols-2">
+                  <StatCell
+                    label="Effective rate on taxable income"
+                    value={formatRatePercent(output.liability.effectiveRateOnTaxable)}
+                    detail="Total annual liability ÷ taxable income"
+                  />
+                  <StatCell
+                    label="Marginal bracket"
+                    value={formatRatePercent(output.liability.marginalBracketRate)}
+                    detail={
+                      bracket === null
+                        ? "Statutory bracket rate at your taxable income"
+                        : bracket.upTo === null
+                          ? `On each dollar above ${formatBound(bracket.over)}`
+                          : `On each dollar from ${formatBound(bracket.over)} to ${formatBound(bracket.upTo)}`
+                    }
+                  />
                 </div>
               </div>
 
-              <section aria-label="Annual tax position" className="nexus-panel-soft grid gap-3 p-5">
-                <h2 className="font-mono text-[11px] tracking-[0.16em] text-ink-2">Annual tax position (estimate)</h2>
-                <dl className="grid gap-2">
-                  {(
-                    [
-                      ["Taxable income", output.liability.taxableIncome],
-                      ["Income tax", output.liability.grossIncomeTax],
-                      ["Low income tax offset", output.liability.litoOffset],
-                      ["Medicare levy", output.liability.medicareLevy],
-                      ["Medicare levy surcharge", output.liability.medicareLevySurcharge],
-                      ["Study loan repayment", output.liability.studyLoanRepayment],
-                      ["Total annual liability", output.liability.totalAnnualLiability],
-                    ] as const
-                  ).map(([label, amount]) => (
-                    <div key={label} className="flex items-baseline justify-between gap-6 border-b border-hairline pb-1.5 last:border-b-2 last:border-hairline-strong">
-                      <dt className="text-[13px] text-ink-2">{label}</dt>
-                      <dd className="font-mono text-[14px] tabular-nums text-ink">{formatMoney(amount)}</dd>
-                    </div>
-                  ))}
-                </dl>
+              <section aria-label="Annual tax position" className="nexus-panel-soft grid gap-4 p-6 md:p-8">
+                <div className="flex min-w-0 flex-wrap items-baseline justify-between gap-x-6 gap-y-2">
+                  <h2 className="font-mono text-[11px] tracking-[0.16em] text-ink-2">
+                    {isAnnual ? "Annual tax position (estimate)" : "Tax position (estimate)"}
+                  </h2>
+                  <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-[var(--pc-accent-text)]">
+                    Shown {period.label}
+                  </span>
+                </div>
+                <div className="overflow-x-auto">
+                  <table className="w-full min-w-[320px] border-collapse text-left">
+                    <caption className="sr-only">
+                      Gross package through to net cash under the resolved rule packs
+                    </caption>
+                    <thead>
+                      <tr className="border-b border-hairline font-mono text-[10px] uppercase tracking-[0.14em] text-ink-3">
+                        <th scope="col" className="py-2 pe-4 font-normal">Line</th>
+                        <th scope="col" className="py-2 text-right font-normal">Amount {period.label}</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {(
+                        [
+                          ["Gross package", output.annualised.grossPackage, false],
+                          ["Employer super", output.annualised.employerSuper, false],
+                          ["Gross cash income", output.annualised.grossCashIncome, false],
+                          ["Taxable income", output.liability.taxableIncome, false],
+                          ["Income tax", output.liability.grossIncomeTax, false],
+                          ["Low income tax offset", output.liability.litoOffset, false],
+                          ["Medicare levy", output.liability.medicareLevy, false],
+                          ["Medicare levy surcharge", output.liability.medicareLevySurcharge, false],
+                          ["Study loan repayment", output.liability.studyLoanRepayment, false],
+                          [
+                            isAnnual ? "Total annual liability" : "Total liability",
+                            output.liability.totalAnnualLiability,
+                            true,
+                          ],
+                          ["Net cash", output.netAnnualCash, true],
+                        ] as const
+                      ).map(([label, amount, emphasis]) => (
+                        <tr
+                          key={label}
+                          className={
+                            emphasis
+                              ? "border-b-2 border-hairline-strong"
+                              : "border-b border-hairline"
+                          }
+                        >
+                          <th scope="row" className="py-2 pe-4 text-[13px] font-normal text-ink-2">
+                            {label}
+                          </th>
+                          <td
+                            className={`py-2 text-right font-mono text-[14px] tabular-nums ${
+                              emphasis ? "text-ink" : "text-ink-2"
+                            }`}
+                          >
+                            {formatMoney(shown(amount))}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+                <p className="text-[12px] leading-5 text-ink-3">
+                  The headline figure and the withholding below come straight from the engine&rsquo;s
+                  pay-cycle outputs and are never rescaled by this control.
+                </p>
               </section>
 
-              <section aria-label="Estimated employer withholding" className="nexus-panel-soft grid gap-3 p-5">
+              <section aria-label="Estimated employer withholding" className="nexus-panel-soft grid gap-4 p-6 md:p-8">
                 <h2 className="font-mono text-[11px] tracking-[0.16em] text-ink-2">
                   Estimated employer withholding ({CYCLE_LABEL[state.payCycle]})
                 </h2>
                 {output.withholding ? (
                   <>
-                    <dl className="grid gap-2">
-                      {(
-                        [
-                          ["PAYG withholding", output.withholding.perCycleOrdinary],
-                          ["Study loan component", output.withholding.perCycleStudyLoan],
-                          ["Additional withholding", output.withholding.perCycleAdditional],
-                          ["Total withheld per pay", output.withholding.perCycleTotal],
-                        ] as const
-                      ).map(([label, amount]) => (
-                        <div key={label} className="flex items-baseline justify-between gap-6 border-b border-hairline pb-1.5">
-                          <dt className="text-[13px] text-ink-2">{label}</dt>
-                          <dd className="font-mono text-[14px] tabular-nums text-ink">{formatMoney(amount)}</dd>
-                        </div>
-                      ))}
-                    </dl>
+                    <div className="overflow-x-auto">
+                      <table className="w-full min-w-[320px] border-collapse text-left">
+                        <caption className="sr-only">
+                          Withholding components for one pay period
+                        </caption>
+                        <thead>
+                          <tr className="border-b border-hairline font-mono text-[10px] uppercase tracking-[0.14em] text-ink-3">
+                            <th scope="col" className="py-2 pe-4 font-normal">Line</th>
+                            <th scope="col" className="py-2 text-right font-normal">
+                              Amount {CYCLE_LABEL[state.payCycle]}
+                            </th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {(
+                            [
+                              ["PAYG withholding", output.withholding.perCycleOrdinary, false],
+                              ["Study loan component", output.withholding.perCycleStudyLoan, false],
+                              ["Additional withholding", output.withholding.perCycleAdditional, false],
+                              ["Total withheld per pay", output.withholding.perCycleTotal, true],
+                            ] as const
+                          ).map(([label, amount, emphasis]) => (
+                            <tr
+                              key={label}
+                              className={
+                                emphasis
+                                  ? "border-b-2 border-hairline-strong"
+                                  : "border-b border-hairline"
+                              }
+                            >
+                              <th scope="row" className="py-2 pe-4 text-[13px] font-normal text-ink-2">
+                                {label}
+                              </th>
+                              <td
+                                className={`py-2 text-right font-mono text-[14px] tabular-nums ${
+                                  emphasis ? "text-ink" : "text-ink-2"
+                                }`}
+                              >
+                                {formatMoney(amount)}
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
                     <p className="text-[12px] leading-5 text-ink-3">
                       Annualised withholding {formatMoney(output.withholding.annualised)} differs from the
                       annual liability by {formatMoney(output.withholding.varianceFromAnnualLiability)}.
@@ -755,7 +951,7 @@ export function PayCalculator({ variant }: { variant: PayVariant }) {
             <ExplainabilityTabs
               result={result}
               summary={
-                <div className="grid gap-3">
+                <div className="grid gap-4">
                   <p className="max-w-2xl text-[14px] leading-6 text-ink">
                     {`On ${formatMoney(output.annualised.grossCashIncome)} of gross cash income in FY ${state.financialYear}, the estimated annual liability is ${formatMoney(output.liability.totalAnnualLiability)}, leaving ${formatMoney(output.netAnnualCash)} net per year (${formatMoney(output.netPerCycle)} ${CYCLE_LABEL[state.payCycle]}). Employer super of ${formatMoney(output.annualised.employerSuper)} is paid separately to your fund.`}
                   </p>

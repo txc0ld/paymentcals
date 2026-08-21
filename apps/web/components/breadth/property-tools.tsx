@@ -86,13 +86,13 @@ export function DepositCalculator() {
         !result ? (
           <EmptyState>Enter the property price and target LVR to see the deposit needed.</EmptyState>
         ) : (
-          <div className="nexus-result grid gap-6 p-6">
+          <div className="nexus-result grid min-w-0 gap-6 p-6 md:p-8">
             <PrimaryResult
               label={`Deposit at ${lvrPctRaw}% LVR`}
               amount={moneyFromDecimalString("AUD", result.deposit, 2)}
               qualifier={`With your entered upfront costs the cash needed is ${formatMajor(result.totalCashNeeded)}. The loan at this LVR is ${formatMajor(result.loan)}.`}
             />
-            <div className="grid gap-3 border-t border-hairline pt-4 sm:grid-cols-2">
+            <div className="grid gap-4 border-t border-hairline pt-6 sm:grid-cols-2">
               <ResultMetric label="Loan amount" amount={moneyFromDecimalString("AUD", result.loan, 2)} />
               <ResultMetric label="Total cash needed" amount={moneyFromDecimalString("AUD", result.totalCashNeeded, 2)} detail="deposit + entered costs" />
             </div>
@@ -143,7 +143,7 @@ export function LvrCalculator() {
         lvr === null ? (
           <EmptyState>Enter the property value and loan amount to calculate the LVR.</EmptyState>
         ) : (
-          <div className="nexus-result grid gap-6 p-6">
+          <div className="nexus-result grid min-w-0 gap-6 p-6 md:p-8">
             <div className="flex flex-col gap-2">
               <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-ink-3">
                 Loan-to-value ratio
@@ -233,7 +233,7 @@ export function AffordabilityEstimate() {
             error={!expenses.ok && expenses.error ? expenses.error : undefined}
           />
           <MoneyField id="aff-debts" label="Existing debt repayments per month" value={debtsRaw} onChange={setDebtsRaw} error={!debts.ok && debts.error ? debts.error : undefined} />
-          <div className="grid gap-4 sm:grid-cols-2">
+          <div className="grid items-start gap-4 sm:grid-cols-2">
             <div className="grid gap-1.5">
               <label htmlFor="aff-rate" className="font-mono text-[11px] uppercase tracking-[0.14em] text-ink-2">
                 Interest rate % p.a.
@@ -253,7 +253,7 @@ export function AffordabilityEstimate() {
         !range ? (
           <EmptyState>Enter your income to see an indicative borrowing range under generic assumptions.</EmptyState>
         ) : range.high.isZero() ? (
-          <div className="nexus-panel-soft grid gap-3 p-6">
+          <div className="nexus-panel-soft grid min-w-0 gap-4 p-6 md:p-8">
             <h2 className="text-lg font-semibold tracking-tight text-ink">No surplus under these assumptions</h2>
             <p className="text-[14px] leading-6 text-ink-2">
               After the expense floor and debt repayments there is no monthly surplus to service a
@@ -261,7 +261,7 @@ export function AffordabilityEstimate() {
             </p>
           </div>
         ) : (
-          <div className="nexus-result grid gap-6 p-6">
+          <div className="nexus-result grid min-w-0 gap-6 p-6 md:p-8">
             <PrimaryResult
               label="Indicative borrowing range"
               amount={moneyFromDecimalString("AUD", range.high.toFixed(2), 2)}

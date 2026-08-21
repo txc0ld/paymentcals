@@ -17,6 +17,7 @@ import type { SCompareResult } from "../../lib/ledger-serialize";
 import { parseMoneyInput } from "../../lib/money-input";
 import { useLedgerJob } from "../../lib/use-ledger";
 import { MortgageDisclosure } from "./mortgage-disclosure";
+import { MetricCell } from "./result-parts";
 import { ScheduleView } from "./schedule-view";
 import { LOAN_BASICS_DEFAULTS, LoanBasicsFields, PPY, parseLoanBasics, type LoanBasicsState } from "./loan-fields";
 
@@ -141,20 +142,19 @@ export function SavingsPresetCalculator({ variant }: { variant: SavingsVariant }
               : "Enter your loan and an extra repayment to see the interest and time saved."}
           </EmptyState>
         ) : (
-          <div className="grid gap-5">
-            <div className="nexus-result grid gap-6 p-6">
+          <div className="grid gap-6">
+            <div className="nexus-result grid gap-6 p-6 md:p-8">
               <PrimaryResult
                 label="Interest saved over the loan"
                 amount={moneyFromDecimalString("AUD", result.interestSaved, 2)}
                 qualifier={`Compared with the same loan and repayments but ${variant === "offset" ? "no offset balance" : "no extra repayments"}, on identical dates.`}
               />
-              <div className="grid gap-3 border-t border-hairline pt-4 sm:grid-cols-3">
-                <div className="grid gap-1 rounded-[var(--pc-radius-control)] border border-hairline bg-surface p-4">
-                  <span className="font-mono text-[10px] uppercase tracking-[0.16em] text-ink-3">Time saved</span>
-                  <span className="font-mono text-xl tabular-nums text-ink">
-                    {periodsToYearsLabel(result.periodsSaved, PPY[state.frequency])}
-                  </span>
-                </div>
+              <div className="grid gap-4 border-t border-hairline pt-6 sm:grid-cols-3">
+                <MetricCell
+                  label="Time saved"
+                  value={periodsToYearsLabel(result.periodsSaved, PPY[state.frequency])}
+                  detail={`paid off ${result.scenario.payoffDate ?? "beyond term"} instead of ${result.baseline.payoffDate ?? "beyond term"}`}
+                />
                 <ResultMetric
                   label="Interest with this plan"
                   amount={moneyFromDecimalString("AUD", result.scenario.totalInterest, 2)}
@@ -167,10 +167,11 @@ export function SavingsPresetCalculator({ variant }: { variant: SavingsVariant }
                     detail="available, not repaid"
                   />
                 ) : (
-                  <div className="grid gap-1 rounded-[var(--pc-radius-control)] border border-hairline bg-surface p-4">
-                    <span className="font-mono text-[10px] uppercase tracking-[0.16em] text-ink-3">Paid off</span>
-                    <span className="font-mono text-xl tabular-nums text-ink">{result.scenario.payoffDate ?? "beyond term"}</span>
-                  </div>
+                  <MetricCell
+                    label="Paid off"
+                    value={result.scenario.payoffDate ?? "beyond term"}
+                    detail={`${result.scenario.rows.length} repayments, ${result.baseline.rows.length} without the extra`}
+                  />
                 )}
               </div>
               {variant === "offset" ? (
@@ -186,7 +187,7 @@ export function SavingsPresetCalculator({ variant }: { variant: SavingsVariant }
       }
       explanation={
         result ? (
-          <div className="nexus-panel-soft min-w-0 p-5 md:p-6">
+          <div className="nexus-panel-soft min-w-0 p-6 md:p-8">
             <ScheduleView result={result.scenario} calculatorId={entry.id} frequency={state.frequency} />
           </div>
         ) : null
