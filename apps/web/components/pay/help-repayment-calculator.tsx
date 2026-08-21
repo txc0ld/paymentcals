@@ -19,8 +19,15 @@ import {
 import { getRegistryEntry } from "@paymentcalcs/calculator-registry";
 import { stslRepayment } from "@paymentcalcs/engine-au-tax";
 import { Dec, moneyFromDecimalString, moneyToDecimal, type DecimalValue } from "@paymentcalcs/calculation-core";
-import type { StslRules } from "@paymentcalcs/rules-au";
+import { resolveRulePack } from "@paymentcalcs/rule-schema";
+import {
+  allAuRulePacks,
+  auIntegrityManifest,
+  type HelpIndexationRulePack,
+  type StslRules,
+} from "@paymentcalcs/rules-au";
 import { analytics } from "../../lib/analytics";
+import { allowDraftRules } from "../../lib/draft-rules";
 import { parseMoneyInput } from "../../lib/money-input";
 import { FINANCIAL_YEARS, resolvePayPacks, type FinancialYear, type PayResolutionOutcome } from "../../lib/pay-packs";
 import { useScenarioActions } from "./use-scenario-actions";
@@ -29,6 +36,25 @@ const entry = getRegistryEntry("AU-PAY-013")!;
 
 /** Income steps either side of the entered figure, in whole dollars. */
 const SENSITIVITY_OFFSETS = [-10000, -5000, 0, 5000, 10000] as const;
+
+/** Published annual rates shown alongside the current one. */
+const INDEXATION_HISTORY_ROWS = 5;
+
+/** Indexation rules are optional: without them the section simply hides. */
+type IndexationResolution =
+  | "pending"
+  | { ok: true; pack: HelpIndexationRulePack; draft: boolean }
+  | { ok: false };
+
+/** Pack "MM-DD" → "1 June", so the date is never written from memory. */
+function appliesOnLabel(appliesOn: string): string {
+  const [month = "01", day = "01"] = appliesOn.split("-");
+  const monthName = new Date(Date.UTC(2000, Number(month) - 1, 1)).toLocaleDateString("en-AU", {
+    month: "long",
+    timeZone: "UTC",
+  });
+  return `${Number(day)} ${monthName}`;
+}
 
 /** Every band opening in the resolved pack, ascending. */
 function bandBoundaries(rules: StslRules): DecimalValue[] {
@@ -122,18 +148,43 @@ function tierWindow(rows: TierRow[], size = 5): TierRow[] {
 export function HelpRepaymentCalculator() {
   const [financialYear, setFinancialYear] = useState<FinancialYear>("2026-27");
   const [incomeRaw, setIncomeRaw] = useState("");
+  const [balanceRaw, setBalanceRaw] = useState("");
   const [resolution, setResolution] = useState<PayResolutionOutcome | "pending">("pending");
+  const [indexation, setIndexation] = useState<IndexationResolution>("pending");
 
   const scenario = useScenarioActions({
     calculatorId: entry.id,
-    state: { financialYear, incomeRaw },
+    state: { financialYear, incomeRaw, balanceRaw },
     onHydrate: (saved) => {
       if (FINANCIAL_YEARS.includes(saved.financialYear as FinancialYear)) {
         setFinancialYear(saved.financialYear as FinancialYear);
       }
       if (typeof saved.incomeRaw === "string") setIncomeRaw(saved.incomeRaw);
+      if (typeof saved.balanceRaw === "string") setBalanceRaw(saved.balanceRaw);
     },
   });
+
+  // Indexation rates resolve independently of the FY pay packs (fail-closed:
+  // an unresolved pack hides the section rather than showing a rate).
+  useEffect(() => {
+    let cancelled = false;
+    resolveRulePack(allAuRulePacks, auIntegrityManifest, {
+      domain: "help-indexation",
+      jurisdiction: "AU",
+      valuationDate: new Date().toISOString().slice(0, 10),
+      allowDraftRules,
+    }).then((outcome) => {
+      if (cancelled) return;
+      setIndexation(
+        outcome.ok
+          ? { ok: true, pack: outcome.pack as HelpIndexationRulePack, draft: outcome.draft }
+          : { ok: false },
+      );
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   useEffect(() => {
     let cancelled = false;
@@ -151,6 +202,10 @@ export function HelpRepaymentCalculator() {
   }, [financialYear]);
 
   const income = useMemo(() => parseMoneyInput(incomeRaw), [incomeRaw]);
+  const balance = useMemo(
+    () => (balanceRaw.trim() ? parseMoneyInput(balanceRaw) : null),
+    [balanceRaw],
+  );
 
   const repayment = useMemo(() => {
     if (resolution === "pending" || !resolution.ok || !resolution.resolution.stsl || !income.ok) return null;
@@ -174,7 +229,9 @@ export function HelpRepaymentCalculator() {
   }, [repayment, financialYear]);
 
   const stslMissing = resolution !== "pending" && resolution.ok && resolution.resolution.stsl === null;
-  const draft = resolution !== "pending" && resolution.ok && resolution.draft;
+  const draft =
+    (resolution !== "pending" && resolution.ok && resolution.draft) ||
+    (indexation !== "pending" && indexation.ok && indexation.draft);
   const rules =
     resolution !== "pending" && resolution.ok && resolution.resolution.stsl
       ? resolution.resolution.stsl.pack.rules
@@ -197,6 +254,23 @@ export function HelpRepaymentCalculator() {
         })
       : null;
   const boundary = rules && incomeDec ? nextBoundary(rules, incomeDec) : null;
+
+  /* Indexation is a single published event on one date — the latest rate
+   * applied once to the balance entered. Nothing is projected forward. */
+  const indexationRules = indexation !== "pending" && indexation.ok ? indexation.pack.rules : null;
+  const latestRate = indexationRules ? (indexationRules.rates[indexationRules.rates.length - 1] ?? null) : null;
+  const rateHistory = indexationRules
+    ? [...indexationRules.rates].slice(-INDEXATION_HISTORY_ROWS).reverse()
+    : [];
+  const appliesOn = indexationRules ? appliesOnLabel(indexationRules.appliesOn) : null;
+  const indexed =
+    latestRate && balance && balance.ok
+      ? (() => {
+          const principal = moneyToDecimal(balance.money) as DecimalValue;
+          const amount = principal.times(new Dec(latestRate.ratePercent)).div(100) as DecimalValue;
+          return { amount: toAud(amount), after: toAud(principal.plus(amount) as DecimalValue) };
+        })()
+      : null;
 
   return (
     <>
@@ -226,6 +300,7 @@ export function HelpRepaymentCalculator() {
                 onReset={() => {
                   setFinancialYear("2026-27");
                   setIncomeRaw("");
+                  setBalanceRaw("");
                 }}
               />
             }
@@ -254,6 +329,16 @@ export function HelpRepaymentCalculator() {
                 onChange={setIncomeRaw}
                 error={!income.ok && income.error ? income.error : undefined}
               />
+              {latestRate ? (
+                <MoneyField
+                  id="help-balance"
+                  label="Loan balance (optional)"
+                  description={`Your outstanding study loan balance, used only for the ${appliesOn} indexation figures. Blank leaves the repayment result unchanged.`}
+                  value={balanceRaw}
+                  onChange={setBalanceRaw}
+                  error={balance && !balance.ok && balance.error ? balance.error : undefined}
+                />
+              ) : null}
             </div>
           )
         }
@@ -432,6 +517,89 @@ export function HelpRepaymentCalculator() {
                       </tbody>
                     </table>
                   </div>
+                </section>
+              ) : null}
+
+              {latestRate && indexationRules ? (
+                <section aria-label="Indexation" className="grid gap-4 border-t border-hairline pt-6">
+                  <div className="flex min-w-0 flex-wrap items-baseline justify-between gap-x-6 gap-y-2">
+                    <h2 className="font-mono text-[11px] tracking-[0.16em] text-[var(--pc-accent-text)]">
+                      Indexation on {appliesOn}
+                    </h2>
+                    <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-ink-3">
+                      Published rate for {latestRate.year}
+                    </span>
+                  </div>
+                  <div className="grid auto-rows-fr gap-4 @sm:grid-cols-3">
+                    <div className="nexus-panel-soft flex min-w-0 flex-col gap-1 p-5">
+                      <span className="font-mono text-[10px] uppercase tracking-[0.16em] text-ink-3">
+                        Indexation rate
+                      </span>
+                      <span className="font-mono text-xl tabular-nums text-ink">
+                        {latestRate.ratePercent}%
+                      </span>
+                      <span className="text-[12px] leading-4 text-ink-3">
+                        {appliesOn} {latestRate.year}, from the resolved rule pack
+                      </span>
+                    </div>
+                    {indexed ? (
+                      <>
+                        <ResultMetric
+                          label="Indexation amount"
+                          amount={indexed.amount}
+                          detail={`${latestRate.ratePercent}% of the balance entered`}
+                        />
+                        <ResultMetric
+                          label="Balance after indexation"
+                          amount={indexed.after}
+                          detail={`On ${appliesOn} ${latestRate.year}`}
+                        />
+                      </>
+                    ) : (
+                      <div className="nexus-panel-soft flex min-w-0 flex-col justify-center gap-1 p-5 @sm:col-span-2">
+                        <span className="text-[13px] leading-5 text-ink-3">
+                          Enter a loan balance to see the indexation amount and the balance after it.
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                  <p className="max-w-2xl text-[13px] leading-5 text-ink-2">
+                    Indexation applies on {appliesOn} to debt that has been unpaid for{" "}
+                    {indexationRules.unpaidForMonths} months or more, at the lower of CPI and WPI
+                    (published by the ATO). This is one year&rsquo;s published indexation applied once —
+                    no later year is projected.
+                  </p>
+                  <table className="w-full border-collapse text-left">
+                    <caption className="sr-only">
+                      The most recently published annual indexation rates
+                    </caption>
+                    <thead>
+                      <tr className="border-b border-hairline font-mono text-[10px] uppercase tracking-[0.14em] text-ink-3">
+                        <th scope="col" className="py-2 pe-4 font-normal">Year</th>
+                        <th scope="col" className="py-2 text-right font-normal">Rate</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {rateHistory.map((row) => (
+                        <tr key={row.year} className="border-b border-hairline">
+                          <th
+                            scope="row"
+                            className="py-2 pe-4 font-mono text-[13px] font-normal tabular-nums text-ink-2"
+                          >
+                            {row.year}
+                            {row.previouslyPublishedPercent ? (
+                              <span className="block font-sans text-[11px] leading-4 text-ink-3">
+                                First published at {row.previouslyPublishedPercent}%
+                              </span>
+                            ) : null}
+                          </th>
+                          <td className="py-2 text-right align-top font-mono text-[13px] tabular-nums text-ink">
+                            {row.ratePercent}%
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
                 </section>
               ) : null}
 

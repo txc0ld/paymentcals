@@ -86,6 +86,8 @@ export interface PayFormState {
   familyStatus: "single" | "family";
   dependantsRaw: string;
   spouseIncomeRaw: string;
+  saptoEligible: boolean;
+  saptoStatus: "single" | "couple_each" | "illness_separated_each";
   payCycle: "weekly" | "fortnightly" | "monthly" | "quarterly";
   additionalWithholdingRaw: string;
   /** Annual gross to compare against, same settings. Empty = no comparison. */
@@ -115,6 +117,8 @@ const DEFAULT_STATE: PayFormState = {
   familyStatus: "single",
   dependantsRaw: "0",
   spouseIncomeRaw: "",
+  saptoEligible: false,
+  saptoStatus: "single",
   payCycle: "fortnightly",
   additionalWithholdingRaw: "",
   compareRaw: "",
@@ -138,7 +142,15 @@ function parseOptionalMoney(raw: string, errors: Record<string, string>, key: st
   return parsed.money;
 }
 
-function buildInput(state: PayFormState): { input: AuPayInput | null; errors: Record<string, string> } {
+/**
+ * `saptoAvailable` gates the offset claim: the engine fails closed when SAPTO
+ * is claimed without a resolved pack, so the claim is only ever sent once the
+ * pack has resolved. Without it the calculator shows the unavailable state.
+ */
+function buildInput(
+  state: PayFormState,
+  saptoAvailable: boolean,
+): { input: AuPayInput | null; errors: Record<string, string> } {
   const errors: Record<string, string> = {};
   const amount = parseMoneyInput(state.amountRaw);
   if (!amount.ok) {
@@ -176,6 +188,9 @@ function buildInput(state: PayFormState): { input: AuPayInput | null; errors: Re
     taxpayer: {
       residency: state.residency,
       claimsTaxFreeThreshold: state.claimsTFT,
+      ...(state.saptoEligible && saptoAvailable
+        ? { sapto: { eligible: true, status: state.saptoStatus } }
+        : {}),
       medicare: {
         status: state.medicareStatus,
         hasPrivateHospitalCover: state.privateCover,
@@ -330,9 +345,9 @@ function StatCell({ label, value, detail }: { label: string; value: string; deta
  * carries the exact figures, so colour is never the only cue. */
 function NetSplitBar({ output }: { output: AuPayOutput }) {
   const net = moneyToDecimal(output.netAnnualCash) as DecimalValue;
-  const incomeTax = (moneyToDecimal(output.liability.grossIncomeTax) as DecimalValue).minus(
-    moneyToDecimal(output.liability.litoOffset) as DecimalValue,
-  );
+  const incomeTax = (moneyToDecimal(output.liability.grossIncomeTax) as DecimalValue)
+    .minus(moneyToDecimal(output.liability.litoOffset) as DecimalValue)
+    .minus(moneyToDecimal(output.liability.saptoOffset) as DecimalValue);
   const medicare = (moneyToDecimal(output.liability.medicareLevy) as DecimalValue).plus(
     moneyToDecimal(output.liability.medicareLevySurcharge) as DecimalValue,
   );
@@ -548,11 +563,22 @@ export function PayCalculator({ variant }: { variant: PayVariant }) {
     setHydrated(true);
   }, [entry.id]);
 
-  const { input, errors } = useMemo(() => buildInput(state), [state]);
+  /** The SAPTO pack resolved for the selected year; null = claim not runnable. */
+  const saptoAvailable =
+    resolution !== "pending" && resolution.ok && resolution.resolution.sapto !== null;
+  /** Claimed but unresolvable: the offset is never estimated, only declared missing. */
+  const saptoUnavailable =
+    state.saptoEligible && resolution !== "pending" && resolution.ok && !saptoAvailable;
+
+  const { input, errors } = useMemo(() => buildInput(state, saptoAvailable), [state, saptoAvailable]);
   const compareInput = useMemo(() => {
     if (!state.compareRaw.trim()) return null;
-    return buildInput({ ...state, amountRaw: state.compareRaw, frequency: "annually" }).input;
-  }, [state]);
+    return buildInput({ ...state, amountRaw: state.compareRaw, frequency: "annually" }, saptoAvailable)
+      .input;
+  }, [state, saptoAvailable]);
+  /** The offset only reaches the engine — and the breakdown — for residents. */
+  const saptoClaimed =
+    input?.taxpayer.sapto?.eligible === true && input.taxpayer.residency === "resident";
 
   useEffect(() => {
     if (resolution === "pending" || !resolution.ok || !input) {
@@ -992,6 +1018,38 @@ export function PayCalculator({ variant }: { variant: PayVariant }) {
                       </>
                     ) : null}
                   </FieldGroup>
+                  <FieldGroup legend="Seniors & pensioners tax offset (SAPTO)">
+                    <ToggleField
+                      id="pay-sapto"
+                      label="Eligible for SAPTO"
+                      description="For Australian residents who meet the ATO age and pension eligibility conditions."
+                      checked={state.saptoEligible}
+                      onChange={(saptoEligible) => patch({ saptoEligible })}
+                    />
+                    {state.saptoEligible ? (
+                      saptoUnavailable ? (
+                        <RuleUnavailableState
+                          jurisdictionLabel="Australia (SAPTO thresholds)"
+                          detail="The seniors and pensioners tax offset pack could not be resolved, so no offset is applied."
+                        />
+                      ) : (
+                        <SelectField
+                          id="pay-sapto-status"
+                          label="SAPTO status"
+                          value={state.saptoStatus}
+                          onChange={(saptoStatus) => patch({ saptoStatus })}
+                          options={[
+                            { value: "single", label: "Single" },
+                            { value: "couple_each", label: "Member of a couple (each)" },
+                            { value: "illness_separated_each", label: "Illness-separated couple (each)" },
+                          ]}
+                        />
+                      )
+                    ) : null}
+                    <p className="text-[12px] leading-5 text-ink-3">
+                      Thresholds are the latest published by the ATO (2025&ndash;26).
+                    </p>
+                  </FieldGroup>
                 </>
               ) : null}
             </div>
@@ -1065,13 +1123,17 @@ export function PayCalculator({ variant }: { variant: PayVariant }) {
                   </span>
                 </div>
                 {(() => {
-                  const rows = [
+                  const rows: ReadonlyArray<readonly [string, Money, boolean]> = [
                     ["Gross package", output.annualised.grossPackage, false],
                     ["Employer super", output.annualised.employerSuper, false],
                     ["Gross cash income", output.annualised.grossCashIncome, false],
                     ["Taxable income", output.liability.taxableIncome, false],
                     ["Income tax", output.liability.grossIncomeTax, false],
                     ["Low income tax offset", output.liability.litoOffset, false],
+                    // Only when the offset was actually claimed and run.
+                    ...(saptoClaimed
+                      ? [["SAPTO offset", output.liability.saptoOffset, false] as const]
+                      : []),
                     ["Medicare levy", output.liability.medicareLevy, false],
                     ["Medicare levy surcharge", output.liability.medicareLevySurcharge, false],
                     ["Study loan repayment", output.liability.studyLoanRepayment, false],

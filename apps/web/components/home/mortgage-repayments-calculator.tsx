@@ -21,6 +21,7 @@ import type { SLedgerResult, SLedgerRow } from "../../lib/ledger-serialize";
 import { parseMoneyInput } from "../../lib/money-input";
 import { useLedgerJob } from "../../lib/use-ledger";
 import { DisclosurePanel } from "./field-parts";
+import { LenderRatesPanel } from "./lender-rates-panel";
 import { MortgageDisclosure } from "./mortgage-disclosure";
 import { FrequencyComparison, RateSensitivityLadder } from "./mortgage-comparisons";
 import { MetricCell, PanelHeading, diffMajor, sharePct, sumMajor } from "./result-parts";
@@ -138,7 +139,17 @@ export function MortgageRepaymentsCalculator() {
       }
       inputs={
         <div className="grid gap-6">
-          <LoanBasicsFields state={state} onChange={(patch) => setState((s) => ({ ...s, ...patch }))} errors={parsed.errors} />
+          <LoanBasicsFields
+            state={state}
+            onChange={(patch) => setState((s) => ({ ...s, ...patch }))}
+            errors={parsed.errors}
+            rateAside={
+              <LenderRatesPanel
+                id="mortgage-lender-rates"
+                onUse={(ratePctRaw) => setState((s) => ({ ...s, ratePctRaw }))}
+              />
+            }
+          />
           {uiMode === "advanced" ? (
             <FieldGroup legend="Fees">
               <MoneyField

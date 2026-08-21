@@ -21,6 +21,7 @@ import type { SRefinanceResult } from "../../lib/ledger-serialize";
 import { parseMoneyInput } from "../../lib/money-input";
 import { useLedgerJob } from "../../lib/use-ledger";
 import { AdvantageChart } from "./advantage-chart";
+import { LenderRatesPanel } from "./lender-rates-panel";
 import { MortgageDisclosure } from "./mortgage-disclosure";
 import { PanelHeading, diffMajor, formatSignedMajor, sumMajor } from "./result-parts";
 import { PPY } from "./loan-fields";
@@ -234,6 +235,7 @@ export function RefinanceCalculator() {
               {rateInput("ref-new-rate", "New rate % p.a.", newRateRaw, setNewRateRaw)}
               {rateInput("ref-new-years", "New term (years)", newTermYearsRaw, setNewTermYearsRaw)}
             </div>
+            <LenderRatesPanel id="refinance-lender-rates" onUse={setNewRateRaw} />
             <MoneyField id="ref-upfront" label="Switching costs paid in cash" value={upfrontRaw} onChange={setUpfrontRaw} />
             <MoneyField
               id="ref-financed"

@@ -71,10 +71,13 @@ export function LoanBasicsFields({
   state,
   onChange,
   errors,
+  rateAside,
 }: {
   state: LoanBasicsState;
   onChange: (patch: Partial<LoanBasicsState>) => void;
   errors: Record<string, string>;
+  /** Optional reference content rendered directly under the rate field. */
+  rateAside?: React.ReactNode;
 }) {
   return (
     <div className="grid gap-6">
@@ -127,6 +130,7 @@ export function LoanBasicsFields({
           ) : null}
         </div>
       </div>
+      {rateAside ?? null}
       <SelectField
         id="loan-frequency"
         label="Repayment frequency"

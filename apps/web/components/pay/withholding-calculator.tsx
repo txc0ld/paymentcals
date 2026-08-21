@@ -18,8 +18,11 @@ import {
 } from "@paymentcalcs/calculation-ui";
 import { getRegistryEntry } from "@paymentcalcs/calculator-registry";
 import {
+  computeMethodAWithholding,
   computeWithholding,
   selectScale,
+  type MethodAComputation,
+  type MethodACycle,
   type WithholdingComputation,
   type WithholdingCycle,
 } from "@paymentcalcs/engine-au-withholding";
@@ -31,8 +34,15 @@ import {
   type DecimalValue,
   type Money,
 } from "@paymentcalcs/calculation-core";
-import type { CoefficientRow } from "@paymentcalcs/rules-au";
+import { resolveRulePack } from "@paymentcalcs/rule-schema";
+import {
+  allAuRulePacks,
+  auIntegrityManifest,
+  type CoefficientRow,
+  type Schedule5RulePack,
+} from "@paymentcalcs/rules-au";
 import { analytics } from "../../lib/analytics";
+import { allowDraftRules } from "../../lib/draft-rules";
 import { parseMoneyInput } from "../../lib/money-input";
 import { resolvePayPacks, type PayResolutionOutcome } from "../../lib/pay-packs";
 import { useScenarioActions } from "./use-scenario-actions";
@@ -52,6 +62,19 @@ const CYCLES = [
 function periodsPerYear(cycle: WithholdingCycle): number {
   return CYCLES.find((candidate) => candidate.cycle === cycle)!.periods;
 }
+
+/** Schedule 5 Method A is published for weekly, fortnightly and monthly only. */
+function methodACycleOf(cycle: WithholdingCycle): MethodACycle | null {
+  return cycle === "quarterly" ? null : cycle;
+}
+
+const METHOD_A_QUARTERLY_NOTE =
+  "Schedule 5 Method A is published for weekly, fortnightly and monthly cycles only.";
+
+/** Schedule 5 resolution, kept separate so its absence disables one feature. */
+type Schedule5Outcome =
+  | { ok: true; pack: Schedule5RulePack; draft: boolean }
+  | { ok: false; reason: string };
 
 /** Medicare levy exemption declarations, mapped to schedule scales 5 and 6. */
 const MEDICARE_OPTIONS = [
@@ -173,7 +196,10 @@ export function WithholdingCalculator() {
   const [foreignResident, setForeignResident] = useState(false);
   const [stsl, setStsl] = useState(false);
   const [medicareStatus, setMedicareStatus] = useState<MedicareStatus>("standard");
+  /** Bonus, commission or back payment paid in this period. Empty = feature off. */
+  const [additionalRaw, setAdditionalRaw] = useState("");
   const [resolution, setResolution] = useState<PayResolutionOutcome | "pending">("pending");
+  const [schedule5, setSchedule5] = useState<Schedule5Outcome | "pending">("pending");
   const [computation, setComputation] = useState<WithholdingComputation | null>(null);
   /** Annual reconciliation from E02 — never derived from the schedule figures. */
   const [reconciliation, setReconciliation] = useState<{
@@ -184,9 +210,10 @@ export function WithholdingCalculator() {
 
   const scenario = useScenarioActions({
     calculatorId: entry.id,
-    state: { earningsRaw, cycle, claimsTFT, foreignResident, stsl, medicareStatus },
+    state: { earningsRaw, cycle, claimsTFT, foreignResident, stsl, medicareStatus, additionalRaw },
     onHydrate: (saved) => {
       if (typeof saved.earningsRaw === "string") setEarningsRaw(saved.earningsRaw);
+      if (typeof saved.additionalRaw === "string") setAdditionalRaw(saved.additionalRaw);
       if (CYCLES.some((candidate) => candidate.cycle === saved.cycle)) setCycle(saved.cycle!);
       if (typeof saved.claimsTFT === "boolean") setClaimsTFT(saved.claimsTFT);
       if (typeof saved.foreignResident === "boolean") setForeignResident(saved.foreignResident);
@@ -211,7 +238,30 @@ export function WithholdingCalculator() {
     };
   }, []);
 
+  /* Schedule 5 resolves on its own so the integrity check still runs, and so a
+   * missing pack disables only the additional-payment feature. */
+  useEffect(() => {
+    let cancelled = false;
+    resolveRulePack(allAuRulePacks, auIntegrityManifest, {
+      domain: "schedule5",
+      jurisdiction: "AU",
+      valuationDate: "2026-10-01",
+      allowDraftRules,
+    }).then((outcome) => {
+      if (cancelled) return;
+      setSchedule5(
+        outcome.ok
+          ? { ok: true, pack: outcome.pack as Schedule5RulePack, draft: outcome.draft }
+          : { ok: false, reason: outcome.reason },
+      );
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
   const earnings = useMemo(() => parseMoneyInput(earningsRaw), [earningsRaw]);
+  const additional = useMemo(() => parseMoneyInput(additionalRaw), [additionalRaw]);
 
   useEffect(() => {
     if (resolution === "pending" || !resolution.ok || !resolution.resolution.payg || !earnings.ok) {
@@ -287,6 +337,45 @@ export function WithholdingCalculator() {
     }
   }, [resolution, annualEarnings, claimsTFT, foreignResident, stsl, medicareStatus]);
 
+  /* Schedule 5 Method A: withholding on a bonus or back payment made in this
+   * period. The ten published steps live in the engine; this only feeds it. */
+  const methodA = useMemo((): MethodAComputation | null => {
+    if (resolution === "pending" || !resolution.ok || !resolution.resolution.payg) return null;
+    if (schedule5 === "pending" || !schedule5.ok) return null;
+    if (!earnings.ok || additionalRaw.trim() === "" || !additional.ok) return null;
+    const methodCycle = methodACycleOf(cycle);
+    if (methodCycle === null) return null;
+    const scale = selectScale({
+      residency: foreignResident ? "foreign_resident" : "resident",
+      claimsTaxFreeThreshold: claimsTFT,
+      medicareStatus,
+    });
+    if (typeof scale !== "string") return null;
+    try {
+      return computeMethodAWithholding(resolution.resolution.payg.pack.rules, schedule5.pack.rules, {
+        periodEarnings: moneyToDecimal(earnings.money) as DecimalValue,
+        additionalPayment: moneyToDecimal(additional.money) as DecimalValue,
+        cycle: methodCycle,
+        scale,
+        stslEnabled: stsl,
+      });
+    } catch {
+      // Missing coefficients fail closed: the block is dropped, never part-filled.
+      return null;
+    }
+  }, [
+    resolution,
+    schedule5,
+    earnings,
+    additional,
+    additionalRaw,
+    cycle,
+    claimsTFT,
+    foreignResident,
+    stsl,
+    medicareStatus,
+  ]);
+
   /* E02 annual liability against E03 annualised withholding. Deliberately a
    * separate engine call: this is the reconciliation, not a rescaling. */
   useEffect(() => {
@@ -350,7 +439,15 @@ export function WithholdingCalculator() {
 
   const paygUnavailable =
     resolution !== "pending" && resolution.ok && resolution.resolution.payg === null;
-  const draft = resolution !== "pending" && resolution.ok && resolution.draft;
+  const draft =
+    (resolution !== "pending" && resolution.ok && resolution.draft) ||
+    (schedule5 !== "pending" && schedule5.ok && schedule5.draft);
+  /** A payment was entered but Schedule 5 did not resolve: no figure is shown. */
+  const schedule5Unavailable =
+    additionalRaw.trim() !== "" &&
+    methodACycleOf(cycle) !== null &&
+    schedule5 !== "pending" &&
+    !schedule5.ok;
   const toMoney = (value: DecimalValue) =>
     moneyFromDecimalString("AUD", value.toDecimalPlaces(2, Dec.ROUND_HALF_UP).toFixed(2), 2);
 
@@ -412,6 +509,7 @@ export function WithholdingCalculator() {
                   setForeignResident(false);
                   setStsl(false);
                   setMedicareStatus("standard");
+                  setAdditionalRaw("");
                 }}
               />
             }
@@ -471,6 +569,18 @@ export function WithholdingCalculator() {
                 checked={stsl}
                 onChange={setStsl}
               />
+              {methodACycleOf(cycle) === null ? (
+                <p className="text-[12px] leading-5 text-ink-3">{METHOD_A_QUARTERLY_NOTE}</p>
+              ) : (
+                <MoneyField
+                  id="wh-additional"
+                  label="Bonus or back payment this period"
+                  description="A back payment, commission, bonus or similar payment made with this pay. Leave blank if there is none."
+                  value={additionalRaw}
+                  onChange={setAdditionalRaw}
+                  error={!additional.ok && additional.error ? additional.error : undefined}
+                />
+              )}
             </div>
           )
         }
@@ -500,6 +610,52 @@ export function WithholdingCalculator() {
                 per year at this rate: {formatMoney(toMoney(computation.periodTotal.times(periodsPerYear(cycle)) as DecimalValue))}.
               </p>
             </div>
+
+            {methodA ? (
+              <section
+                aria-label="Bonus or back payment"
+                className="nexus-panel-soft @container grid min-w-0 gap-4 p-6 md:p-8"
+              >
+                <div className="flex min-w-0 flex-wrap items-baseline justify-between gap-x-6 gap-y-2">
+                  <h2 className="font-mono text-[11px] tracking-[0.16em] text-[var(--pc-accent-text)]">
+                    Bonus or back payment this period
+                  </h2>
+                  <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-ink-3">
+                    Schedule 5, Method A
+                  </span>
+                </div>
+                <div className="grid auto-rows-fr gap-4 @sm:grid-cols-2 @xl:grid-cols-3">
+                  <ResultMetric
+                    label="Withholding on ordinary earnings"
+                    amount={toMoney(methodA.periodOnEarnings)}
+                  />
+                  <ResultMetric
+                    label="Withholding on the additional payment"
+                    amount={toMoney(methodA.periodOnAdditional)}
+                  />
+                  <ResultMetric
+                    label="Total withheld this period"
+                    amount={toMoney(methodA.periodTotal)}
+                  />
+                </div>
+                {methodA.capApplied ? (
+                  <p className="text-[12px] leading-5 text-ink-2">
+                    Withholding on the additional payment is capped at 47% of the payment (Schedule 5).
+                  </p>
+                ) : null}
+                <p className="text-[12px] leading-5 text-ink-3">
+                  Schedule 5 Method A apportions the payment across {methodA.apportionPeriods} pay
+                  periods, runs the regular schedule with and without that share, then scales the
+                  difference back up. Cents are ignored at each published step, so this total can differ
+                  from the ordinary-earnings figure above.
+                </p>
+              </section>
+            ) : schedule5Unavailable ? (
+              <RuleUnavailableState
+                jurisdictionLabel="Australia (Schedule 5)"
+                detail="The Schedule 5 rule pack could not be resolved, so no withholding on the additional payment is shown."
+              />
+            ) : null}
 
             {allCycles && annualEarnings ? (
               <section

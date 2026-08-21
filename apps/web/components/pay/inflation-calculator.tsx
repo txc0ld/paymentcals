@@ -17,7 +17,12 @@ import {
 import { getRegistryEntry } from "@paymentcalcs/calculator-registry";
 import { CpiRangeError, computeRealIncome, type RealIncomeResult } from "@paymentcalcs/engine-compensation";
 import { resolveRulePack } from "@paymentcalcs/rule-schema";
-import { allAuRulePacks, auIntegrityManifest, type CpiRulePack } from "@paymentcalcs/rules-au";
+import {
+  allAuRulePacks,
+  auIntegrityManifest,
+  type CpiRulePack,
+  type WpiRulePack,
+} from "@paymentcalcs/rules-au";
 import { allowDraftRules } from "../../lib/draft-rules";
 import { formatMajor } from "../../lib/format-major";
 import { parseMoneyInput } from "../../lib/money-input";
@@ -25,10 +30,14 @@ import { useScenarioActions } from "./use-scenario-actions";
 
 const entry = getRegistryEntry("AU-PAY-015")!;
 
-type CpiResolution =
+type PackResolution<Pack> =
   | "pending"
-  | { ok: true; pack: CpiRulePack; draft: boolean }
+  | { ok: true; pack: Pack; draft: boolean }
   | { ok: false; reason: string };
+
+type CpiResolution = PackResolution<CpiRulePack>;
+/** The WPI series is optional: without it the wages comparison simply hides. */
+type WpiResolution = PackResolution<WpiRulePack>;
 
 function monthToDate(month: string, end: boolean): string {
   // <input type="month"> → mid-month date; the engine snaps to the CPI quarter.
@@ -76,6 +85,7 @@ export function InflationCalculator() {
   /** Optional "what I earn now" — blank leaves every existing figure untouched. */
   const [currentSalaryRaw, setCurrentSalaryRaw] = useState("");
   const [resolution, setResolution] = useState<CpiResolution>("pending");
+  const [wpiResolution, setWpiResolution] = useState<WpiResolution>("pending");
 
   const scenario = useScenarioActions({
     calculatorId: entry.id,
@@ -90,18 +100,26 @@ export function InflationCalculator() {
 
   useEffect(() => {
     let cancelled = false;
-    resolveRulePack(allAuRulePacks, auIntegrityManifest, {
-      domain: "cpi",
+    const query = {
       jurisdiction: "AU",
       valuationDate: new Date().toISOString().slice(0, 10),
       allowDraftRules,
-    }).then((outcome) => {
+    };
+    Promise.all([
+      resolveRulePack(allAuRulePacks, auIntegrityManifest, { ...query, domain: "cpi" }),
+      resolveRulePack(allAuRulePacks, auIntegrityManifest, { ...query, domain: "wpi" }),
+    ]).then(([cpi, wpi]) => {
       if (cancelled) return;
-      if (outcome.ok) {
-        setResolution({ ok: true, pack: outcome.pack as CpiRulePack, draft: outcome.draft });
-      } else {
-        setResolution({ ok: false, reason: outcome.reason });
-      }
+      setResolution(
+        cpi.ok
+          ? { ok: true, pack: cpi.pack as CpiRulePack, draft: cpi.draft }
+          : { ok: false, reason: cpi.reason },
+      );
+      setWpiResolution(
+        wpi.ok
+          ? { ok: true, pack: wpi.pack as WpiRulePack, draft: wpi.draft }
+          : { ok: false, reason: wpi.reason },
+      );
     });
     return () => {
       cancelled = true;
@@ -125,10 +143,40 @@ export function InflationCalculator() {
   }, [resolution, salary, fromMonth, toMonth]);
 
   const rules = resolution !== "pending" && resolution.ok ? resolution.pack.rules : null;
-  const minMonth = rules ? rules.quarters[0]!.date.slice(0, 7) : undefined;
-  const maxMonth = rules ? rules.quarters[rules.quarters.length - 1]!.date.slice(0, 7) : undefined;
+  const wpiRules = wpiResolution !== "pending" && wpiResolution.ok ? wpiResolution.pack.rules : null;
+  /* Month bounds are the intersection of both published series, so any window
+   * the user can select is one both CPI and WPI actually cover. */
+  const cpiFirst = rules ? rules.quarters[0]!.date.slice(0, 7) : undefined;
+  const cpiLast = rules ? rules.quarters[rules.quarters.length - 1]!.date.slice(0, 7) : undefined;
+  const wpiFirst = wpiRules ? wpiRules.quarters[0]!.date.slice(0, 7) : undefined;
+  const wpiLast = wpiRules ? wpiRules.quarters[wpiRules.quarters.length - 1]!.date.slice(0, 7) : undefined;
+  const minMonth = cpiFirst && wpiFirst ? (wpiFirst > cpiFirst ? wpiFirst : cpiFirst) : cpiFirst;
+  const maxMonth = cpiLast && wpiLast ? (wpiLast < cpiLast ? wpiLast : cpiLast) : cpiLast;
   const result = computation && computation.ok ? computation.result : null;
   const pctRise = result ? new Dec(result.cumulativeInflation).times(100).toFixed(2) : null;
+
+  /* Wages over the identical window: the WPI series is read at the very
+   * quarters the CPI result landed on, so the two percentages always describe
+   * the same period. Published quarters only — never a projection. */
+  const wages = useMemo(() => {
+    if (!wpiRules || !result || !salary.ok) return null;
+    try {
+      const salaryMajor = new Dec(salary.money.minorUnits).div(100).toFixed(2);
+      const wpi = computeRealIncome(wpiRules, salaryMajor, result.fromQuarter.date, result.toQuarter.date);
+      const wagePct = new Dec(wpi.cumulativeInflation).times(100);
+      const gap = wagePct.minus(new Dec(result.cumulativeInflation).times(100));
+      return {
+        wpi,
+        wagePct: wagePct.toFixed(2),
+        gapAbs: gap.abs().toFixed(2),
+        wagesAhead: gap.greaterThanOrEqualTo(0),
+      };
+    } catch (error) {
+      // Outside the WPI range the comparison is withheld, never extrapolated.
+      if (error instanceof CpiRangeError) return null;
+      throw error;
+    }
+  }, [wpiRules, result, salary]);
 
   const currentSalary = useMemo(
     () => (currentSalaryRaw.trim() ? parseMoneyInput(currentSalaryRaw) : null),
@@ -183,9 +231,14 @@ export function InflationCalculator() {
     </div>
   );
 
+  /** Either series running on draft rules must carry the banner. */
+  const draftRules =
+    (resolution !== "pending" && resolution.ok && resolution.draft) ||
+    (wpiResolution !== "pending" && wpiResolution.ok && wpiResolution.draft);
+
   return (
     <>
-      {resolution !== "pending" && resolution.ok && resolution.draft ? <DraftRulesBanner /> : null}
+      {draftRules ? <DraftRulesBanner /> : null}
       <CalculatorShell
         header={
           <CalculatorHeader
@@ -198,7 +251,7 @@ export function InflationCalculator() {
                 resolution === "pending"
                   ? { label: "Resolving rules", tone: "neutral" }
                   : resolution.ok
-                    ? resolution.draft
+                    ? draftRules
                       ? { label: "Draft rules — not verified", tone: "draft" }
                       : { label: "Current", tone: "neutral" }
                     : { label: "Rules unavailable", tone: "warn" },
@@ -336,6 +389,62 @@ export function InflationCalculator() {
                   <p className="text-[12px] leading-5 text-ink-3">
                     This compares two figures only: what you earn now and what the same purchasing power
                     costs on {result.toQuarter.date}. It says nothing about the value of the work.
+                  </p>
+                </section>
+              ) : null}
+
+              {wages ? (
+                <section
+                  aria-label="Wages comparison"
+                  className="nexus-panel-soft @container grid gap-4 p-6 md:p-8"
+                >
+                  <div className="flex min-w-0 flex-wrap items-baseline justify-between gap-x-6 gap-y-2">
+                    <h2 className="font-mono text-[11px] tracking-[0.16em] text-[var(--pc-accent-text)]">
+                      Wages comparison (WPI)
+                    </h2>
+                    <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-ink-3">
+                      Same window, wage price index
+                    </span>
+                  </div>
+                  <div className="grid gap-px border border-hairline bg-hairline @md:grid-cols-3">
+                    {(
+                      [
+                        [
+                          "Tracking wage growth",
+                          formatMajor(wages.wpi.neededSalary),
+                          `If the salary had moved with the WPI from ${result.fromQuarter.date}`,
+                        ],
+                        [
+                          "Cumulative WPI",
+                          `${wages.wagePct}%`,
+                          `Index ${wages.wpi.fromQuarter.index} → ${wages.wpi.toQuarter.index}`,
+                        ],
+                        [
+                          wages.wagesAhead ? "Wages ahead of prices by" : "Wages behind prices by",
+                          `${wages.gapAbs} pp`,
+                          `Against cumulative CPI of ${pctRise}%`,
+                        ],
+                      ] as const
+                    ).map(([label, value, detail]) => (
+                      <div key={label} className="grid content-start gap-1 bg-surface-2 p-5">
+                        <span className="font-mono text-[10px] uppercase tracking-[0.16em] text-ink-3">{label}</span>
+                        <span className="break-words font-mono text-[15px] tabular-nums text-[var(--pc-accent-text)]">
+                          {value}
+                        </span>
+                        <span className="text-[12px] leading-4 text-ink-3">{detail}</span>
+                      </div>
+                    ))}
+                  </div>
+                  <p className="max-w-2xl text-[13px] leading-5 text-ink-2">
+                    Prices rose {pctRise}% over this period; wages rose {wages.wagePct}%. Wages therefore
+                    grew {wages.wagesAhead ? "faster" : "slower"} than prices between{" "}
+                    {result.fromQuarter.date} and {result.toQuarter.date}, a difference of {wages.gapAbs}{" "}
+                    percentage points. The WPI is an economy-wide measure of wage rates for the same job,
+                    not a record of any individual&rsquo;s pay.
+                  </p>
+                  <p className="text-[12px] leading-5 text-ink-3">
+                    ABS Wage Price Index (6345.0), total hourly rates of pay excluding bonuses, private and
+                    public, original series.
                   </p>
                 </section>
               ) : null}

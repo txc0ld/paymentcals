@@ -41,7 +41,12 @@ import {
 } from "@paymentcalcs/engine-business";
 import { bisect, defaultSolverOptions } from "@paymentcalcs/financial-solvers";
 import { resolveRulePack, type ResolveOutcome } from "@paymentcalcs/rule-schema";
-import { allAuRulePacks, auIntegrityManifest, type GstRulePack } from "@paymentcalcs/rules-au";
+import {
+  allAuRulePacks,
+  auIntegrityManifest,
+  type GstRegistrationRulePack,
+  type GstRulePack,
+} from "@paymentcalcs/rules-au";
 import { decodeUrlState, encodeUrlState } from "@paymentcalcs/scenario-schema";
 import { analytics } from "../../lib/analytics";
 import { allowDraftRules } from "../../lib/draft-rules";
@@ -84,6 +89,17 @@ const LIMITATIONS = [
 /** Shared cap across editor, URL state and engine schema. */
 const MAX_INVOICE_LINES = 200;
 
+/** Registration thresholds are reference-only: unresolved, the panel hides. */
+type RegistrationResolution =
+  | "pending"
+  | { ok: true; pack: GstRegistrationRulePack; draft: boolean }
+  | { ok: false };
+
+/** Whole-dollar pack threshold, formatted for display. */
+function threshold(dollars: string): string {
+  return formatMoney(moneyFromDecimalString("AUD", dollars, 0));
+}
+
 /** Today in the calculator's jurisdiction, not UTC (rule packs are date-gated). */
 function todayIso(): string {
   return new Intl.DateTimeFormat("en-CA", {
@@ -96,6 +112,7 @@ function todayIso(): string {
 
 export function GstCalculator() {
   const [resolution, setResolution] = useState<ResolveOutcome | "pending">("pending");
+  const [registration, setRegistration] = useState<RegistrationResolution>("pending");
   const [uiMode, setUiMode] = useState<UiMode>("simple");
   const [simpleMode, setSimpleMode] = useState<SimpleMode>("add");
   const [amountRaw, setAmountRaw] = useState("");
@@ -126,6 +143,28 @@ export function GstCalculator() {
           rule_status: "unavailable",
         });
       }
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  // Registration thresholds are reference figures only — they never feed the
+  // engine, and an unresolved pack simply removes the panel (§16.6).
+  useEffect(() => {
+    let cancelled = false;
+    resolveRulePack(allAuRulePacks, auIntegrityManifest, {
+      domain: "gst-registration",
+      jurisdiction: "AU",
+      valuationDate: todayIso(),
+      allowDraftRules,
+    }).then((outcome) => {
+      if (cancelled) return;
+      setRegistration(
+        outcome.ok
+          ? { ok: true, pack: outcome.pack as GstRegistrationRulePack, draft: outcome.draft }
+          : { ok: false },
+      );
     });
     return () => {
       cancelled = true;
@@ -324,8 +363,11 @@ export function GstCalculator() {
     analytics.track("scenario_action", { calculator_id: entry.id, action: "reset" });
   }
 
-  const draft = resolution !== "pending" && resolution.ok && resolution.draft;
+  const draft =
+    (resolution !== "pending" && resolution.ok && resolution.draft) ||
+    (registration !== "pending" && registration.ok && registration.draft);
   const output = result?.output;
+  const registrationRules = registration !== "pending" && registration.ok ? registration.pack.rules : null;
 
   /**
    * Invoice reconciliation: the rendered lines summed against the invoice
@@ -487,7 +529,7 @@ export function GstCalculator() {
                 resolution === "pending"
                   ? { label: "Resolving rules", tone: "neutral" }
                   : resolution.ok
-                    ? resolution.draft
+                    ? draft
                       ? { label: "Draft rules — not verified", tone: "draft" }
                       : { label: "Current", tone: "neutral" }
                     : { label: "Rules unavailable", tone: "warn" },
@@ -663,6 +705,55 @@ export function GstCalculator() {
                       {reverseTarget.reason}
                     </p>
                   )}
+                </section>
+              ) : null}
+              {registrationRules ? (
+                <section
+                  aria-label="GST registration thresholds"
+                  className="nexus-panel-soft @container grid min-w-0 gap-4 p-6 md:p-8"
+                >
+                  <div className="flex min-w-0 flex-wrap items-baseline justify-between gap-x-6 gap-y-2">
+                    <h2 className="font-mono text-[11px] tracking-[0.16em] text-[var(--pc-accent-text)]">
+                      GST registration thresholds
+                    </h2>
+                    <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-ink-3">
+                      From the resolved rule pack
+                    </span>
+                  </div>
+                  <dl className="grid gap-px border border-hairline bg-hairline @md:grid-cols-2">
+                    <div className="grid content-start gap-1 bg-surface-2 p-5">
+                      <dt className="font-mono text-[10px] uppercase tracking-[0.16em] text-ink-3">
+                        GST turnover threshold
+                      </dt>
+                      <dd className="font-mono text-[15px] tabular-nums text-[var(--pc-accent-text)]">
+                        {threshold(registrationRules.generalThreshold)}
+                      </dd>
+                    </div>
+                    <div className="grid content-start gap-1 bg-surface-2 p-5">
+                      <dt className="font-mono text-[10px] uppercase tracking-[0.16em] text-ink-3">
+                        Non-profit body threshold
+                      </dt>
+                      <dd className="font-mono text-[15px] tabular-nums text-[var(--pc-accent-text)]">
+                        {threshold(registrationRules.nonProfitThreshold)}
+                      </dd>
+                    </div>
+                  </dl>
+                  <ul className="grid gap-2 text-[13px] leading-5 text-ink-2">
+                    {registrationRules.taxiRideSourcingAlwaysRequired ? (
+                      <li>
+                        Taxi, limousine and ride-sourcing drivers are required to register for GST
+                        regardless of turnover.
+                      </li>
+                    ) : null}
+                    <li>
+                      Registration is required within {registrationRules.registrationDays} days of GST
+                      turnover reaching the relevant threshold.
+                    </li>
+                  </ul>
+                  <p className="text-[12px] leading-5 text-ink-3">
+                    Reference figures only. This calculator does not assess whether you are registered or
+                    required to register.
+                  </p>
                 </section>
               ) : null}
             </>

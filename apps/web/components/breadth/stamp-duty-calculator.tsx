@@ -18,12 +18,21 @@ import {
 } from "@paymentcalcs/calculation-ui";
 import { getRegistryEntry } from "@paymentcalcs/calculator-registry";
 import { Dec, moneyFromDecimalString, moneyToDecimalString, type DecimalValue } from "@paymentcalcs/calculation-core";
-import { DutyRulesUnavailableError, generalDuty, type DutyComputation } from "@paymentcalcs/engine-property";
+import {
+  ConcessionUnavailableError,
+  DutyRulesUnavailableError,
+  concessionalDuty,
+  generalDuty,
+  type ConcessionComputation,
+  type ConcessionScheme,
+  type DutyComputation,
+} from "@paymentcalcs/engine-property";
 import { resolveRulePack, type ResolveOutcome } from "@paymentcalcs/rule-schema";
 import {
   allAuRulePacks,
   auIntegrityManifest,
   type DutyBracket,
+  type DutyConcessionRulePack,
   type StampDutyRulePack,
   type StampDutyRules,
 } from "@paymentcalcs/rules-au";
@@ -38,6 +47,35 @@ const VALUATION_DATE = "2026-10-01";
 
 type PercentBracket = NonNullable<StampDutyRules["generalPercent"]>["brackets"][number];
 type PercentSlab = NonNullable<StampDutyRules["generalFormula"]>["slabs"][number];
+
+/** "general" is always the default: the general-rate path never changes. */
+type BuyerType = "general" | ConcessionScheme;
+
+const GENERAL_BUYER_OPTION = { value: "general" as const, label: "Investor / other (general rate)" };
+
+/**
+ * Only the buyer types whose published schedule has been transcribed into a
+ * concessions pack are offered; everywhere else the general rate is the only
+ * option, and the caption says so rather than implying none exists.
+ */
+const BUYER_OPTIONS: Record<StateCode, ReadonlyArray<{ value: BuyerType; label: string }>> = {
+  NSW: [
+    GENERAL_BUYER_OPTION,
+    { value: "nsw_fhbas_home", label: "First home buyer — new or existing home (FHBAS)" },
+    { value: "nsw_fhbas_vacant_land", label: "First home buyer — vacant land (FHBAS)" },
+  ],
+  VIC: [GENERAL_BUYER_OPTION, { value: "vic_ppr", label: "Principal place of residence (≤ $550,000)" }],
+  QLD: [
+    GENERAL_BUYER_OPTION,
+    { value: "qld_home", label: "Home (owner-occupier) concession" },
+    { value: "qld_first_home", label: "First home concession" },
+  ],
+  WA: [GENERAL_BUYER_OPTION],
+  SA: [GENERAL_BUYER_OPTION],
+  TAS: [GENERAL_BUYER_OPTION],
+  ACT: [GENERAL_BUYER_OPTION, { value: "act_owner_occupier", label: "Eligible owner-occupier (Table 1)" }],
+  NT: [GENERAL_BUYER_OPTION],
+};
 
 const METHOD_LABEL: Record<DutyComputation["method"], string> = {
   per100: "Bracket base plus a rate per $100 or part thereof",
@@ -61,6 +99,32 @@ function useDutyResolution(state: StateCode) {
     let cancelled = false;
     setResolution("pending");
     resolveDuty(state).then((outcome) => {
+      if (!cancelled) setResolution(outcome);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [state]);
+  return resolution;
+}
+
+/** The concessions pack is separate from the general-rate pack and resolves the same way. */
+function resolveConcessions(state: StateCode): Promise<ResolveOutcome> {
+  return resolveRulePack(allAuRulePacks, auIntegrityManifest, {
+    domain: "stamp-duty-concessions",
+    jurisdiction: "AU",
+    subdivision: state,
+    valuationDate: VALUATION_DATE,
+    allowDraftRules,
+  });
+}
+
+function useConcessionResolution(state: StateCode) {
+  const [resolution, setResolution] = useState<ResolveOutcome | "pending">("pending");
+  useEffect(() => {
+    let cancelled = false;
+    setResolution("pending");
+    resolveConcessions(state).then((outcome) => {
       if (!cancelled) setResolution(outcome);
     });
     return () => {
@@ -281,14 +345,48 @@ function BracketLadder({
 export function StampDutyCalculator({ variant }: { variant: "duty" | "buying_costs" }) {
   const entry = getRegistryEntry(variant === "duty" ? "AU-HOME-017" : "AU-HOME-018")!;
   const [state, setState] = useState<StateCode>("NSW");
+  const [buyerType, setBuyerType] = useState<BuyerType>("general");
   const [valueRaw, setValueRaw] = useState("");
   const [legalRaw, setLegalRaw] = useState("");
   const [inspectionsRaw, setInspectionsRaw] = useState("");
   const [otherRaw, setOtherRaw] = useState("");
 
   const resolution = useDutyResolution(state);
+  const concessionResolution = useConcessionResolution(state);
   const allResolutions = useAllDutyResolutions();
   const duty = useMemo(() => computeDuty(resolution, valueRaw), [resolution, valueRaw]);
+
+  const buyerOptions = BUYER_OPTIONS[state];
+  const buyerLabel = buyerOptions.find((option) => option.value === buyerType)?.label ?? GENERAL_BUYER_OPTION.label;
+
+  // A selected concession that cannot be priced from its own pack shows the
+  // unavailable state; it never falls back to the general figure silently.
+  const concession = useMemo<ConcessionComputation | "unavailable" | null>(() => {
+    if (buyerType === "general") return null;
+    if (resolution === "pending" || !resolution.ok) return null;
+    if (concessionResolution === "pending") return null;
+    const parsed = parseMoneyInput(valueRaw);
+    if (!parsed.ok) return null;
+    const value = new Dec(moneyToDecimalString(parsed.money)) as DecimalValue;
+    if (value.lessThan(0)) return null;
+    if (!concessionResolution.ok) return "unavailable";
+    try {
+      return concessionalDuty(
+        value,
+        (resolution.pack as StampDutyRulePack).rules,
+        (concessionResolution.pack as DutyConcessionRulePack).rules,
+        buyerType,
+      );
+    } catch (error) {
+      if (error instanceof ConcessionUnavailableError || error instanceof DutyRulesUnavailableError) {
+        return "unavailable";
+      }
+      throw error;
+    }
+  }, [buyerType, resolution, concessionResolution, valueRaw]);
+
+  const appliedConcession = concession !== null && concession !== "unavailable" ? concession : null;
+  const concessionUnavailable = concession === "unavailable";
 
   const unsupported =
     duty === "unsupported" || (resolution !== "pending" && !resolution.ok);
@@ -296,14 +394,17 @@ export function StampDutyCalculator({ variant }: { variant: "duty" | "buying_cos
   const appliedDuty = duty !== null && duty !== "unsupported" ? duty : null;
   const rules =
     resolution !== "pending" && resolution.ok ? (resolution.pack as StampDutyRulePack).rules : null;
-  const sources: WorkingSource[] =
-    resolution !== "pending" && resolution.ok
-      ? resolution.pack.sources.map((source) => ({
-          title: `${source.authority} — ${source.title}`,
-          url: source.url,
-          detail: `retrieved ${source.retrievedAt.slice(0, 10)}`,
-        }))
-      : [];
+  const toSource = (source: { authority: string; title: string; url: string; retrievedAt: string }): WorkingSource => ({
+    title: `${source.authority} — ${source.title}`,
+    url: source.url,
+    detail: `retrieved ${source.retrievedAt.slice(0, 10)}`,
+  });
+  const sources: WorkingSource[] = [
+    ...(resolution !== "pending" && resolution.ok ? resolution.pack.sources.map(toSource) : []),
+    ...(appliedConcession && concessionResolution !== "pending" && concessionResolution.ok
+      ? concessionResolution.pack.sources.map(toSource)
+      : []),
+  ];
 
   const enteredValue = useMemo(() => {
     const parsed = parseMoneyInput(valueRaw);
@@ -335,6 +436,7 @@ export function StampDutyCalculator({ variant }: { variant: "duty" | "buying_cos
     setInspectionsRaw("");
     setOtherRaw("");
     setState("NSW");
+    setBuyerType("general");
   }
 
   return (
@@ -346,7 +448,7 @@ export function StampDutyCalculator({ variant }: { variant: "duty" | "buying_cos
             meta={{
               title: entry.displayName,
               jurisdictionLabel: `Australia · ${state}`,
-              periodLabel: "General rates only",
+              periodLabel: buyerType === "general" ? "General rates only" : "Concessional rate",
               calculationClass: entry.calculationClass,
               ruleStatus: unsupported
                 ? { label: `${state} not yet supported`, tone: "warn" }
@@ -366,9 +468,27 @@ export function StampDutyCalculator({ variant }: { variant: "duty" | "buying_cos
               id="duty-state"
               label="State or territory"
               value={state}
-              onChange={setState}
+              onChange={(next) => {
+                setState(next);
+                // Schemes are jurisdiction-specific: a NSW selection can never
+                // survive into QLD.
+                setBuyerType("general");
+              }}
               options={STATES.map((code) => ({ value: code, label: code }))}
             />
+            <SelectField
+              id="duty-buyer-type"
+              label="Buyer type"
+              value={buyerType}
+              onChange={setBuyerType}
+              options={buyerOptions}
+            />
+            {buyerOptions.length === 1 ? (
+              <p className="text-[13px] leading-5 text-ink-3">
+                Published concession schedules for this state have not been transcribed and verified
+                yet.
+              </p>
+            ) : null}
             <MoneyField
               id="duty-value"
               label={variant === "duty" ? "Dutiable value (usually the price)" : "Property price"}
@@ -383,8 +503,9 @@ export function StampDutyCalculator({ variant }: { variant: "duty" | "buying_cos
               </>
             ) : null}
             <p className="text-[13px] leading-5 text-ink-3">
-              General rates only: concessions, exemptions, first-home schemes and foreign surcharges
-              are not modelled, and GST treatment of new property is out of scope.
+              Published rates for the selected buyer type only. Other exemptions, off-the-plan and
+              pensioner schemes and foreign surcharges are not modelled, and GST treatment of new
+              property is out of scope.
             </p>
           </div>
         }
@@ -397,8 +518,79 @@ export function StampDutyCalculator({ variant }: { variant: "duty" | "buying_cos
                 figure is shown. This calculator never substitutes another state&rsquo;s rates.
               </p>
             </div>
+          ) : concessionUnavailable ? (
+            <div className="nexus-panel-soft grid min-w-0 gap-4 p-6 text-center md:p-8">
+              <Badge tone="warn">Rule unavailable</Badge>
+              <p className="mx-auto max-w-md text-[14px] leading-6 text-ink-2">
+                The published schedule for this buyer type could not be resolved, so no figure is
+                shown. This calculator never substitutes the general rate for a concessional one.
+              </p>
+            </div>
           ) : !appliedDuty ? (
             <EmptyState>Enter the property value to estimate the general transfer duty.</EmptyState>
+          ) : appliedConcession ? (
+            <div className="nexus-result @container grid min-w-0 gap-6 p-6 md:p-8">
+              <PrimaryResult
+                label={variant === "duty" ? `Estimated ${state} transfer duty` : "Estimated upfront costs"}
+                amount={moneyFromDecimalString(
+                  "AUD",
+                  variant === "duty"
+                    ? appliedConcession.duty.toFixed(2)
+                    : appliedConcession.duty.plus(extras).toFixed(2),
+                  2,
+                )}
+                qualifier={
+                  variant === "duty"
+                    ? `Published rate for the selected buyer type: ${buyerLabel}.`
+                    : `Includes ${formatMajor(appliedConcession.duty.toFixed(2))} estimated ${state} transfer duty at the published rate for ${buyerLabel}, plus the costs you entered.`
+                }
+              />
+              {appliedConcession.fellBackToGeneral && appliedConcession.note ? (
+                <p className="border-l-2 border-warn pl-3 text-[13px] leading-5 text-ink-2">
+                  {appliedConcession.note}
+                </p>
+              ) : null}
+              <div className="grid gap-4 border-t border-hairline pt-6 @sm:grid-cols-2 @xl:grid-cols-3">
+                <ResultMetric
+                  label="Concessional duty"
+                  amount={moneyFromDecimalString("AUD", appliedConcession.duty.toFixed(2), 2)}
+                />
+                <ResultMetric
+                  label="General duty"
+                  amount={moneyFromDecimalString("AUD", appliedConcession.generalDuty.toFixed(2), 2)}
+                  detail="the same value at the general rate"
+                />
+                <ResultMetric
+                  label="Saving"
+                  amount={moneyFromDecimalString("AUD", appliedConcession.saving.toFixed(2), 2)}
+                  detail="general duty minus concessional duty"
+                />
+              </div>
+              {variant === "buying_costs" ? (
+                <div className="grid gap-4 border-t border-hairline pt-6 @sm:grid-cols-2">
+                  <ResultMetric
+                    label="Transfer duty"
+                    amount={moneyFromDecimalString("AUD", appliedConcession.duty.toFixed(2), 2)}
+                  />
+                  <ResultMetric
+                    label="Your entered costs"
+                    amount={moneyFromDecimalString("AUD", extras.toFixed(2), 2)}
+                  />
+                </div>
+              ) : null}
+              <div className="grid min-w-0 gap-2 border-t border-hairline pt-6">
+                <h3 className="font-mono text-[10px] uppercase tracking-[0.18em] text-[var(--pc-accent-text)]">
+                  Applied from the {state} concessions rules
+                </h3>
+                {!appliedConcession.fellBackToGeneral && appliedConcession.note ? (
+                  <p className="text-[12px] leading-5 text-ink-3">{appliedConcession.note}</p>
+                ) : null}
+                <p className="text-[12px] leading-5 text-ink-3">
+                  Eligibility criteria apply and are assessed by the revenue office; this shows the
+                  published rate for the selected buyer type.
+                </p>
+              </div>
+            </div>
           ) : (
             <div className="nexus-result @container grid min-w-0 gap-6 p-6 md:p-8">
               <PrimaryResult
@@ -503,7 +695,9 @@ export function StampDutyCalculator({ variant }: { variant: "duty" | "buying_cos
                     From the resolved rule pack
                   </span>
                 </div>
-                <BracketLadder state={state} rules={rules} duty={appliedDuty} />
+                {/* No band is marked "applied" while a concessional scheme is
+                  * selected: the concession is priced from its own schedule. */}
+                <BracketLadder state={state} rules={rules} duty={appliedConcession ? null : appliedDuty} />
               </section>
             ) : null}
             {comparison ? (
@@ -576,6 +770,11 @@ export function StampDutyCalculator({ variant }: { variant: "duty" | "buying_cos
                 "Percentage bands: duty = base amount + percent × the value above the threshold, or percent × the whole value for a slab row.",
                 "Statutory formula: D = a × V² + b × V with V = value ÷ 1,000, floored to the nearest 5 cents.",
                 "Any statutory minimum duty is applied last.",
+                ...(appliedConcession
+                  ? [
+                      "A selected buyer-type concession is priced from that jurisdiction's separate concessions pack and shown beside the general-rate figure for the same value.",
+                    ]
+                  : []),
               ]}
               assumptions={[
                 "General (non-concessional) rates only, at the rule pack's effective date.",
@@ -584,7 +783,7 @@ export function StampDutyCalculator({ variant }: { variant: "duty" | "buying_cos
               ]}
               sources={sources}
               limitations={[
-                "Concessions, exemptions, first-home and off-the-plan schemes, pensioner rates and foreign-purchaser surcharges are not modelled.",
+                "Only the buyer-type concessions offered in the Buyer type field are modelled, and eligibility is assessed by the revenue office, not here. Other exemptions, off-the-plan and pensioner schemes and foreign-purchaser surcharges are not modelled.",
                 "Mortgage registration, transfer registration and other lodgement fees are separate from duty and are not included.",
                 "GST treatment of new residential property, and the margin scheme, are out of scope.",
                 "Where a jurisdiction's rates have not been transcribed and verified, the row shows no figure rather than an estimate.",
