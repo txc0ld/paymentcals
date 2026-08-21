@@ -85,8 +85,11 @@ export function LoanBasicsFields({
         onChange={(principalRaw) => onChange({ principalRaw })}
         error={errors.principal}
       />
-      <div className="grid items-start gap-4 sm:grid-cols-2">
-        <div className="grid content-start gap-1.5">
+      {/* Container query, not a viewport one: this pair renders inside the
+       * 360–440px inputs column, where a viewport `sm:` breakpoint would put
+       * two ~180px tracks under inputs whose intrinsic width is ~200px. */}
+      <div className="grid items-start gap-4 @md:grid-cols-2">
+        <div className="grid min-w-0 content-start gap-1.5">
           <label htmlFor="loan-rate" className="font-mono text-[11px] uppercase tracking-[0.14em] text-ink-2">
             Interest rate % p.a.
           </label>
@@ -105,7 +108,7 @@ export function LoanBasicsFields({
             </span>
           ) : null}
         </div>
-        <div className="grid content-start gap-1.5">
+        <div className="grid min-w-0 content-start gap-1.5">
           <label htmlFor="loan-term" className="font-mono text-[11px] uppercase tracking-[0.14em] text-ink-2">
             Term (years)
           </label>

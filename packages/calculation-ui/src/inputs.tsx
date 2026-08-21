@@ -40,7 +40,7 @@ export function SegmentedControl<T extends string>({
       role="radiogroup"
       aria-label={label}
       onKeyDown={onKeyDown}
-      className="nexus-control inline-flex max-w-full flex-wrap overflow-hidden"
+      className="nexus-control inline-flex w-fit max-w-full flex-wrap overflow-hidden"
     >
       {options.map((option) => {
         const selected = option.value === value;

@@ -350,6 +350,28 @@ const entries: RegistryEntry[] = [
       "Estimate your compulsory HELP or study-loan repayment from repayment income under the marginal repayment system, with thresholds from official sources.",
   }),
   zRegistryEntry.parse({
+    id: "AU-PAY-016",
+    slug: "super-contributions-calculator",
+    displayName: "Super Contributions Calculator",
+    category: "pay-tax",
+    jurisdictionScope: "au",
+    releasePriority: "P0",
+    calculationClass: "B",
+    engineDependencies: ["E04"],
+    rulePackDependencies: ["super-guarantee", "super-thresholds", "super-statistics"],
+    supportedModes: ["simple", "advanced"],
+    inputSchemaVersion: "1",
+    resultSchemaVersion: "1",
+    disclosureSet: ["universal-footer-v2.0"],
+    sourceSet: ["ato-concessional-cap-2026-08-21"],
+    seo: {
+      title: "Super Contributions Calculator: SG, Caps and Balance Ranges",
+      description:
+        "Employer super on your salary, concessional cap headroom with salary sacrifice, the Division 293 threshold, and balance ranges across Australian age groups.",
+    },
+    ownership: { owner: "tmayorx@gmail.com", reviewCadence: "annual + pre-1-July watch" },
+  }),
+  zRegistryEntry.parse({
     id: "AU-PAY-015",
     slug: "inflation-calculator",
     displayName: "Inflation Calculator",

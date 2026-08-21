@@ -36,13 +36,19 @@ export function CalculatorHeader({
         </h1>
         {modeControl}
       </div>
+      {/* Each rule travels with the item that follows it, so a wrapped meta
+       * line never ends on a dangling separator. */}
       <div className="flex min-w-0 flex-wrap items-center gap-x-4 gap-y-3 font-mono text-[11px] uppercase tracking-[0.14em] text-ink-3">
         <span>{meta.jurisdictionLabel}</span>
-        <span aria-hidden="true" className="h-3 w-px bg-hairline-strong" />
-        <span>{meta.periodLabel}</span>
-        <span aria-hidden="true" className="h-3 w-px bg-hairline-strong" />
-        <span title={CLASS_DESCRIPTIONS[meta.calculationClass]}>
-          {CLASS_DESCRIPTIONS[meta.calculationClass]}
+        <span className="flex min-w-0 items-center gap-x-4">
+          <span aria-hidden="true" className="h-3 w-px shrink-0 bg-hairline-strong" />
+          <span>{meta.periodLabel}</span>
+        </span>
+        <span className="flex min-w-0 items-center gap-x-4">
+          <span aria-hidden="true" className="h-3 w-px shrink-0 bg-hairline-strong" />
+          <span title={CLASS_DESCRIPTIONS[meta.calculationClass]}>
+            {CLASS_DESCRIPTIONS[meta.calculationClass]}
+          </span>
         </span>
         <Badge tone={meta.ruleStatus.tone}>{meta.ruleStatus.label}</Badge>
         {actions ? <span className="ms-auto flex max-w-full flex-wrap items-center gap-2">{actions}</span> : null}
@@ -71,11 +77,14 @@ export function CalculatorShell({
   return (
     <div className="mx-auto grid w-full max-w-[100rem] gap-8 px-4 py-10 md:gap-12 md:px-8 md:py-16">
       {header}
+      {/* Both columns are query containers: the inputs column is only
+       * 360–440px wide on a 1440px screen, so anything laid out inside them
+       * must respond to the column, never to the viewport. */}
       <div className="grid min-w-0 gap-8 lg:grid-cols-[minmax(360px,440px)_1fr] lg:items-start lg:gap-12">
-        <section aria-label="Inputs" className="nexus-panel grid min-w-0 gap-6 p-6 md:p-8">
+        <section aria-label="Inputs" className="nexus-panel @container grid min-w-0 gap-6 p-6 md:p-8">
           {inputs}
         </section>
-        <section aria-label="Results" className="grid min-w-0 gap-6 lg:sticky lg:top-24">
+        <section aria-label="Results" className="@container grid min-w-0 gap-6 lg:sticky lg:top-24">
           {results}
         </section>
       </div>

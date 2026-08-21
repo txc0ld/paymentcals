@@ -168,7 +168,10 @@ export function InflationCalculator() {
                 onChange={setSalaryRaw}
                 error={!salary.ok && salary.error ? salary.error : undefined}
               />
-              <div className="grid items-start gap-4 sm:grid-cols-2">
+              {/* Container query, not a viewport one: the inputs column is
+               * ~296–376px wide from lg up, where a month picker pair would
+               * be crushed. It only pairs when the column is genuinely wide. */}
+              <div className="grid items-start gap-4 @sm:grid-cols-2">
                 {monthField("inf-from", "Date of last pay rise", fromMonth, setFromMonth)}
                 {monthField("inf-to", "Comparison date", toMonth, setToMonth, true)}
               </div>
@@ -183,8 +186,8 @@ export function InflationCalculator() {
           ) : !result || !salary.ok ? (
             <EmptyState>Enter a salary and the date of your last pay rise.</EmptyState>
           ) : (
-            <div className="grid gap-6">
-              <div className="nexus-result grid gap-6 p-6 md:p-8">
+            <div className="grid min-w-0 gap-6">
+              <div className="nexus-result @container grid gap-6 p-6 md:p-8">
                 <div className="grid gap-3">
                   <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-ink-3">
                     Salary needed on {result.toQuarter.date} to keep its {result.fromQuarter.date} purchasing power
@@ -202,7 +205,7 @@ export function InflationCalculator() {
                     power. Matching inflation takes a rise of {formatMajor(result.shortfall)} ({pctRise}%).
                   </p>
                 </div>
-                <div className="grid auto-rows-fr gap-4 border-t border-hairline pt-6 sm:grid-cols-3">
+                <div className="grid auto-rows-fr gap-4 border-t border-hairline pt-6 @xl:grid-cols-3">
                   <div className="nexus-panel-soft flex min-w-0 flex-col gap-1 p-5">
                     <span className="font-mono text-[10px] uppercase tracking-[0.16em] text-ink-3">Effective value now</span>
                     <span className="font-mono text-xl tabular-nums text-ink">{formatMajor(result.effectiveValue)}</span>

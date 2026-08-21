@@ -145,7 +145,7 @@ export function StampDutyCalculator({ variant }: { variant: "duty" | "buying_cos
           ) : !duty ? (
             <EmptyState>Enter the property value to estimate the general transfer duty.</EmptyState>
           ) : (
-            <div className="nexus-result grid min-w-0 gap-6 p-6 md:p-8">
+            <div className="nexus-result @container grid min-w-0 gap-6 p-6 md:p-8">
               <PrimaryResult
                 label={variant === "duty" ? `Estimated ${state} transfer duty` : "Estimated upfront costs"}
                 amount={moneyFromDecimalString(
@@ -174,7 +174,7 @@ export function StampDutyCalculator({ variant }: { variant: "duty" | "buying_cos
                 }
               />
               {variant === "buying_costs" ? (
-                <div className="grid gap-4 border-t border-hairline pt-6 sm:grid-cols-2">
+                <div className="grid gap-4 border-t border-hairline pt-6 @sm:grid-cols-2">
                   <ResultMetric label="Transfer duty" amount={moneyFromDecimalString("AUD", duty.duty.toFixed(2), 2)} />
                   <ResultMetric label="Your entered costs" amount={moneyFromDecimalString("AUD", extras.toFixed(2), 2)} />
                 </div>

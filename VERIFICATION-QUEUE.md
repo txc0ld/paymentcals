@@ -112,3 +112,13 @@ snapshots + sha256 hashes in compliance-archive/sources/state-revenue/. Owner sp
 - [ ] NT: confirm floor-to-5-cents rounding and the unmodelled $5 joint-tenant addition
 - [ ] WHM 2024-25/2025-26 brackets and Medicare 2024-25 thresholds (one source is an archived Wayback capture of the official ATO family page, corroborated by the live myTax worksheet)
 - NOT PUBLISHED by the ATO as of 2026-08-21 (stays fail-closed, evidence in the archived pages): foreign-resident brackets FY2026-27; Medicare low-income thresholds FY2026-27
+
+## ATO Taxation statistics + super thresholds (D-020/D-021, 2026-08-21)
+
+Archived: ts24-individuals-table16-percentiles / -table23-super-by-age (XLSX, data.gov.au),
+super-caps + super-div293 pages (ato.gov.au); sha256 in each pack's source record.
+
+- [ ] Spot-check three percentile rows of `au-income-percentiles` against Table 16A (range label + summed counts)
+- [ ] Spot-check three cells of `au-super-balance-by-age` against Table 23A (median/average/count)
+- [ ] Confirm concessional caps ($30,000 / $32,500 from 1 July 2026) and the $250,000 Division 293 threshold against the archived pages
+- [ ] D-020: confirm the no-projections boundary for super remains acceptable (ASIC calculator-relief conditions)

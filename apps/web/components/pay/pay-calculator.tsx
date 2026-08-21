@@ -34,8 +34,17 @@ import {
   type AuPayInput,
   type AuPayOutput,
 } from "@paymentcalcs/engine-au-tax";
-import type { IncomeTaxRules, TaxBracket } from "@paymentcalcs/rules-au";
+import { genderMix, incomePercentileFor } from "@paymentcalcs/engine-compensation";
+import { resolveRulePack } from "@paymentcalcs/rule-schema";
+import {
+  allAuRulePacks,
+  auIntegrityManifest,
+  type IncomePercentilesRulePack,
+  type IncomeTaxRules,
+  type TaxBracket,
+} from "@paymentcalcs/rules-au";
 import { decodeUrlState, encodeUrlState } from "@paymentcalcs/scenario-schema";
+import { allowDraftRules } from "../../lib/draft-rules";
 import { analytics } from "../../lib/analytics";
 import { parseMoneyInput } from "../../lib/money-input";
 import { FINANCIAL_YEARS, resolvePayPacks, type FinancialYear, type PayResolutionOutcome } from "../../lib/pay-packs";
@@ -343,6 +352,106 @@ function NetSplitBar({ output }: { output: AuPayOutput }) {
   );
 }
 
+const ordinal = (n: number) =>
+  `${n}${n % 100 >= 11 && n % 100 <= 13 ? "th" : ["th", "st", "nd", "rd"][n % 10] && n % 10 <= 3 ? ["th", "st", "nd", "rd"][n % 10] : "th"}`;
+
+/** Where the taxable income sits among Australian taxpayers, straight from
+ * the resolved ATO percentile pack. Distribution bars show the gender mix of
+ * each percentile; the exact figures live in the table beneath. */
+function IncomeRangeSection({
+  pack,
+  taxableIncome,
+}: {
+  pack: IncomePercentilesRulePack;
+  taxableIncome: Money;
+}) {
+  const income = (moneyToDecimal(taxableIncome) as DecimalValue).toFixed(2);
+  const row = incomePercentileFor(pack.rules, income);
+  const mix = genderMix(row);
+  const width = 600;
+  const height = 130;
+  const barW = width / 100;
+  return (
+    <section aria-label="Income range" className="nexus-panel-soft grid gap-4 p-6 md:p-8">
+      <div className="flex min-w-0 flex-wrap items-baseline justify-between gap-x-6 gap-y-2">
+        <h2 className="font-mono text-[11px] tracking-[0.16em] text-[var(--pc-accent-text)]">
+          Income range
+        </h2>
+        <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-ink-3">
+          ATO percentile distribution, {pack.rules.incomeYear}
+        </span>
+      </div>
+      <svg
+        viewBox={`0 0 ${width} ${height}`}
+        role="img"
+        aria-label={`Gender mix across the 100 taxable-income percentiles; your income sits in the ${ordinal(row.percentile)} percentile`}
+        className="h-auto w-full"
+      >
+        {pack.rules.percentiles.map((p) => {
+          const males = Number(p.males);
+          const females = Number(p.females);
+          const total = males + females || 1;
+          const maleH = (males / total) * (height - 8);
+          const femaleH = (females / total) * (height - 8);
+          const x = (p.percentile - 1) * barW;
+          return (
+            <g key={p.percentile}>
+              <rect x={x + 0.6} y={height - femaleH} width={barW - 1.2} height={femaleH} fill="var(--pc-accent)" opacity={0.7} />
+              <rect x={x + 0.6} y={height - femaleH - maleH} width={barW - 1.2} height={maleH} fill="currentColor" className="text-ink/35" />
+            </g>
+          );
+        })}
+        <line
+          x1={(row.percentile - 0.5) * barW}
+          x2={(row.percentile - 0.5) * barW}
+          y1={0}
+          y2={height}
+          stroke="var(--pc-text)"
+          strokeWidth={2}
+        />
+      </svg>
+      <div className="flex flex-wrap gap-x-6 gap-y-2">
+        <span className="flex items-baseline gap-2">
+          <span aria-hidden="true" className="h-2 w-2 self-center bg-accent opacity-70" />
+          <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-ink-3">Female share</span>
+        </span>
+        <span className="flex items-baseline gap-2">
+          <span aria-hidden="true" className="h-2 w-2 self-center bg-ink/35" />
+          <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-ink-3">Male share</span>
+        </span>
+        <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-ink-3">
+          | Marker: your percentile
+        </span>
+      </div>
+      <div className="grid gap-px border border-hairline bg-hairline @md:grid-cols-2 @3xl:grid-cols-4">
+        {(
+          [
+            ["Percentile", `${ordinal(row.percentile)} percentile`, null],
+            ["Income range", row.rangeLabel, null],
+            ["Gender mix", `${mix.malePercent}% male · ${mix.femalePercent}% female`, null],
+            [
+              "Tax burden",
+              formatMoney(moneyFromDecimalString("AUD", row.averageNetTax, 2)),
+              `average net tax · ${new Dec(row.shareOfNetTax).times(100).toFixed(1)}% of total net tax`,
+            ],
+          ] as const
+        ).map(([label, value, detail]) => (
+          <div key={label} className="grid content-start gap-1 bg-surface-2 p-5">
+            <span className="font-mono text-[10px] uppercase tracking-[0.16em] text-ink-3">{label}</span>
+            <span className="font-mono text-[15px] tabular-nums text-[var(--pc-accent-text)]">{value}</span>
+            {detail ? <span className="text-[12px] leading-4 text-ink-3">{detail}</span> : null}
+          </div>
+        ))}
+      </div>
+      <p className="text-[12px] leading-5 text-ink-3">
+        Positions compare your taxable income with all taxable individuals in the ATO&rsquo;s{" "}
+        {pack.rules.incomeYear} statistics ({Number(pack.rules.totalIndividuals).toLocaleString("en-AU")} people) —
+        a historical distribution, not a ranking of current incomes.
+      </p>
+    </section>
+  );
+}
+
 export function PayCalculator({ variant }: { variant: PayVariant }) {
   const entry = getRegistryEntry(variant.calculatorId)!;
   const [state, setState] = useState<PayFormState>({ ...DEFAULT_STATE, ...variant.defaults });
@@ -352,6 +461,24 @@ export function PayCalculator({ variant }: { variant: PayVariant }) {
   const [compareResult, setCompareResult] = useState<CalculationResultV1<AuPayOutput> | null>(null);
   /** Index into GRID_COLUMNS for the small-screen single-cycle view. */
   const [mobileCycle, setMobileCycle] = useState(3);
+  /** ATO percentile-distribution pack (descriptive comparison only). */
+  const [percentiles, setPercentiles] = useState<IncomePercentilesRulePack | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    resolveRulePack(allAuRulePacks, auIntegrityManifest, {
+      domain: "income-percentiles",
+      jurisdiction: "AU",
+      valuationDate: new Date().toISOString().slice(0, 10),
+      allowDraftRules,
+    }).then((outcome) => {
+      // Supplementary display: on any failure it simply does not render.
+      if (!cancelled && outcome.ok) setPercentiles(outcome.pack as IncomePercentilesRulePack);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
   const [savedFlash, setSavedFlash] = useState<string | null>(null);
   const [hydrated, setHydrated] = useState(false);
   const hydratedOnce = useRef(false);
@@ -614,7 +741,7 @@ export function PayCalculator({ variant }: { variant: PayVariant }) {
                 onChange={(amountRaw) => patch({ amountRaw })}
                 error={errors.amount}
               />
-              <div className="grid items-start gap-4 sm:grid-cols-2">
+              <div className="grid items-start gap-4 @md:grid-cols-2">
                 <SelectField
                   id="pay-frequency"
                   label="Amount is per"
@@ -641,7 +768,7 @@ export function PayCalculator({ variant }: { variant: PayVariant }) {
                 />
               </div>
               {showHours ? (
-                <div className="grid items-start gap-4 sm:grid-cols-2">
+                <div className="grid items-start gap-4 @md:grid-cols-2">
                   <div className="grid gap-1.5">
                     <label htmlFor="pay-hours" className="font-mono text-[11px] uppercase tracking-[0.14em] text-ink-2">
                       Ordinary hours per week
@@ -830,8 +957,8 @@ export function PayCalculator({ variant }: { variant: PayVariant }) {
               employer withholding, each shown separately.
             </EmptyState>
           ) : (
-            <div className="grid gap-6">
-              <div className="nexus-result grid gap-6 p-6 md:p-8">
+            <div className="grid min-w-0 gap-6">
+              <div className="nexus-result grid min-w-0 gap-6 p-6 md:p-8">
                 <PrimaryResult
                   label={
                     variant.primaryMetric === "netPerCycle"
@@ -841,7 +968,7 @@ export function PayCalculator({ variant }: { variant: PayVariant }) {
                   amount={primaryAmount(variant, output, state)}
                   qualifier={`Annual estimate under FY ${state.financialYear} rules. Marginal bracket ${formatRatePercent(output.liability.marginalBracketRate)}; the next $1,000 of gross is worth ${formatMoney(output.netValueOfNextThousand)} after obligations.`}
                 />
-                <div className="grid auto-rows-fr gap-4 border-t border-hairline pt-6 sm:grid-cols-3">
+                <div className="grid auto-rows-fr gap-4 border-t border-hairline pt-6 @xl:grid-cols-3">
                   <ResultMetric label="Net per year" amount={output.netAnnualCash} />
                   <ResultMetric label="Base salary" amount={output.annualised.baseSalary} />
                   <ResultMetric
@@ -853,7 +980,7 @@ export function PayCalculator({ variant }: { variant: PayVariant }) {
 
                 {/* Where each gross dollar goes: visual + text legend (non-colour cues). */}
                 <NetSplitBar output={output} />
-                <div className="grid auto-rows-fr gap-4 sm:grid-cols-2">
+                <div className="grid auto-rows-fr gap-4 @md:grid-cols-2">
                   <StatCell
                     label="Effective rate on taxable income"
                     value={formatRatePercent(output.liability.effectiveRateOnTaxable)}
@@ -900,7 +1027,7 @@ export function PayCalculator({ variant }: { variant: PayVariant }) {
                   return (
                     <>
                       {/* Small screens: one cycle at a time, no horizontal scroll. */}
-                      <div className="grid gap-4 md:hidden">
+                      <div className="grid gap-4 @2xl:hidden">
                         <SegmentedControl
                           label="Pay cycle shown"
                           size="sm"
@@ -937,7 +1064,7 @@ export function PayCalculator({ variant }: { variant: PayVariant }) {
                         </table>
                       </div>
                       {/* md+: all cycles side by side. */}
-                      <div className="hidden md:block">
+                      <div className="hidden min-w-0 overflow-x-auto @2xl:block">
                         <table className="w-full border-collapse text-left">
                           <caption className="sr-only">
                             Gross package through to net cash at each pay cycle, under the resolved rule packs
@@ -1005,7 +1132,7 @@ export function PayCalculator({ variant }: { variant: PayVariant }) {
                         <tr className="border-b border-hairline font-mono text-[10px] uppercase tracking-[0.14em] text-ink-3">
                           <th scope="col" className="py-2 pe-4 font-normal">Taxable income</th>
                           <th scope="col" className="py-2 ps-4 text-right font-normal">Marginal rate</th>
-                          <th scope="col" className="hidden py-2 ps-4 text-right font-normal sm:table-cell">Position</th>
+                          <th scope="col" className="hidden py-2 ps-4 text-right font-normal @xl:table-cell">Position</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -1024,12 +1151,12 @@ export function PayCalculator({ variant }: { variant: PayVariant }) {
                               {formatRatePercent(row.rate)}
                               {/* Small screens: the marker folds into this cell. */}
                               {row.active ? (
-                                <span className="ms-2 font-mono text-[10px] uppercase tracking-[0.1em] text-[var(--pc-accent-text)] sm:hidden">
+                                <span className="ms-2 font-mono text-[10px] uppercase tracking-[0.1em] text-[var(--pc-accent-text)] @xl:hidden">
                                   · Yours
                                 </span>
                               ) : null}
                             </td>
-                            <td className="hidden py-2 ps-4 text-right font-mono text-[10px] uppercase tracking-[0.14em] sm:table-cell">
+                            <td className="hidden py-2 ps-4 text-right font-mono text-[10px] uppercase tracking-[0.14em] @xl:table-cell">
                               {row.active ? (
                                 <span className="text-[var(--pc-accent-text)]">Your bracket</span>
                               ) : (
@@ -1048,7 +1175,7 @@ export function PayCalculator({ variant }: { variant: PayVariant }) {
                 <h2 className="font-mono text-[11px] tracking-[0.16em] text-[var(--pc-accent-text)]">
                   Compare another salary
                 </h2>
-                <div className="grid items-start gap-4 sm:grid-cols-2">
+                <div className="grid items-start gap-4 @md:grid-cols-2">
                   <MoneyField
                     id="pay-compare"
                     label="Annual gross to compare"
@@ -1096,6 +1223,10 @@ export function PayCalculator({ variant }: { variant: PayVariant }) {
                   ) : null}
                 </div>
               </section>
+
+              {percentiles ? (
+                <IncomeRangeSection pack={percentiles} taxableIncome={output.liability.taxableIncome} />
+              ) : null}
 
               <section aria-label="Estimated employer withholding" className="nexus-panel-soft grid gap-4 p-6 md:p-8">
                 <h2 className="font-mono text-[11px] tracking-[0.16em] text-[var(--pc-accent-text)]">

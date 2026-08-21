@@ -25,9 +25,13 @@ export default function SourcesPage() {
           run in preview builds behind a visible draft banner.
         </p>
       </header>
-      <ul className="mt-12 grid gap-px bg-hairline md:grid-cols-2">
+      {/* rule-grid, not gap-px over a hairline fill: the pack count is odd at
+       * two columns and the fill would paint the empty cell as a solid block. */}
+      {/* content-start: cells are row-height matched, so without it a short
+       * pack's content spreads down the middle of a tall row. */}
+      <ul className="rule-grid mt-12 md:grid-cols-2">
         {allAuRulePacks.map((pack) => (
-          <li key={pack.rulePackId} className="grid gap-4 bg-surface p-5 md:p-6">
+          <li key={pack.rulePackId} className="grid content-start gap-4 bg-surface p-6 md:p-8">
             <div className="flex flex-wrap items-baseline justify-between gap-2">
               <span className="font-mono text-[14px] text-ink">{pack.rulePackId}</span>
               <span className="border border-hairline px-2 py-0.5 font-mono text-[10px] uppercase tracking-[0.14em] text-ink-2">

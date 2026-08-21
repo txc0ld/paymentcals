@@ -86,13 +86,13 @@ export function DepositCalculator() {
         !result ? (
           <EmptyState>Enter the property price and target LVR to see the deposit needed.</EmptyState>
         ) : (
-          <div className="nexus-result grid min-w-0 gap-6 p-6 md:p-8">
+          <div className="nexus-result @container grid min-w-0 gap-6 p-6 md:p-8">
             <PrimaryResult
               label={`Deposit at ${lvrPctRaw}% LVR`}
               amount={moneyFromDecimalString("AUD", result.deposit, 2)}
               qualifier={`With your entered upfront costs the cash needed is ${formatMajor(result.totalCashNeeded)}. The loan at this LVR is ${formatMajor(result.loan)}.`}
             />
-            <div className="grid gap-4 border-t border-hairline pt-6 sm:grid-cols-2">
+            <div className="grid gap-4 border-t border-hairline pt-6 @sm:grid-cols-2">
               <ResultMetric label="Loan amount" amount={moneyFromDecimalString("AUD", result.loan, 2)} />
               <ResultMetric label="Total cash needed" amount={moneyFromDecimalString("AUD", result.totalCashNeeded, 2)} detail="deposit + entered costs" />
             </div>
@@ -233,14 +233,16 @@ export function AffordabilityEstimate() {
             error={!expenses.ok && expenses.error ? expenses.error : undefined}
           />
           <MoneyField id="aff-debts" label="Existing debt repayments per month" value={debtsRaw} onChange={setDebtsRaw} error={!debts.ok && debts.error ? debts.error : undefined} />
-          <div className="grid items-start gap-4 sm:grid-cols-2">
-            <div className="grid gap-1.5">
+          {/* Container query: "Assessment buffer % (editable)" alone needs more
+            * than half of the 360–440px inputs column. */}
+          <div className="grid items-start gap-4 @md:grid-cols-2">
+            <div className="grid min-w-0 gap-1.5">
               <label htmlFor="aff-rate" className="font-mono text-[11px] uppercase tracking-[0.14em] text-ink-2">
                 Interest rate % p.a.
               </label>
               <input id="aff-rate" inputMode="decimal" value={ratePctRaw} onChange={(e) => setRatePctRaw(e.target.value)} className="nexus-input min-h-11 bg-surface px-3 font-mono text-[15px] tabular-nums text-ink outline-none focus:border-focus" />
             </div>
-            <div className="grid gap-1.5">
+            <div className="grid min-w-0 gap-1.5">
               <label htmlFor="aff-buffer" className="font-mono text-[11px] uppercase tracking-[0.14em] text-ink-2">
                 Assessment buffer % (editable)
               </label>

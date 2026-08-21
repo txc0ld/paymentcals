@@ -61,8 +61,10 @@ export function TimelineEditor({
                 Remove
               </button>
             </div>
-            <div className="grid items-start gap-4 sm:grid-cols-2">
-              <label className="grid gap-1.5">
+            {/* Container query: a date input and an amount input side by side
+              * need ~448px, which the narrow inputs column never has. */}
+            <div className="grid items-start gap-4 @md:grid-cols-2">
+              <label className="grid min-w-0 gap-1.5">
                 <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-ink-2">
                   {event.kind === "extra_recurring" || event.kind === "fee_annual" ? "Starts" : "Date"}
                 </span>
@@ -73,7 +75,7 @@ export function TimelineEditor({
                   className="nexus-input min-h-11 bg-surface px-3 font-mono text-[14px] text-ink outline-none focus:border-focus"
                 />
               </label>
-              <label className="grid gap-1.5">
+              <label className="grid min-w-0 gap-1.5">
                 <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-ink-2">
                   {event.kind === "rate_change" ? "New rate % p.a." : "Amount"}
                 </span>

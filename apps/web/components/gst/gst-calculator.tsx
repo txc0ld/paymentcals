@@ -418,12 +418,16 @@ export function GstCalculator() {
               </div>
               {uiMode === "simple" ? (
                 <>
-                  <SegmentedControl
-                    label="GST operation"
-                    value={simpleMode}
-                    onChange={setSimpleMode}
-                    options={SIMPLE_MODES}
-                  />
+                  {/* The control is inline-flex; as a bare grid item it would be
+                    * stretched, painting an empty segment after the last option. */}
+                  <div className="grid justify-items-start">
+                    <SegmentedControl
+                      label="GST operation"
+                      value={simpleMode}
+                      onChange={setSimpleMode}
+                      options={SIMPLE_MODES}
+                    />
+                  </div>
                   <MoneyField
                     id="gst-amount"
                     label={simpleMode === "add" ? "Amount excluding GST" : "Amount including GST"}
@@ -439,7 +443,7 @@ export function GstCalculator() {
                 </>
               ) : (
                 <>
-                  <div className="grid gap-1.5">
+                  <div className="grid justify-items-start gap-1.5">
                     <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-ink-2">Rounding</span>
                     <SegmentedControl
                       label="Rounding level"
@@ -470,7 +474,7 @@ export function GstCalculator() {
               below the result.
             </EmptyState>
           ) : (
-            <div className="nexus-result grid min-w-0 gap-6 p-6 md:p-8">
+            <div className="nexus-result @container grid min-w-0 gap-6 p-6 md:p-8">
               <PrimaryResult
                 label={output.mode === "line_items" ? "Invoice total (inc GST)" : PRIMARY_LABELS[output.mode as SimpleMode]}
                 amount={
@@ -484,7 +488,7 @@ export function GstCalculator() {
                 }
                 qualifier={`At the standard GST rate of ${formatRatePercent(output.rate)} under the resolved rule pack.`}
               />
-              <div className="grid gap-4 sm:grid-cols-3">
+              <div className="grid gap-4 @sm:grid-cols-2 @xl:grid-cols-3">
                 <ResultMetric label="Excluding GST" amount={output.exclusiveAmount} />
                 <ResultMetric label="GST" amount={output.gstAmount} />
                 <ResultMetric label="Including GST" amount={output.inclusiveAmount} />

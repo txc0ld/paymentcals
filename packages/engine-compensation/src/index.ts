@@ -14,3 +14,13 @@ export {
   type RealIncomeResult,
   type RealIncomeStep,
 } from "./real-income";
+export {
+  SuperThresholdUnavailableError,
+  genderMix,
+  incomePercentileFor,
+  superBalanceCell,
+  superBalanceSlice,
+  superContributionSummary,
+  type GenderMix,
+  type SuperContributionSummary,
+} from "./statistics";

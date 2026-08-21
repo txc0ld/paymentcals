@@ -58,7 +58,9 @@ export function LineItemsEditor({
                   </button>
                 ) : null}
               </div>
-              <div className="grid gap-4 sm:grid-cols-[1fr_auto]">
+              {/* Container query, so the fixed-width Qty field pairs with the
+                * description whenever the column itself is wide enough. */}
+              <div className="grid gap-4 @xs:grid-cols-[1fr_auto]">
                 <label className="grid gap-1.5">
                   <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-ink-2">
                     Description (optional)
@@ -104,7 +106,7 @@ export function LineItemsEditor({
                     <span role="alert" className="text-[12px] text-error">{error}</span>
                   ) : null}
                 </label>
-                <div className="grid content-end gap-1.5">
+                <div className="grid content-end justify-items-start gap-1.5">
                   <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-ink-2">Amount is</span>
                   <SegmentedControl
                     size="sm"
@@ -117,7 +119,7 @@ export function LineItemsEditor({
                     ]}
                   />
                 </div>
-                <div className="grid content-end gap-1.5">
+                <div className="grid content-end justify-items-start gap-1.5">
                   <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-ink-2">Treatment</span>
                   <SegmentedControl
                     size="sm"

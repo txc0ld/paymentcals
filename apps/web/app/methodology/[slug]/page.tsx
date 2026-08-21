@@ -54,14 +54,18 @@ export default async function MethodologyPage({ params }: { params: Promise<{ sl
       </h1>
       <p className="mt-4 max-w-[65ch] text-[15px] leading-7 text-ink-2">{entry.seo.description}</p>
 
+      {/* max-w-5xl is the page measure; the intro above shares it so the
+       * section rules and the engine grid line up on the same right edge. */}
       <div className="mt-14 max-w-5xl border-t border-hairline pt-8">
         <h2 className="text-[length:var(--pc-text-h3)] font-semibold tracking-tight text-ink">Engines and formulas</h2>
-        <ul className="mt-5 grid gap-px bg-hairline md:grid-cols-2">
+        {/* rule-grid: engine counts are odd as often as not, and a gap-px fill
+         * would paint the unfilled cell of the last row as a solid block. */}
+        <ul className="rule-grid mt-6 md:grid-cols-2">
           {entry.engineDependencies.map((engineId) => {
             const note = ENGINE_NOTES[engineId];
             if (!note) return null;
             return (
-              <li key={engineId} className="grid gap-2 bg-surface p-5 md:p-6">
+              <li key={engineId} className="grid content-start gap-2 bg-surface p-6 md:p-8">
                 <span className="font-mono text-[11px] uppercase tracking-[0.16em] text-ink-2">
                   {engineId} · {note.name}
                 </span>

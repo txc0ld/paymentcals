@@ -200,7 +200,7 @@ export function HelpRepaymentCalculator() {
           ) : !repayment ? (
             <EmptyState>Enter your repayment income to estimate the compulsory annual repayment.</EmptyState>
           ) : (
-            <div className="nexus-result grid gap-6 p-6 md:p-8">
+            <div className="nexus-result @container grid gap-6 p-6 md:p-8">
               <PrimaryResult
                 label="Compulsory annual repayment"
                 amount={repayment}
@@ -210,7 +210,7 @@ export function HelpRepaymentCalculator() {
                     : `Under the FY ${financialYear} system a single rate applies to your whole repayment income once you cross the threshold.`
                 }
               />
-              <div className="grid auto-rows-fr gap-4 border-t border-hairline pt-6 sm:grid-cols-2">
+              <div className="grid auto-rows-fr gap-4 border-t border-hairline pt-6 @sm:grid-cols-2">
                 <ResultMetric
                   label="Repayment income"
                   amount={income.ok ? income.money : repayment}
@@ -236,7 +236,7 @@ export function HelpRepaymentCalculator() {
                       From the resolved rule pack
                     </span>
                   </div>
-                  <div className="overflow-x-auto">
+                  <div className="min-w-0 overflow-x-auto">
                     <table className="w-full min-w-[320px] border-collapse text-left">
                       <caption className="sr-only">
                         Repayment income tiers around your income, with the applied tier marked

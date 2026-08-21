@@ -124,8 +124,10 @@ export function SavingsCalculator({ variant }: { variant: "compound" | "goal" })
               error={!contribution.ok && contribution.error ? contribution.error : undefined}
             />
           ) : null}
-          <div className="grid items-start gap-4 sm:grid-cols-2">
-            <div className="grid gap-1.5">
+          {/* Container query: the inputs column is 360–440px, too narrow for
+            * two number inputs abreast however wide the viewport is. */}
+          <div className="grid items-start gap-4 @md:grid-cols-2">
+            <div className="grid min-w-0 gap-1.5">
               <label htmlFor="save-rate" className="font-mono text-[11px] uppercase tracking-[0.14em] text-ink-2">
                 Interest rate % p.a.
               </label>
@@ -138,7 +140,7 @@ export function SavingsCalculator({ variant }: { variant: "compound" | "goal" })
                 className="nexus-input min-h-11 bg-surface px-3 font-mono text-[15px] tabular-nums text-ink outline-none focus:border-focus"
               />
             </div>
-            <div className="grid gap-1.5">
+            <div className="grid min-w-0 gap-1.5">
               <label htmlFor="save-years" className="font-mono text-[11px] uppercase tracking-[0.14em] text-ink-2">
                 Years
               </label>
@@ -182,7 +184,7 @@ export function SavingsCalculator({ variant }: { variant: "compound" | "goal" })
               : "Enter a rate and timeframe to see the balance grow with compound interest."}
           </EmptyState>
         ) : (
-          <div className="nexus-result grid min-w-0 gap-6 p-6 md:p-8">
+          <div className="nexus-result @container grid min-w-0 gap-6 p-6 md:p-8">
             {variant === "goal" && perPeriodNeeded ? (
               <PrimaryResult
                 label={`Deposit needed per ${compounding === "monthly" ? "month" : compounding === "quarterly" ? "quarter" : "year"}`}
@@ -197,14 +199,14 @@ export function SavingsCalculator({ variant }: { variant: "compound" | "goal" })
               />
             )}
             <div
-              className={`grid gap-4 border-t border-hairline pt-6 ${
-                timeToGoal ? "sm:grid-cols-3" : "sm:grid-cols-2"
+              className={`grid gap-4 border-t border-hairline pt-6 @sm:grid-cols-2 ${
+                timeToGoal ? "@xl:grid-cols-3" : ""
               }`}
             >
               <ResultMetric label="Total deposits" amount={moneyFromDecimalString("AUD", result.totalContributions.toFixed(2), 2)} />
               <ResultMetric label="Total interest earned" amount={moneyFromDecimalString("AUD", result.totalInterest.toFixed(2), 2)} />
               {timeToGoal ? (
-                <div className="nexus-panel-soft flex min-w-0 flex-col gap-1 p-4">
+                <div className="nexus-panel-soft flex min-w-0 flex-col gap-1 p-5">
                   <span className="font-mono text-[10px] uppercase tracking-[0.16em] text-ink-3">Time to goal</span>
                   <span className="font-mono text-xl tabular-nums text-ink">
                     {timeToGoal.year} {timeToGoal.year === 1 ? "year" : "years"}

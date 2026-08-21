@@ -82,7 +82,7 @@ function CoefficientTable({
   return (
     <div className="grid gap-4">
       <h3 className="font-mono text-[11px] tracking-[0.16em] text-[var(--pc-accent-text)]">{caption}</h3>
-      <div className="overflow-x-auto">
+      <div className="min-w-0 overflow-x-auto">
         <table className="w-full min-w-[320px] border-collapse text-left">
           <caption className="sr-only">{caption}</caption>
           <thead>
@@ -303,13 +303,13 @@ export function WithholdingCalculator() {
               statement-of-formulas coefficients.
             </EmptyState>
           ) : (
-            <div className="nexus-result grid gap-6 p-6 md:p-8">
+            <div className="nexus-result @container grid gap-6 p-6 md:p-8">
               <PrimaryResult
                 label={`Total withheld per ${cycle.replace("ly", "")}`}
                 amount={toMoney(computation.periodTotal)}
                 qualifier={`Calculated as y = a·x − b on weekly-equivalent earnings of $${computation.weeklyX} using ${computation.scale.replaceAll("_", " ")}, rounded to the dollar per the schedule.`}
               />
-              <div className="grid auto-rows-fr gap-4 border-t border-hairline pt-6 sm:grid-cols-2">
+              <div className="grid auto-rows-fr gap-4 border-t border-hairline pt-6 @sm:grid-cols-2">
                 <ResultMetric label="PAYG component" amount={toMoney(computation.periodOrdinary)} />
                 <ResultMetric label="Study loan component" amount={toMoney(computation.periodStsl)} />
               </div>
@@ -325,7 +325,7 @@ export function WithholdingCalculator() {
           computation && weeklyX && ordinaryRows ? (
             <section
               aria-label="How this was calculated"
-              className="nexus-panel grid min-w-0 gap-6 p-6 md:p-8"
+              className="nexus-panel @container grid min-w-0 gap-6 p-6 md:p-8"
             >
               <div className="flex min-w-0 flex-wrap items-baseline justify-between gap-x-6 gap-y-2">
                 <h2 className="font-mono text-[11px] tracking-[0.16em] text-[var(--pc-accent-text)]">Working</h2>
@@ -334,7 +334,7 @@ export function WithholdingCalculator() {
                 </span>
               </div>
 
-              <dl className="grid auto-rows-fr gap-4 sm:grid-cols-3">
+              <dl className="grid auto-rows-fr gap-4 @xl:grid-cols-3">
                 {(
                   [
                     ["Weekly-equivalent earnings", `$${computation.weeklyX}`],

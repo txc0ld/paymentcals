@@ -1,0 +1,60 @@
+{
+  "rulePackId": "au-super-thresholds",
+  "jurisdiction": "AU",
+  "subdivision": null,
+  "domain": "super-thresholds",
+  "effectiveFrom": "2024-07-01",
+  "effectiveTo": null,
+  "status": "active",
+  "schemaVersion": 1,
+  "rulesVersion": "0.1.0",
+  "sources": [
+    {
+      "sourceId": "ato-concessional-cap-2026-08-21",
+      "authority": "Australian Taxation Office",
+      "title": "Concessional contributions cap",
+      "url": "https://www.ato.gov.au/individuals-and-families/super-for-individuals-and-families/super/growing-and-keeping-track-of-your-super/caps-limits-and-tax-on-super-contributions/concessional-contributions-cap",
+      "jurisdiction": "AU",
+      "domain": "super-thresholds",
+      "retrievedAt": "2026-08-21T13:05:00+08:00",
+      "archivedSnapshotRef": "compliance-archive/sources/ato/super-caps.2026-08-21.html",
+      "contentHash": "513d54653a1e1b83fe6a25c6a2853b44171ad36c8f2a665c69c8ca3c3e9fa18d",
+      "notes": "Page states: 'From 1 July 2026, the concessional contributions cap is $32,500' and 'From 1 July 2024 to 30 June 2026 ... was $30,000'. Carry-forward of unused cap exists but is not modelled (needs the member's own history)."
+    },
+    {
+      "sourceId": "ato-division-293-2026-08-21",
+      "authority": "Australian Taxation Office",
+      "title": "Division 293 tax on concessional contributions by high-income earners",
+      "url": "https://www.ato.gov.au/individuals-and-families/super-for-individuals-and-families/super/growing-and-keeping-track-of-your-super/caps-limits-and-tax-on-super-contributions/division-293-tax-on-concessional-contributions-by-high-income-earners",
+      "jurisdiction": "AU",
+      "domain": "super-thresholds",
+      "retrievedAt": "2026-08-21T13:05:00+08:00",
+      "archivedSnapshotRef": "compliance-archive/sources/ato/super-div293.2026-08-21.html",
+      "contentHash": "b878589e369fc03f5b790441e8365b359b448e7bb8018b73daa763965ae34cca",
+      "notes": "Page states the $250,000 combined income + concessional contributions threshold. The 15% additional tax rate is stated on the same page."
+    }
+  ],
+  "review": {
+    "preparedBy": "claude-build-agent",
+    "approvedBy": "owner (directive: income range + super suite, 2026-08-21)",
+    "approvedAt": "2026-08-21T08:00:00Z"
+  },
+  "verifiedAt": null,
+  "rules": {
+    "concessionalCaps": [
+      {
+        "financialYear": "2024-25",
+        "cap": "30000"
+      },
+      {
+        "financialYear": "2025-26",
+        "cap": "30000"
+      },
+      {
+        "financialYear": "2026-27",
+        "cap": "32500"
+      }
+    ],
+    "division293Threshold": "250000"
+  }
+}

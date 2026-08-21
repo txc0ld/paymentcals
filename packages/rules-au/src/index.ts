@@ -8,6 +8,9 @@ import { zPaygWithholdingRulePack, type PaygWithholdingRulePack } from "./domain
 
 import auGstStandard from "./packs/au-gst-standard.json" with { type: "json" };
 import auCpiQuarterly from "./packs/au-cpi-quarterly.json" with { type: "json" };
+import auIncomePercentiles from "./packs/au-income-percentiles.json" with { type: "json" };
+import auSuperBalanceByAge from "./packs/au-super-balance-by-age.json" with { type: "json" };
+import auSuperThresholds from "./packs/au-super-thresholds.json" with { type: "json" };
 import incomeTax2425 from "./packs/au-income-tax-2024-25.json" with { type: "json" };
 import incomeTax2526 from "./packs/au-income-tax-2025-26.json" with { type: "json" };
 import incomeTax2627 from "./packs/au-income-tax-2026-27.json" with { type: "json" };
@@ -32,10 +35,21 @@ import dutyNt from "./packs/au-stamp-duty-nt.json" with { type: "json" };
 import manifest from "../integrity-manifest.json" with { type: "json" };
 import { zStampDutyRulePack, type StampDutyRulePack } from "./domains/stamp-duty";
 import { zCpiRulePack, type CpiRulePack } from "./domains/cpi";
+import {
+  zIncomePercentilesRulePack,
+  zSuperStatisticsRulePack,
+  zSuperThresholdsRulePack,
+  type IncomePercentilesRulePack,
+  type SuperStatisticsRulePack,
+  type SuperThresholdsRulePack,
+} from "./domains/statistics";
 
 /** Every pack is validated at module load — a malformed pack can never resolve. */
 export const gstPack: GstRulePack = zGstRulePack.parse(auGstStandard);
 export const cpiPack: CpiRulePack = zCpiRulePack.parse(auCpiQuarterly);
+export const incomePercentilesPack: IncomePercentilesRulePack = zIncomePercentilesRulePack.parse(auIncomePercentiles);
+export const superBalanceByAgePack: SuperStatisticsRulePack = zSuperStatisticsRulePack.parse(auSuperBalanceByAge);
+export const superThresholdsPack: SuperThresholdsRulePack = zSuperThresholdsRulePack.parse(auSuperThresholds);
 
 export const incomeTaxPacks: IncomeTaxRulePack[] = [incomeTax2425, incomeTax2526, incomeTax2627].map(
   (p) => zIncomeTaxRulePack.parse(p),
@@ -59,6 +73,9 @@ export const stampDutyPacks: StampDutyRulePack[] = [
 export const allAuRulePacks: readonly RulePackV1[] = [
   gstPack,
   cpiPack,
+  incomePercentilesPack,
+  superBalanceByAgePack,
+  superThresholdsPack,
   ...incomeTaxPacks,
   ...medicarePacks,
   ...stslPacks,
@@ -103,3 +120,19 @@ export {
   type StampDutyRules,
 } from "./domains/stamp-duty";
 export { zCpiRulePack, zCpiRules, type CpiQuarter, type CpiRulePack, type CpiRules } from "./domains/cpi";
+export {
+  zIncomePercentilesRulePack,
+  zIncomePercentilesRules,
+  zSuperStatisticsRulePack,
+  zSuperStatisticsRules,
+  zSuperThresholdsRulePack,
+  zSuperThresholdsRules,
+  type IncomePercentileRow,
+  type IncomePercentilesRulePack,
+  type IncomePercentilesRules,
+  type SuperBalanceCell,
+  type SuperStatisticsRulePack,
+  type SuperStatisticsRules,
+  type SuperThresholdsRulePack,
+  type SuperThresholdsRules,
+} from "./domains/statistics";

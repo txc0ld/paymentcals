@@ -143,13 +143,13 @@ export function SavingsPresetCalculator({ variant }: { variant: SavingsVariant }
           </EmptyState>
         ) : (
           <div className="grid gap-6">
-            <div className="nexus-result grid gap-6 p-6 md:p-8">
+            <div className="nexus-result @container grid min-w-0 gap-6 p-6 md:p-8">
               <PrimaryResult
                 label="Interest saved over the loan"
                 amount={moneyFromDecimalString("AUD", result.interestSaved, 2)}
                 qualifier={`Compared with the same loan and repayments but ${variant === "offset" ? "no offset balance" : "no extra repayments"}, on identical dates.`}
               />
-              <div className="grid gap-4 border-t border-hairline pt-6 sm:grid-cols-3">
+              <div className="grid gap-4 border-t border-hairline pt-6 @sm:grid-cols-2 @xl:grid-cols-3">
                 <MetricCell
                   label="Time saved"
                   value={periodsToYearsLabel(result.periodsSaved, PPY[state.frequency])}

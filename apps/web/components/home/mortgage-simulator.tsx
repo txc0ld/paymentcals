@@ -181,17 +181,22 @@ export function MortgageSimulator() {
           </EmptyState>
         ) : (
           <div className="grid gap-6">
-            <div className="nexus-result grid gap-6 p-6 md:p-8">
-              <div className="flex items-start justify-between gap-4">
+            <div className="nexus-result @container grid min-w-0 gap-6 p-6 md:p-8">
+              {/* The primary amount and the badge only fit on one line once the
+                * panel is wide; in the 470px results column at lg they cannot,
+                * so the badge drops below rather than forcing an overflow. */}
+              <div className="grid min-w-0 gap-4 @xl:flex @xl:items-start @xl:justify-between">
                 <PrimaryResult
                   label={mode === "compare" ? "Scenario A · total interest" : "Total interest over the loan"}
                   amount={moneyFromDecimalString("AUD", resultA.result.totalInterest, 2)}
                   qualifier={`Initial repayment ${formatMajor(resultA.result.scheduledPaymentInitial)}; paid off ${resultA.result.payoffDate ?? "beyond term"} (${periodsToYearsLabel(resultA.result.periodsUsed, PPY[scenarioA.basics.frequency])}).`}
                 />
-                <Badge tone="neutral">Scheduled model</Badge>
+                <span className="justify-self-start @xl:shrink-0">
+                  <Badge tone="neutral">Scheduled model</Badge>
+                </span>
               </div>
               {mode === "compare" && resultB.result ? (
-                <div className="grid gap-4 border-t border-hairline pt-6 sm:grid-cols-3">
+                <div className="grid gap-4 border-t border-hairline pt-6 @sm:grid-cols-2 @xl:grid-cols-3">
                   <ResultMetric
                     label="Scenario B · total interest"
                     amount={moneyFromDecimalString("AUD", resultB.result.totalInterest, 2)}

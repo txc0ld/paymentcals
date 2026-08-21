@@ -157,13 +157,13 @@ export function ContractorCalculator() {
           !result ? (
             <EmptyState>Enter a target income to see the day rate that actually covers it.</EmptyState>
           ) : (
-            <div className="nexus-result grid min-w-0 gap-6 p-6 md:p-8">
+            <div className="nexus-result @container grid min-w-0 gap-6 p-6 md:p-8">
               <PrimaryResult
                 label="Target day rate (excluding GST)"
                 amount={moneyFromDecimalString("AUD", result.targetDayRate.toFixed(2), 2)}
                 qualifier={`${result.billableDays.toFixed(0)} billable days from ${result.capacityDays} available. Break-even is ${formatMajor(result.breakEvenDayRate.toFixed(2))} per day; the target adds the risk margin.`}
               />
-              <div className="grid gap-4 border-t border-hairline pt-6 sm:grid-cols-3">
+              <div className="grid gap-4 border-t border-hairline pt-6 @sm:grid-cols-2 @xl:grid-cols-3">
                 <ResultMetric label="Hourly equivalent" amount={moneyFromDecimalString("AUD", result.targetHourlyRate.toFixed(2), 2)} />
                 <ResultMetric
                   label="Super replacement"
@@ -177,7 +177,7 @@ export function ContractorCalculator() {
                     detail="including GST, which is not revenue"
                   />
                 ) : (
-                  <div className="nexus-panel-soft flex min-w-0 flex-col gap-1 p-4">
+                  <div className="nexus-panel-soft flex min-w-0 flex-col gap-1 p-5">
                     <span className="font-mono text-[10px] uppercase tracking-[0.16em] text-ink-3">GST</span>
                     <span className="text-[13px] leading-5 text-ink-2">Not registered; no GST added to the quote.</span>
                   </div>

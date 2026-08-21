@@ -285,15 +285,15 @@ export function IncomeTaxExplorer() {
               year selector.
             </EmptyState>
           ) : (
-            <div className="grid gap-6">
+            <div className="grid min-w-0 gap-6">
               {output && taxAfterOffsets ? (
-                <div className="nexus-result grid gap-6 p-6 md:p-8">
+                <div className="nexus-result @container grid gap-6 p-6 md:p-8">
                   <PrimaryResult
                     label="Income tax per year"
                     amount={output.liability.grossIncomeTax}
                     qualifier={`Bracket tax only, before offsets and levies. After the low income tax offset it is $${Number(taxAfterOffsets.toFixed(2)).toLocaleString("en-AU", { minimumFractionDigits: 2 })}. Medicare, surcharge and study loans live in the Pay Calculator.`}
                   />
-                  <div className="grid auto-rows-fr gap-4 border-t border-hairline pt-6 sm:grid-cols-3">
+                  <div className="grid auto-rows-fr gap-4 border-t border-hairline pt-6 @xl:grid-cols-3">
                     <ResultMetric label="Low income tax offset" amount={output.liability.litoOffset} />
                     <ResultMetric label="Taxable income" amount={output.liability.taxableIncome} />
                     <div className="nexus-panel-soft flex min-w-0 flex-col gap-1 p-5">
@@ -309,7 +309,7 @@ export function IncomeTaxExplorer() {
                 </div>
               ) : null}
 
-              <section aria-label="Tax brackets" className="nexus-panel-soft grid gap-4 p-6 md:p-8">
+              <section aria-label="Tax brackets" className="nexus-panel-soft @container grid gap-4 p-6 md:p-8">
                 <div className="flex min-w-0 flex-wrap items-baseline justify-between gap-x-6 gap-y-2">
                   <h2 className="font-mono text-[11px] tracking-[0.16em] text-[var(--pc-accent-text)]">
                     FY {financialYear} rates — {RESIDENCY_OPTIONS.find((o) => o.value === residency)?.label}
@@ -318,7 +318,7 @@ export function IncomeTaxExplorer() {
                     From the resolved rule pack
                   </span>
                 </div>
-                <div className="overflow-x-auto">
+                <div className="min-w-0 overflow-x-auto">
                   <table className="w-full border-collapse text-left">
                     <caption className="sr-only">
                       Statutory tax brackets with the tax payable at each band, in the official wording
@@ -326,7 +326,7 @@ export function IncomeTaxExplorer() {
                     <thead>
                       <tr className="border-b border-hairline font-mono text-[10px] uppercase tracking-[0.14em] text-ink-3">
                         <th scope="col" className="py-2 pe-4 font-normal">Income</th>
-                        <th scope="col" className="hidden py-2 pe-4 font-normal sm:table-cell">Tax liability</th>
+                        <th scope="col" className="hidden py-2 pe-4 font-normal @xl:table-cell">Tax liability</th>
                         <th scope="col" className="py-2 text-right font-normal">Rate</th>
                       </tr>
                     </thead>
@@ -344,7 +344,7 @@ export function IncomeTaxExplorer() {
                             className={active ? "border-b-2 border-[var(--pc-accent)]" : "border-b border-hairline"}
                           >
                             <td className="py-2 pe-4 font-mono text-[13px] tabular-nums text-ink-2">{row.range}</td>
-                            <td className="hidden py-2 pe-4 text-[13px] text-ink-2 sm:table-cell">{row.liability}</td>
+                            <td className="hidden py-2 pe-4 text-[13px] text-ink-2 @xl:table-cell">{row.liability}</td>
                             <td className="py-2 text-right font-mono text-[13px] tabular-nums text-ink-2">
                               {formatRatePercent(row.rate)}
                               {active ? (

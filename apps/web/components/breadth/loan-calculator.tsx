@@ -227,7 +227,7 @@ export function LoanCalculator({ variant }: { variant: "personal" | "car" }) {
         !result && !balloonSchedule ? (
           <EmptyState>Enter the loan to see repayments, total interest and the schedule.</EmptyState>
         ) : (
-          <div className="nexus-result grid min-w-0 gap-6 p-6 md:p-8">
+          <div className="nexus-result @container grid min-w-0 gap-6 p-6 md:p-8">
             <PrimaryResult
               label={`Repayment per ${periodNoun}`}
               amount={moneyFromDecimalString(
@@ -241,7 +241,7 @@ export function LoanCalculator({ variant }: { variant: "personal" | "car" }) {
                   : `Over ${state.termYearsRaw} years at ${state.ratePctRaw || "…"}% p.a.`
               }
             />
-            <div className="grid gap-4 border-t border-hairline pt-6 sm:grid-cols-3">
+            <div className="grid gap-4 border-t border-hairline pt-6 @sm:grid-cols-2 @xl:grid-cols-3">
               <ResultMetric
                 label="Total interest"
                 amount={moneyFromDecimalString(
@@ -259,7 +259,7 @@ export function LoanCalculator({ variant }: { variant: "personal" | "car" }) {
                 )}
                 detail={balloonSchedule ? "including the balloon at term end" : undefined}
               />
-              <div className="nexus-panel-soft flex min-w-0 flex-col gap-1 p-4">
+              <div className="nexus-panel-soft flex min-w-0 flex-col gap-1 p-5">
                 <span className="font-mono text-[10px] uppercase tracking-[0.16em] text-ink-3">Paid off</span>
                 <span className="font-mono text-xl tabular-nums text-ink">
                   {balloonSchedule
@@ -307,13 +307,13 @@ export function LoanCalculator({ variant }: { variant: "personal" | "car" }) {
                   <span aria-hidden="true" className="h-0.5 w-6 shrink-0 bg-accent" />
                   With {formatMajor(extraAmount!)} extra per {periodNoun}
                 </h3>
-                <div className="grid items-start gap-4 sm:grid-cols-2">
+                <div className="grid items-start gap-4 @sm:grid-cols-2">
                   <ResultMetric
                     label="Interest saved"
                     amount={moneyFromDecimalString("AUD", saving.interestSaved, 2)}
                     detail={`interest falls to ${formatMajor(saving.newInterest)}`}
                   />
-                  <div className="nexus-panel-soft flex min-w-0 flex-col gap-1 p-4">
+                  <div className="nexus-panel-soft flex min-w-0 flex-col gap-1 p-5">
                     <span className="font-mono text-[10px] uppercase tracking-[0.16em] text-ink-3">Time saved</span>
                     <span className="font-mono text-xl tabular-nums text-ink">
                       {periodsToYearsLabel(Math.max(0, saving.periodsSaved), PPY[state.frequency])}

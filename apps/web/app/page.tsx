@@ -85,7 +85,10 @@ export default function HomePage() {
       {/* S3 — Platform preview */}
       <section aria-label="Interface preview" className="px-4 py-24 md:px-8 md:py-32">
         <div className="reveal-up mx-auto w-full max-w-[100rem]">
-          <div className="glass-panel relative aspect-[16/10] w-full overflow-hidden border border-hairline md:aspect-[21/9]">
+          {/* Each ratio only applies where it is taller than the content:
+           * 16/10 clipped the caption at 390 and 21/9 clipped it at 768,
+           * both silently, against overflow-hidden. */}
+          <div className="glass-panel relative aspect-auto w-full overflow-hidden border border-hairline sm:aspect-[16/10] lg:aspect-[21/9]">
             <div className="flex items-center gap-4 border-b border-hairline px-5 py-3">
               <span className="flex gap-1.5" aria-hidden="true">
                 <span className="h-2 w-2 rounded-full bg-ink/30" />

@@ -77,7 +77,7 @@ export function ExplainabilityTabs({
         role="tabpanel"
         id={`${baseId}-panel-${active}`}
         aria-labelledby={`${baseId}-tab-${active}`}
-        className="min-w-0 p-5 md:p-7"
+        className="@container min-w-0 p-6 md:p-8"
       >
         {active === "Summary" ? summary : null}
         {active === "Breakdown" ? breakdown : null}

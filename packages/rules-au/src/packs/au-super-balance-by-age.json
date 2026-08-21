@@ -1,0 +1,1284 @@
+{
+  "rulePackId": "au-super-balance-by-age",
+  "jurisdiction": "AU",
+  "subdivision": null,
+  "domain": "super-statistics",
+  "effectiveFrom": "2025-07-01",
+  "effectiveTo": null,
+  "status": "active",
+  "schemaVersion": 1,
+  "rulesVersion": "0.1.0",
+  "sources": [
+    {
+      "sourceId": "ato-ts24-individuals-table23-2026-08-21",
+      "authority": "Australian Taxation Office (Taxation statistics 2023–24, via data.gov.au)",
+      "title": "Individuals Table 23A: Super contributions and total super member accounts balance, by age range, sex and taxable income range, 2023–24",
+      "url": "https://data.gov.au/data/dataset/faea4485-f407-457d-97f8-3f0822ccd654/resource/0c0d97e6-15db-483c-980d-53fef39de5ae/download/ts24individual23contributionsagesextaxableincome.xlsx",
+      "jurisdiction": "AU",
+      "domain": "super-statistics",
+      "retrievedAt": "2026-08-21T13:00:00+08:08",
+      "archivedSnapshotRef": "compliance-archive/sources/ato/ts24-individuals-table23-super-by-age.2026-08-21.xlsx",
+      "contentHash": "47ffd996378d407cba526034d1b27c9eaed6544f36840315330dd85bcc500188",
+      "notes": "Median and average total super member account balances per (age range × sex × taxable income range) cell, verbatim per cell — the source publishes no all-income totals, so cells are never aggregated. 2023–24 income year."
+    }
+  ],
+  "review": {
+    "preparedBy": "claude-build-agent",
+    "approvedBy": "owner (directive: income range + super suite, 2026-08-21)",
+    "approvedAt": "2026-08-21T08:00:00Z"
+  },
+  "verifiedAt": null,
+  "rules": {
+    "incomeYear": "2023–24",
+    "cells": [
+      {
+        "ageRange": "a. Under 18",
+        "sex": "Female",
+        "taxableIncomeRange": "a. $18,200 or less",
+        "individuals": "38159",
+        "medianBalance": "244",
+        "averageBalance": "4736"
+      },
+      {
+        "ageRange": "a. Under 18",
+        "sex": "Female",
+        "taxableIncomeRange": "b. $18,201 to $45,000",
+        "individuals": "9808",
+        "medianBalance": "1276",
+        "averageBalance": "6638"
+      },
+      {
+        "ageRange": "a. Under 18",
+        "sex": "Female",
+        "taxableIncomeRange": "c. $45,001 to $120,000",
+        "individuals": "401",
+        "medianBalance": "4711",
+        "averageBalance": "91284"
+      },
+      {
+        "ageRange": "a. Under 18",
+        "sex": "Female",
+        "taxableIncomeRange": "d. $120,001 to $180,000",
+        "individuals": "11",
+        "medianBalance": "13165",
+        "averageBalance": "1037973"
+      },
+      {
+        "ageRange": "a. Under 18",
+        "sex": "Female",
+        "taxableIncomeRange": "e. $180,001 or more",
+        "individuals": "9",
+        "medianBalance": "164",
+        "averageBalance": "292113"
+      },
+      {
+        "ageRange": "a. Under 18",
+        "sex": "Female",
+        "taxableIncomeRange": "f. No income tax return",
+        "individuals": "35030",
+        "medianBalance": "153",
+        "averageBalance": "4152"
+      },
+      {
+        "ageRange": "a. Under 18",
+        "sex": "Male",
+        "taxableIncomeRange": "a. $18,200 or less",
+        "individuals": "35578",
+        "medianBalance": "315",
+        "averageBalance": "8435"
+      },
+      {
+        "ageRange": "a. Under 18",
+        "sex": "Male",
+        "taxableIncomeRange": "b. $18,201 to $45,000",
+        "individuals": "18790",
+        "medianBalance": "1965",
+        "averageBalance": "7444"
+      },
+      {
+        "ageRange": "a. Under 18",
+        "sex": "Male",
+        "taxableIncomeRange": "c. $45,001 to $120,000",
+        "individuals": "1615",
+        "medianBalance": "5393",
+        "averageBalance": "17567"
+      },
+      {
+        "ageRange": "a. Under 18",
+        "sex": "Male",
+        "taxableIncomeRange": "d. $120,001 to $180,000",
+        "individuals": "27",
+        "medianBalance": "6467",
+        "averageBalance": "126713"
+      },
+      {
+        "ageRange": "a. Under 18",
+        "sex": "Male",
+        "taxableIncomeRange": "e. $180,001 or more",
+        "individuals": "6",
+        "medianBalance": "5008",
+        "averageBalance": "232224"
+      },
+      {
+        "ageRange": "a. Under 18",
+        "sex": "Male",
+        "taxableIncomeRange": "f. No income tax return",
+        "individuals": "30084",
+        "medianBalance": "180",
+        "averageBalance": "8533"
+      },
+      {
+        "ageRange": "b. 18 - 24",
+        "sex": "Female",
+        "taxableIncomeRange": "a. $18,200 or less",
+        "individuals": "188732",
+        "medianBalance": "1185",
+        "averageBalance": "3296"
+      },
+      {
+        "ageRange": "b. 18 - 24",
+        "sex": "Female",
+        "taxableIncomeRange": "b. $18,201 to $45,000",
+        "individuals": "421473",
+        "medianBalance": "5558",
+        "averageBalance": "7124"
+      },
+      {
+        "ageRange": "b. 18 - 24",
+        "sex": "Female",
+        "taxableIncomeRange": "c. $45,001 to $120,000",
+        "individuals": "294576",
+        "medianBalance": "15668",
+        "averageBalance": "17476"
+      },
+      {
+        "ageRange": "b. 18 - 24",
+        "sex": "Female",
+        "taxableIncomeRange": "d. $120,001 to $180,000",
+        "individuals": "7777",
+        "medianBalance": "23774",
+        "averageBalance": "30655"
+      },
+      {
+        "ageRange": "b. 18 - 24",
+        "sex": "Female",
+        "taxableIncomeRange": "e. $180,001 or more",
+        "individuals": "2046",
+        "medianBalance": "12536",
+        "averageBalance": "32657"
+      },
+      {
+        "ageRange": "b. 18 - 24",
+        "sex": "Female",
+        "taxableIncomeRange": "f. No income tax return",
+        "individuals": "131503",
+        "medianBalance": "1012",
+        "averageBalance": "4299"
+      },
+      {
+        "ageRange": "b. 18 - 24",
+        "sex": "Male",
+        "taxableIncomeRange": "a. $18,200 or less",
+        "individuals": "168271",
+        "medianBalance": "1192",
+        "averageBalance": "4264"
+      },
+      {
+        "ageRange": "b. 18 - 24",
+        "sex": "Male",
+        "taxableIncomeRange": "b. $18,201 to $45,000",
+        "individuals": "385718",
+        "medianBalance": "5372",
+        "averageBalance": "6844"
+      },
+      {
+        "ageRange": "b. 18 - 24",
+        "sex": "Male",
+        "taxableIncomeRange": "c. $45,001 to $120,000",
+        "individuals": "349210",
+        "medianBalance": "15551",
+        "averageBalance": "17801"
+      },
+      {
+        "ageRange": "b. 18 - 24",
+        "sex": "Male",
+        "taxableIncomeRange": "d. $120,001 to $180,000",
+        "individuals": "18898",
+        "medianBalance": "31379",
+        "averageBalance": "34032"
+      },
+      {
+        "ageRange": "b. 18 - 24",
+        "sex": "Male",
+        "taxableIncomeRange": "e. $180,001 or more",
+        "individuals": "3981",
+        "medianBalance": "33333",
+        "averageBalance": "42196"
+      },
+      {
+        "ageRange": "b. 18 - 24",
+        "sex": "Male",
+        "taxableIncomeRange": "f. No income tax return",
+        "individuals": "161062",
+        "medianBalance": "1337",
+        "averageBalance": "5512"
+      },
+      {
+        "ageRange": "c. 25 - 29",
+        "sex": "Female",
+        "taxableIncomeRange": "a. $18,200 or less",
+        "individuals": "83861",
+        "medianBalance": "3901",
+        "averageBalance": "12219"
+      },
+      {
+        "ageRange": "c. 25 - 29",
+        "sex": "Female",
+        "taxableIncomeRange": "b. $18,201 to $45,000",
+        "individuals": "235100",
+        "medianBalance": "9608",
+        "averageBalance": "14558"
+      },
+      {
+        "ageRange": "c. 25 - 29",
+        "sex": "Female",
+        "taxableIncomeRange": "c. $45,001 to $120,000",
+        "individuals": "496178",
+        "medianBalance": "30188",
+        "averageBalance": "33871"
+      },
+      {
+        "ageRange": "c. 25 - 29",
+        "sex": "Female",
+        "taxableIncomeRange": "d. $120,001 to $180,000",
+        "individuals": "35804",
+        "medianBalance": "57244",
+        "averageBalance": "62664"
+      },
+      {
+        "ageRange": "c. 25 - 29",
+        "sex": "Female",
+        "taxableIncomeRange": "e. $180,001 or more",
+        "individuals": "5882",
+        "medianBalance": "68367",
+        "averageBalance": "84785"
+      },
+      {
+        "ageRange": "c. 25 - 29",
+        "sex": "Female",
+        "taxableIncomeRange": "f. No income tax return",
+        "individuals": "97546",
+        "medianBalance": "4660",
+        "averageBalance": "14737"
+      },
+      {
+        "ageRange": "c. 25 - 29",
+        "sex": "Male",
+        "taxableIncomeRange": "a. $18,200 or less",
+        "individuals": "62366",
+        "medianBalance": "3541",
+        "averageBalance": "13239"
+      },
+      {
+        "ageRange": "c. 25 - 29",
+        "sex": "Male",
+        "taxableIncomeRange": "b. $18,201 to $45,000",
+        "individuals": "186612",
+        "medianBalance": "8108",
+        "averageBalance": "12868"
+      },
+      {
+        "ageRange": "c. 25 - 29",
+        "sex": "Male",
+        "taxableIncomeRange": "c. $45,001 to $120,000",
+        "individuals": "516890",
+        "medianBalance": "28738",
+        "averageBalance": "33501"
+      },
+      {
+        "ageRange": "c. 25 - 29",
+        "sex": "Male",
+        "taxableIncomeRange": "d. $120,001 to $180,000",
+        "individuals": "74533",
+        "medianBalance": "56964",
+        "averageBalance": "63531"
+      },
+      {
+        "ageRange": "c. 25 - 29",
+        "sex": "Male",
+        "taxableIncomeRange": "e. $180,001 or more",
+        "individuals": "16675",
+        "medianBalance": "76382",
+        "averageBalance": "86751"
+      },
+      {
+        "ageRange": "c. 25 - 29",
+        "sex": "Male",
+        "taxableIncomeRange": "f. No income tax return",
+        "individuals": "128604",
+        "medianBalance": "5498",
+        "averageBalance": "15408"
+      },
+      {
+        "ageRange": "d. 30 - 34",
+        "sex": "Female",
+        "taxableIncomeRange": "a. $18,200 or less",
+        "individuals": "86385",
+        "medianBalance": "12881",
+        "averageBalance": "25648"
+      },
+      {
+        "ageRange": "d. 30 - 34",
+        "sex": "Female",
+        "taxableIncomeRange": "b. $18,201 to $45,000",
+        "individuals": "213876",
+        "medianBalance": "17051",
+        "averageBalance": "28566"
+      },
+      {
+        "ageRange": "d. 30 - 34",
+        "sex": "Female",
+        "taxableIncomeRange": "c. $45,001 to $120,000",
+        "individuals": "489463",
+        "medianBalance": "49980",
+        "averageBalance": "56695"
+      },
+      {
+        "ageRange": "d. 30 - 34",
+        "sex": "Female",
+        "taxableIncomeRange": "d. $120,001 to $180,000",
+        "individuals": "73496",
+        "medianBalance": "91428",
+        "averageBalance": "98408"
+      },
+      {
+        "ageRange": "d. 30 - 34",
+        "sex": "Female",
+        "taxableIncomeRange": "e. $180,001 or more",
+        "individuals": "18105",
+        "medianBalance": "117558",
+        "averageBalance": "127994"
+      },
+      {
+        "ageRange": "d. 30 - 34",
+        "sex": "Female",
+        "taxableIncomeRange": "f. No income tax return",
+        "individuals": "97922",
+        "medianBalance": "14840",
+        "averageBalance": "29656"
+      },
+      {
+        "ageRange": "d. 30 - 34",
+        "sex": "Male",
+        "taxableIncomeRange": "a. $18,200 or less",
+        "individuals": "49796",
+        "medianBalance": "10727",
+        "averageBalance": "28356"
+      },
+      {
+        "ageRange": "d. 30 - 34",
+        "sex": "Male",
+        "taxableIncomeRange": "b. $18,201 to $45,000",
+        "individuals": "130041",
+        "medianBalance": "11887",
+        "averageBalance": "22557"
+      },
+      {
+        "ageRange": "d. 30 - 34",
+        "sex": "Male",
+        "taxableIncomeRange": "c. $45,001 to $120,000",
+        "individuals": "504589",
+        "medianBalance": "46944",
+        "averageBalance": "55894"
+      },
+      {
+        "ageRange": "d. 30 - 34",
+        "sex": "Male",
+        "taxableIncomeRange": "d. $120,001 to $180,000",
+        "individuals": "144476",
+        "medianBalance": "93476",
+        "averageBalance": "104359"
+      },
+      {
+        "ageRange": "d. 30 - 34",
+        "sex": "Male",
+        "taxableIncomeRange": "e. $180,001 or more",
+        "individuals": "48839",
+        "medianBalance": "128363",
+        "averageBalance": "142812"
+      },
+      {
+        "ageRange": "d. 30 - 34",
+        "sex": "Male",
+        "taxableIncomeRange": "f. No income tax return",
+        "individuals": "127080",
+        "medianBalance": "14797",
+        "averageBalance": "33743"
+      },
+      {
+        "ageRange": "e. 35 - 39",
+        "sex": "Female",
+        "taxableIncomeRange": "a. $18,200 or less",
+        "individuals": "82639",
+        "medianBalance": "24010",
+        "averageBalance": "43206"
+      },
+      {
+        "ageRange": "e. 35 - 39",
+        "sex": "Female",
+        "taxableIncomeRange": "b. $18,201 to $45,000",
+        "individuals": "187903",
+        "medianBalance": "28394",
+        "averageBalance": "46025"
+      },
+      {
+        "ageRange": "e. 35 - 39",
+        "sex": "Female",
+        "taxableIncomeRange": "c. $45,001 to $120,000",
+        "individuals": "453956",
+        "medianBalance": "74655",
+        "averageBalance": "86445"
+      },
+      {
+        "ageRange": "e. 35 - 39",
+        "sex": "Female",
+        "taxableIncomeRange": "d. $120,001 to $180,000",
+        "individuals": "89847",
+        "medianBalance": "136771",
+        "averageBalance": "149388"
+      },
+      {
+        "ageRange": "e. 35 - 39",
+        "sex": "Female",
+        "taxableIncomeRange": "e. $180,001 or more",
+        "individuals": "33927",
+        "medianBalance": "180433",
+        "averageBalance": "196072"
+      },
+      {
+        "ageRange": "e. 35 - 39",
+        "sex": "Female",
+        "taxableIncomeRange": "f. No income tax return",
+        "individuals": "103678",
+        "medianBalance": "29156",
+        "averageBalance": "51586"
+      },
+      {
+        "ageRange": "e. 35 - 39",
+        "sex": "Male",
+        "taxableIncomeRange": "a. $18,200 or less",
+        "individuals": "43893",
+        "medianBalance": "25644",
+        "averageBalance": "52430"
+      },
+      {
+        "ageRange": "e. 35 - 39",
+        "sex": "Male",
+        "taxableIncomeRange": "b. $18,201 to $45,000",
+        "individuals": "99016",
+        "medianBalance": "20309",
+        "averageBalance": "40276"
+      },
+      {
+        "ageRange": "e. 35 - 39",
+        "sex": "Male",
+        "taxableIncomeRange": "c. $45,001 to $120,000",
+        "individuals": "433945",
+        "medianBalance": "74413",
+        "averageBalance": "87335"
+      },
+      {
+        "ageRange": "e. 35 - 39",
+        "sex": "Male",
+        "taxableIncomeRange": "d. $120,001 to $180,000",
+        "individuals": "178774",
+        "medianBalance": "142026",
+        "averageBalance": "156241"
+      },
+      {
+        "ageRange": "e. 35 - 39",
+        "sex": "Male",
+        "taxableIncomeRange": "e. $180,001 or more",
+        "individuals": "89965",
+        "medianBalance": "198561",
+        "averageBalance": "215478"
+      },
+      {
+        "ageRange": "e. 35 - 39",
+        "sex": "Male",
+        "taxableIncomeRange": "f. No income tax return",
+        "individuals": "130247",
+        "medianBalance": "31584",
+        "averageBalance": "60387"
+      },
+      {
+        "ageRange": "f. 40 - 44",
+        "sex": "Female",
+        "taxableIncomeRange": "a. $18,200 or less",
+        "individuals": "67580",
+        "medianBalance": "33611",
+        "averageBalance": "61245"
+      },
+      {
+        "ageRange": "f. 40 - 44",
+        "sex": "Female",
+        "taxableIncomeRange": "b. $18,201 to $45,000",
+        "individuals": "153164",
+        "medianBalance": "36623",
+        "averageBalance": "61100"
+      },
+      {
+        "ageRange": "f. 40 - 44",
+        "sex": "Female",
+        "taxableIncomeRange": "c. $45,001 to $120,000",
+        "individuals": "411162",
+        "medianBalance": "98447",
+        "averageBalance": "116671"
+      },
+      {
+        "ageRange": "f. 40 - 44",
+        "sex": "Female",
+        "taxableIncomeRange": "d. $120,001 to $180,000",
+        "individuals": "97210",
+        "medianBalance": "192468",
+        "averageBalance": "210673"
+      },
+      {
+        "ageRange": "f. 40 - 44",
+        "sex": "Female",
+        "taxableIncomeRange": "e. $180,001 or more",
+        "individuals": "47318",
+        "medianBalance": "257451",
+        "averageBalance": "282768"
+      },
+      {
+        "ageRange": "f. 40 - 44",
+        "sex": "Female",
+        "taxableIncomeRange": "f. No income tax return",
+        "individuals": "109399",
+        "medianBalance": "42911",
+        "averageBalance": "77664"
+      },
+      {
+        "ageRange": "f. 40 - 44",
+        "sex": "Male",
+        "taxableIncomeRange": "a. $18,200 or less",
+        "individuals": "40884",
+        "medianBalance": "43842",
+        "averageBalance": "81676"
+      },
+      {
+        "ageRange": "f. 40 - 44",
+        "sex": "Male",
+        "taxableIncomeRange": "b. $18,201 to $45,000",
+        "individuals": "83274",
+        "medianBalance": "35011",
+        "averageBalance": "63558"
+      },
+      {
+        "ageRange": "f. 40 - 44",
+        "sex": "Male",
+        "taxableIncomeRange": "c. $45,001 to $120,000",
+        "individuals": "374466",
+        "medianBalance": "105641",
+        "averageBalance": "123155"
+      },
+      {
+        "ageRange": "f. 40 - 44",
+        "sex": "Male",
+        "taxableIncomeRange": "d. $120,001 to $180,000",
+        "individuals": "176516",
+        "medianBalance": "195783",
+        "averageBalance": "215555"
+      },
+      {
+        "ageRange": "f. 40 - 44",
+        "sex": "Male",
+        "taxableIncomeRange": "e. $180,001 or more",
+        "individuals": "113740",
+        "medianBalance": "276409",
+        "averageBalance": "299813"
+      },
+      {
+        "ageRange": "f. 40 - 44",
+        "sex": "Male",
+        "taxableIncomeRange": "f. No income tax return",
+        "individuals": "138265",
+        "medianBalance": "50386",
+        "averageBalance": "91950"
+      },
+      {
+        "ageRange": "g. 45 - 49",
+        "sex": "Female",
+        "taxableIncomeRange": "a. $18,200 or less",
+        "individuals": "51539",
+        "medianBalance": "41896",
+        "averageBalance": "80679"
+      },
+      {
+        "ageRange": "g. 45 - 49",
+        "sex": "Female",
+        "taxableIncomeRange": "b. $18,201 to $45,000",
+        "individuals": "125623",
+        "medianBalance": "47094",
+        "averageBalance": "78291"
+      },
+      {
+        "ageRange": "g. 45 - 49",
+        "sex": "Female",
+        "taxableIncomeRange": "c. $45,001 to $120,000",
+        "individuals": "362828",
+        "medianBalance": "123363",
+        "averageBalance": "151106"
+      },
+      {
+        "ageRange": "g. 45 - 49",
+        "sex": "Female",
+        "taxableIncomeRange": "d. $120,001 to $180,000",
+        "individuals": "87113",
+        "medianBalance": "252663",
+        "averageBalance": "283923"
+      },
+      {
+        "ageRange": "g. 45 - 49",
+        "sex": "Female",
+        "taxableIncomeRange": "e. $180,001 or more",
+        "individuals": "48289",
+        "medianBalance": "343158",
+        "averageBalance": "396245"
+      },
+      {
+        "ageRange": "g. 45 - 49",
+        "sex": "Female",
+        "taxableIncomeRange": "f. No income tax return",
+        "individuals": "106742",
+        "medianBalance": "53625",
+        "averageBalance": "105940"
+      },
+      {
+        "ageRange": "g. 45 - 49",
+        "sex": "Male",
+        "taxableIncomeRange": "a. $18,200 or less",
+        "individuals": "35552",
+        "medianBalance": "62309",
+        "averageBalance": "112999"
+      },
+      {
+        "ageRange": "g. 45 - 49",
+        "sex": "Male",
+        "taxableIncomeRange": "b. $18,201 to $45,000",
+        "individuals": "69396",
+        "medianBalance": "52708",
+        "averageBalance": "90864"
+      },
+      {
+        "ageRange": "g. 45 - 49",
+        "sex": "Male",
+        "taxableIncomeRange": "c. $45,001 to $120,000",
+        "individuals": "313932",
+        "medianBalance": "141410",
+        "averageBalance": "165778"
+      },
+      {
+        "ageRange": "g. 45 - 49",
+        "sex": "Male",
+        "taxableIncomeRange": "d. $120,001 to $180,000",
+        "individuals": "147267",
+        "medianBalance": "259653",
+        "averageBalance": "292180"
+      },
+      {
+        "ageRange": "g. 45 - 49",
+        "sex": "Male",
+        "taxableIncomeRange": "e. $180,001 or more",
+        "individuals": "109855",
+        "medianBalance": "372368",
+        "averageBalance": "418989"
+      },
+      {
+        "ageRange": "g. 45 - 49",
+        "sex": "Male",
+        "taxableIncomeRange": "f. No income tax return",
+        "individuals": "137132",
+        "medianBalance": "66039",
+        "averageBalance": "122842"
+      },
+      {
+        "ageRange": "h. 50 - 54",
+        "sex": "Female",
+        "taxableIncomeRange": "a. $18,200 or less",
+        "individuals": "53034",
+        "medianBalance": "54791",
+        "averageBalance": "113067"
+      },
+      {
+        "ageRange": "h. 50 - 54",
+        "sex": "Female",
+        "taxableIncomeRange": "b. $18,201 to $45,000",
+        "individuals": "133833",
+        "medianBalance": "65423",
+        "averageBalance": "109224"
+      },
+      {
+        "ageRange": "h. 50 - 54",
+        "sex": "Female",
+        "taxableIncomeRange": "c. $45,001 to $120,000",
+        "individuals": "371585",
+        "medianBalance": "152317",
+        "averageBalance": "196388"
+      },
+      {
+        "ageRange": "h. 50 - 54",
+        "sex": "Female",
+        "taxableIncomeRange": "d. $120,001 to $180,000",
+        "individuals": "81971",
+        "medianBalance": "317618",
+        "averageBalance": "376081"
+      },
+      {
+        "ageRange": "h. 50 - 54",
+        "sex": "Female",
+        "taxableIncomeRange": "e. $180,001 or more",
+        "individuals": "45728",
+        "medianBalance": "448614",
+        "averageBalance": "556020"
+      },
+      {
+        "ageRange": "h. 50 - 54",
+        "sex": "Female",
+        "taxableIncomeRange": "f. No income tax return",
+        "individuals": "115827",
+        "medianBalance": "62239",
+        "averageBalance": "127978"
+      },
+      {
+        "ageRange": "h. 50 - 54",
+        "sex": "Male",
+        "taxableIncomeRange": "a. $18,200 or less",
+        "individuals": "36867",
+        "medianBalance": "82234",
+        "averageBalance": "155287"
+      },
+      {
+        "ageRange": "h. 50 - 54",
+        "sex": "Male",
+        "taxableIncomeRange": "b. $18,201 to $45,000",
+        "individuals": "73136",
+        "medianBalance": "76067",
+        "averageBalance": "131020"
+      },
+      {
+        "ageRange": "h. 50 - 54",
+        "sex": "Male",
+        "taxableIncomeRange": "c. $45,001 to $120,000",
+        "individuals": "317022",
+        "medianBalance": "179112",
+        "averageBalance": "218814"
+      },
+      {
+        "ageRange": "h. 50 - 54",
+        "sex": "Male",
+        "taxableIncomeRange": "d. $120,001 to $180,000",
+        "individuals": "138374",
+        "medianBalance": "332675",
+        "averageBalance": "388321"
+      },
+      {
+        "ageRange": "h. 50 - 54",
+        "sex": "Male",
+        "taxableIncomeRange": "e. $180,001 or more",
+        "individuals": "107605",
+        "medianBalance": "487779",
+        "averageBalance": "576444"
+      },
+      {
+        "ageRange": "h. 50 - 54",
+        "sex": "Male",
+        "taxableIncomeRange": "f. No income tax return",
+        "individuals": "146682",
+        "medianBalance": "79612",
+        "averageBalance": "154461"
+      },
+      {
+        "ageRange": "i. 55 - 59",
+        "sex": "Female",
+        "taxableIncomeRange": "a. $18,200 or less",
+        "individuals": "56230",
+        "medianBalance": "81540",
+        "averageBalance": "178065"
+      },
+      {
+        "ageRange": "i. 55 - 59",
+        "sex": "Female",
+        "taxableIncomeRange": "b. $18,201 to $45,000",
+        "individuals": "136473",
+        "medianBalance": "93945",
+        "averageBalance": "166824"
+      },
+      {
+        "ageRange": "i. 55 - 59",
+        "sex": "Female",
+        "taxableIncomeRange": "c. $45,001 to $120,000",
+        "individuals": "313584",
+        "medianBalance": "183483",
+        "averageBalance": "257423"
+      },
+      {
+        "ageRange": "i. 55 - 59",
+        "sex": "Female",
+        "taxableIncomeRange": "d. $120,001 to $180,000",
+        "individuals": "58738",
+        "medianBalance": "392248",
+        "averageBalance": "501600"
+      },
+      {
+        "ageRange": "i. 55 - 59",
+        "sex": "Female",
+        "taxableIncomeRange": "e. $180,001 or more",
+        "individuals": "32286",
+        "medianBalance": "573244",
+        "averageBalance": "778047"
+      },
+      {
+        "ageRange": "i. 55 - 59",
+        "sex": "Female",
+        "taxableIncomeRange": "f. No income tax return",
+        "individuals": "109524",
+        "medianBalance": "65827",
+        "averageBalance": "147670"
+      },
+      {
+        "ageRange": "i. 55 - 59",
+        "sex": "Male",
+        "taxableIncomeRange": "a. $18,200 or less",
+        "individuals": "39135",
+        "medianBalance": "110000",
+        "averageBalance": "223994"
+      },
+      {
+        "ageRange": "i. 55 - 59",
+        "sex": "Male",
+        "taxableIncomeRange": "b. $18,201 to $45,000",
+        "individuals": "75912",
+        "medianBalance": "108897",
+        "averageBalance": "199883"
+      },
+      {
+        "ageRange": "i. 55 - 59",
+        "sex": "Male",
+        "taxableIncomeRange": "c. $45,001 to $120,000",
+        "individuals": "286962",
+        "medianBalance": "215771",
+        "averageBalance": "283185"
+      },
+      {
+        "ageRange": "i. 55 - 59",
+        "sex": "Male",
+        "taxableIncomeRange": "d. $120,001 to $180,000",
+        "individuals": "108979",
+        "medianBalance": "403845",
+        "averageBalance": "499674"
+      },
+      {
+        "ageRange": "i. 55 - 59",
+        "sex": "Male",
+        "taxableIncomeRange": "e. $180,001 or more",
+        "individuals": "83569",
+        "medianBalance": "615832",
+        "averageBalance": "779860"
+      },
+      {
+        "ageRange": "i. 55 - 59",
+        "sex": "Male",
+        "taxableIncomeRange": "f. No income tax return",
+        "individuals": "130014",
+        "medianBalance": "85777",
+        "averageBalance": "177407"
+      },
+      {
+        "ageRange": "j. 60 - 64",
+        "sex": "Female",
+        "taxableIncomeRange": "a. $18,200 or less",
+        "individuals": "78159",
+        "medianBalance": "159231",
+        "averageBalance": "320458"
+      },
+      {
+        "ageRange": "j. 60 - 64",
+        "sex": "Female",
+        "taxableIncomeRange": "b. $18,201 to $45,000",
+        "individuals": "150299",
+        "medianBalance": "129067",
+        "averageBalance": "260984"
+      },
+      {
+        "ageRange": "j. 60 - 64",
+        "sex": "Female",
+        "taxableIncomeRange": "c. $45,001 to $120,000",
+        "individuals": "236918",
+        "medianBalance": "208834",
+        "averageBalance": "326179"
+      },
+      {
+        "ageRange": "j. 60 - 64",
+        "sex": "Female",
+        "taxableIncomeRange": "d. $120,001 to $180,000",
+        "individuals": "35888",
+        "medianBalance": "466701",
+        "averageBalance": "657982"
+      },
+      {
+        "ageRange": "j. 60 - 64",
+        "sex": "Female",
+        "taxableIncomeRange": "e. $180,001 or more",
+        "individuals": "21252",
+        "medianBalance": "750541",
+        "averageBalance": "1105640"
+      },
+      {
+        "ageRange": "j. 60 - 64",
+        "sex": "Female",
+        "taxableIncomeRange": "f. No income tax return",
+        "individuals": "125924",
+        "medianBalance": "80844",
+        "averageBalance": "200181"
+      },
+      {
+        "ageRange": "j. 60 - 64",
+        "sex": "Male",
+        "taxableIncomeRange": "a. $18,200 or less",
+        "individuals": "60747",
+        "medianBalance": "208752",
+        "averageBalance": "403290"
+      },
+      {
+        "ageRange": "j. 60 - 64",
+        "sex": "Male",
+        "taxableIncomeRange": "b. $18,201 to $45,000",
+        "individuals": "97311",
+        "medianBalance": "156515",
+        "averageBalance": "323064"
+      },
+      {
+        "ageRange": "j. 60 - 64",
+        "sex": "Male",
+        "taxableIncomeRange": "c. $45,001 to $120,000",
+        "individuals": "251678",
+        "medianBalance": "239985",
+        "averageBalance": "353869"
+      },
+      {
+        "ageRange": "j. 60 - 64",
+        "sex": "Male",
+        "taxableIncomeRange": "d. $120,001 to $180,000",
+        "individuals": "74228",
+        "medianBalance": "458066",
+        "averageBalance": "610163"
+      },
+      {
+        "ageRange": "j. 60 - 64",
+        "sex": "Male",
+        "taxableIncomeRange": "e. $180,001 or more",
+        "individuals": "57334",
+        "medianBalance": "756868",
+        "averageBalance": "1064927"
+      },
+      {
+        "ageRange": "j. 60 - 64",
+        "sex": "Male",
+        "taxableIncomeRange": "f. No income tax return",
+        "individuals": "132183",
+        "medianBalance": "88844",
+        "averageBalance": "222535"
+      },
+      {
+        "ageRange": "k. 65 - 69",
+        "sex": "Female",
+        "taxableIncomeRange": "a. $18,200 or less",
+        "individuals": "75648",
+        "medianBalance": "328471",
+        "averageBalance": "469870"
+      },
+      {
+        "ageRange": "k. 65 - 69",
+        "sex": "Female",
+        "taxableIncomeRange": "b. $18,201 to $45,000",
+        "individuals": "116170",
+        "medianBalance": "168057",
+        "averageBalance": "352937"
+      },
+      {
+        "ageRange": "k. 65 - 69",
+        "sex": "Female",
+        "taxableIncomeRange": "c. $45,001 to $120,000",
+        "individuals": "116922",
+        "medianBalance": "216039",
+        "averageBalance": "421607"
+      },
+      {
+        "ageRange": "k. 65 - 69",
+        "sex": "Female",
+        "taxableIncomeRange": "d. $120,001 to $180,000",
+        "individuals": "16343",
+        "medianBalance": "537149",
+        "averageBalance": "929076"
+      },
+      {
+        "ageRange": "k. 65 - 69",
+        "sex": "Female",
+        "taxableIncomeRange": "e. $180,001 or more",
+        "individuals": "11551",
+        "medianBalance": "980068",
+        "averageBalance": "1648029"
+      },
+      {
+        "ageRange": "k. 65 - 69",
+        "sex": "Female",
+        "taxableIncomeRange": "f. No income tax return",
+        "individuals": "158896",
+        "medianBalance": "158592",
+        "averageBalance": "275664"
+      },
+      {
+        "ageRange": "k. 65 - 69",
+        "sex": "Male",
+        "taxableIncomeRange": "a. $18,200 or less",
+        "individuals": "69819",
+        "medianBalance": "357971",
+        "averageBalance": "523138"
+      },
+      {
+        "ageRange": "k. 65 - 69",
+        "sex": "Male",
+        "taxableIncomeRange": "b. $18,201 to $45,000",
+        "individuals": "97808",
+        "medianBalance": "200925",
+        "averageBalance": "405233"
+      },
+      {
+        "ageRange": "k. 65 - 69",
+        "sex": "Male",
+        "taxableIncomeRange": "c. $45,001 to $120,000",
+        "individuals": "140800",
+        "medianBalance": "224562",
+        "averageBalance": "421984"
+      },
+      {
+        "ageRange": "k. 65 - 69",
+        "sex": "Male",
+        "taxableIncomeRange": "d. $120,001 to $180,000",
+        "individuals": "32832",
+        "medianBalance": "456676",
+        "averageBalance": "756899"
+      },
+      {
+        "ageRange": "k. 65 - 69",
+        "sex": "Male",
+        "taxableIncomeRange": "e. $180,001 or more",
+        "individuals": "26972",
+        "medianBalance": "887474",
+        "averageBalance": "1492762"
+      },
+      {
+        "ageRange": "k. 65 - 69",
+        "sex": "Male",
+        "taxableIncomeRange": "f. No income tax return",
+        "individuals": "143053",
+        "medianBalance": "145789",
+        "averageBalance": "284851"
+      },
+      {
+        "ageRange": "l. 70 - 74",
+        "sex": "Female",
+        "taxableIncomeRange": "a. $18,200 or less",
+        "individuals": "51929",
+        "medianBalance": "398554",
+        "averageBalance": "569967"
+      },
+      {
+        "ageRange": "l. 70 - 74",
+        "sex": "Female",
+        "taxableIncomeRange": "b. $18,201 to $45,000",
+        "individuals": "65074",
+        "medianBalance": "222685",
+        "averageBalance": "467124"
+      },
+      {
+        "ageRange": "l. 70 - 74",
+        "sex": "Female",
+        "taxableIncomeRange": "c. $45,001 to $120,000",
+        "individuals": "43754",
+        "medianBalance": "311688",
+        "averageBalance": "684168"
+      },
+      {
+        "ageRange": "l. 70 - 74",
+        "sex": "Female",
+        "taxableIncomeRange": "d. $120,001 to $180,000",
+        "individuals": "7330",
+        "medianBalance": "750812",
+        "averageBalance": "1367056"
+      },
+      {
+        "ageRange": "l. 70 - 74",
+        "sex": "Female",
+        "taxableIncomeRange": "e. $180,001 or more",
+        "individuals": "6837",
+        "medianBalance": "1273455",
+        "averageBalance": "2200096"
+      },
+      {
+        "ageRange": "l. 70 - 74",
+        "sex": "Female",
+        "taxableIncomeRange": "f. No income tax return",
+        "individuals": "162946",
+        "medianBalance": "169691",
+        "averageBalance": "273360"
+      },
+      {
+        "ageRange": "l. 70 - 74",
+        "sex": "Male",
+        "taxableIncomeRange": "a. $18,200 or less",
+        "individuals": "51502",
+        "medianBalance": "418024",
+        "averageBalance": "607595"
+      },
+      {
+        "ageRange": "l. 70 - 74",
+        "sex": "Male",
+        "taxableIncomeRange": "b. $18,201 to $45,000",
+        "individuals": "65445",
+        "medianBalance": "222586",
+        "averageBalance": "496741"
+      },
+      {
+        "ageRange": "l. 70 - 74",
+        "sex": "Male",
+        "taxableIncomeRange": "c. $45,001 to $120,000",
+        "individuals": "57360",
+        "medianBalance": "282774",
+        "averageBalance": "638009"
+      },
+      {
+        "ageRange": "l. 70 - 74",
+        "sex": "Male",
+        "taxableIncomeRange": "d. $120,001 to $180,000",
+        "individuals": "12083",
+        "medianBalance": "589429",
+        "averageBalance": "1163192"
+      },
+      {
+        "ageRange": "l. 70 - 74",
+        "sex": "Male",
+        "taxableIncomeRange": "e. $180,001 or more",
+        "individuals": "12446",
+        "medianBalance": "1118204",
+        "averageBalance": "2049815"
+      },
+      {
+        "ageRange": "l. 70 - 74",
+        "sex": "Male",
+        "taxableIncomeRange": "f. No income tax return",
+        "individuals": "149826",
+        "medianBalance": "158046",
+        "averageBalance": "280005"
+      },
+      {
+        "ageRange": "m. 75 and over",
+        "sex": "Female",
+        "taxableIncomeRange": "a. $18,200 or less",
+        "individuals": "55517",
+        "medianBalance": "305504",
+        "averageBalance": "505260"
+      },
+      {
+        "ageRange": "m. 75 and over",
+        "sex": "Female",
+        "taxableIncomeRange": "b. $18,201 to $45,000",
+        "individuals": "62780",
+        "medianBalance": "225062",
+        "averageBalance": "506336"
+      },
+      {
+        "ageRange": "m. 75 and over",
+        "sex": "Female",
+        "taxableIncomeRange": "c. $45,001 to $120,000",
+        "individuals": "38492",
+        "medianBalance": "455616",
+        "averageBalance": "903601"
+      },
+      {
+        "ageRange": "m. 75 and over",
+        "sex": "Female",
+        "taxableIncomeRange": "d. $120,001 to $180,000",
+        "individuals": "7524",
+        "medianBalance": "950348",
+        "averageBalance": "1665971"
+      },
+      {
+        "ageRange": "m. 75 and over",
+        "sex": "Female",
+        "taxableIncomeRange": "e. $180,001 or more",
+        "individuals": "8661",
+        "medianBalance": "1462621",
+        "averageBalance": "2574915"
+      },
+      {
+        "ageRange": "m. 75 and over",
+        "sex": "Female",
+        "taxableIncomeRange": "f. No income tax return",
+        "individuals": "186535",
+        "medianBalance": "131044",
+        "averageBalance": "243641"
+      },
+      {
+        "ageRange": "m. 75 and over",
+        "sex": "Male",
+        "taxableIncomeRange": "a. $18,200 or less",
+        "individuals": "62591",
+        "medianBalance": "325437",
+        "averageBalance": "579771"
+      },
+      {
+        "ageRange": "m. 75 and over",
+        "sex": "Male",
+        "taxableIncomeRange": "b. $18,201 to $45,000",
+        "individuals": "64241",
+        "medianBalance": "243229",
+        "averageBalance": "589300"
+      },
+      {
+        "ageRange": "m. 75 and over",
+        "sex": "Male",
+        "taxableIncomeRange": "c. $45,001 to $120,000",
+        "individuals": "48660",
+        "medianBalance": "406522",
+        "averageBalance": "912370"
+      },
+      {
+        "ageRange": "m. 75 and over",
+        "sex": "Male",
+        "taxableIncomeRange": "d. $120,001 to $180,000",
+        "individuals": "10035",
+        "medianBalance": "863610",
+        "averageBalance": "1752569"
+      },
+      {
+        "ageRange": "m. 75 and over",
+        "sex": "Male",
+        "taxableIncomeRange": "e. $180,001 or more",
+        "individuals": "11781",
+        "medianBalance": "1485371",
+        "averageBalance": "3135713"
+      },
+      {
+        "ageRange": "m. 75 and over",
+        "sex": "Male",
+        "taxableIncomeRange": "f. No income tax return",
+        "individuals": "198856",
+        "medianBalance": "130179",
+        "averageBalance": "256338"
+      }
+    ]
+  }
+}

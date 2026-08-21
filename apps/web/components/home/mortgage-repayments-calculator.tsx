@@ -134,13 +134,13 @@ export function MortgageRepaymentsCalculator() {
           </EmptyState>
         ) : (
           <div className="grid gap-6">
-            <div className="nexus-result grid gap-6 p-6 md:p-8">
+            <div className="nexus-result @container grid min-w-0 gap-6 p-6 md:p-8">
               <PrimaryResult
                 label={`Repayment ${CYCLE_LABEL[state.frequency]}`}
                 amount={moneyFromDecimalString("AUD", result.scheduledPaymentInitial, 2)}
                 qualifier={`Scheduled-ledger estimate over ${state.termYearsRaw} years. Lender daily accrual, fee timing and rounding can differ; compare with your contract.`}
               />
-              <div className="grid gap-4 border-t border-hairline pt-6 sm:grid-cols-3">
+              <div className="grid gap-4 border-t border-hairline pt-6 @sm:grid-cols-2 @xl:grid-cols-3">
                 <ResultMetric
                   label="Total interest"
                   amount={moneyFromDecimalString("AUD", result.totalInterest, 2)}

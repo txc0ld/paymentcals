@@ -11,8 +11,10 @@ export const CATEGORY_LABELS: Record<string, string> = {
 };
 
 export function CalculatorGrid({ entries }: { entries: readonly RegistryEntry[] }) {
+  // grid-flow-row-dense: the every-seventh feature cell spans two columns at
+  // lg, and would otherwise leave an unfilled cell behind when it wraps.
   return (
-    <div className="nexus-grid sm:grid-cols-2 lg:grid-cols-3">
+    <div className="nexus-grid grid-flow-row-dense sm:grid-cols-2 lg:grid-cols-3">
       {entries.map((entry, index) => (
         <Link
           key={entry.id}

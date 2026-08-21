@@ -226,17 +226,27 @@ body {
   transition: transform var(--pc-duration) var(--pc-ease), background-color var(--pc-duration-fast) var(--pc-ease);
 }
 
-/* Directory grid keeps the shared name; now sharp editorial cells. */
+/* Hairline-ruled grid. Cells draw the leading rules and the container closes
+ * the trailing edges, so the outer box is always complete while internal rules
+ * exist only where a cell does. Showing a hairline backdrop through 1px gaps
+ * instead would paint every unfilled cell of a ragged last row as a solid
+ * block — the grid's item count rarely divides by its column count. */
+.rule-grid,
 .nexus-grid {
   display: grid;
-  gap: 1px;
-  border: 1px solid var(--pc-hairline);
-  background: var(--pc-hairline);
+  border-block-end: 1px solid var(--pc-hairline);
+  border-inline-end: 1px solid var(--pc-hairline);
 }
 
+.rule-grid > *,
 .nexus-grid > * {
   min-width: 0;
-  border: 0;
+  border-block-start: 1px solid var(--pc-hairline);
+  border-inline-start: 1px solid var(--pc-hairline);
+}
+
+/* Directory grid keeps the shared name; now sharp editorial cells. */
+.nexus-grid > * {
   border-radius: 0;
   background: var(--pc-bg);
   transform: translateY(0);
@@ -249,7 +259,7 @@ body {
   border: 1px solid var(--pc-hairline-strong);
   border-radius: 0;
   background: transparent;
-  color: var(--pc-text);
+  color: var(--pc-accent-text);
   transition: transform var(--pc-duration-fast) var(--pc-ease);
 }
 
@@ -313,6 +323,7 @@ body {
   .nexus-result,
   .nexus-table,
   .swiss-grid > *,
+  .rule-grid > *,
   .nexus-grid > * { border: 2px solid ButtonText; box-shadow: none; }
 }
 

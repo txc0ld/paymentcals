@@ -185,13 +185,13 @@ export function NetToGrossCalculator() {
               <p className="text-[14px] leading-6 text-ink-2">{solved.reason}</p>
             </div>
           ) : (
-            <div className="nexus-result grid gap-6 p-6 md:p-8">
+            <div className="nexus-result @container grid gap-6 p-6 md:p-8">
               <PrimaryResult
                 label={includesSuper ? "Required package (incl. super)" : "Required gross salary"}
                 amount={solved.grossAnnual!}
                 qualifier={`Re-running the forward calculator on this gross produces ${formatMoney(solved.achievedNetAnnual!)} net per year (residual ${formatMoney(solved.residual!)}). ${NET_TO_GROSS_TOLERANCE_NOTE}`}
               />
-              <div className="grid auto-rows-fr gap-4 border-t border-hairline pt-6 sm:grid-cols-2">
+              <div className="grid auto-rows-fr gap-4 border-t border-hairline pt-6 @sm:grid-cols-2">
                 <ResultMetric
                   label={`Gross ${frequency === "annually" ? "per year" : `per ${frequency.replace("ly", "").replace("annual", "year")}`}`}
                   amount={perPeriod(moneyToDecimal(solved.grossAnnual!) as DecimalValue)}
@@ -209,7 +209,7 @@ export function NetToGrossCalculator() {
                       Solved by bisection over the full forward engine in {solved.iterations} iterations
                     </span>
                   </div>
-                  <div className="overflow-x-auto">
+                  <div className="min-w-0 overflow-x-auto">
                     <table className="w-full min-w-[320px] border-collapse text-left">
                       <caption className="sr-only">
                         Target net compared with the net recomputed from the solved gross

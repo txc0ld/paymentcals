@@ -150,7 +150,7 @@ export function RateChangeCalculator() {
         !changed.result || !baseline.result || newRepayment === null || delta === null ? (
           <EmptyState>Enter your loan and the new rate to see the repayment change and lifetime effect.</EmptyState>
         ) : (
-          <div className="nexus-result grid gap-6 p-6 md:p-8">
+          <div className="nexus-result @container grid min-w-0 gap-6 p-6 md:p-8">
             <PrimaryResult
               label="Repayment after the change"
               amount={moneyFromDecimalString("AUD", newRepayment, 2)}
@@ -158,7 +158,7 @@ export function RateChangeCalculator() {
             />
             <div className="grid min-w-0 gap-4 border-t border-hairline pt-6">
               <PanelHeading>What changes</PanelHeading>
-              <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+              <div className="grid gap-4 @sm:grid-cols-2 @3xl:grid-cols-4">
                 <MetricCell
                   label="Before the change"
                   value={formatMajor(delta.before)}
@@ -185,7 +185,7 @@ export function RateChangeCalculator() {
                 />
               </div>
             </div>
-            <div className="grid gap-4 border-t border-hairline pt-6 sm:grid-cols-2">
+            <div className="grid gap-4 border-t border-hairline pt-6 @sm:grid-cols-2">
               <ResultMetric
                 label="Lifetime interest at new rate"
                 amount={moneyFromDecimalString("AUD", changed.result.totalInterest, 2)}

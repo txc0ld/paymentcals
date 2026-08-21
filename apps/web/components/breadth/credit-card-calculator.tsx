@@ -101,7 +101,7 @@ export function CreditCardCalculator() {
               className="nexus-input min-h-11 bg-surface px-3 font-mono text-[15px] tabular-nums text-ink outline-none focus:border-focus"
             />
           </div>
-          <div className="grid gap-1.5">
+          <div className="grid justify-items-start gap-1.5">
             <span className="font-mono text-[11px] uppercase tracking-[0.14em] text-ink-2">Payment plan</span>
             <SegmentedControl
               label="Payment plan"
@@ -133,7 +133,7 @@ export function CreditCardCalculator() {
         !result ? (
           <EmptyState>Enter the balance and rate to see the payoff time cycle by cycle.</EmptyState>
         ) : (
-          <div className="nexus-result grid min-w-0 gap-6 p-6 md:p-8">
+          <div className="nexus-result @container grid min-w-0 gap-6 p-6 md:p-8">
             {result.payoffDate ? (
               <PrimaryResult
                 label="Paid off"
@@ -155,7 +155,7 @@ export function CreditCardCalculator() {
               </p>
             ) : null}
             {result.payoffDate ? (
-              <div className="grid gap-4 border-t border-hairline pt-6 sm:grid-cols-2">
+              <div className="grid gap-4 border-t border-hairline pt-6 @sm:grid-cols-2">
                 <ResultMetric label="Total interest" amount={moneyFromDecimalString("AUD", result.totalInterest.toFixed(2), 2)} />
                 <ResultMetric label="Total paid" amount={moneyFromDecimalString("AUD", result.totalPaid.toFixed(2), 2)} />
               </div>

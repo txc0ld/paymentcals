@@ -82,7 +82,9 @@ export function ResultMetric({
   return (
     <div className="nexus-panel-soft flex min-w-0 flex-col gap-1 p-5">
       <span className="font-mono text-[10px] uppercase tracking-[0.16em] text-ink-3">{label}</span>
-      <span className="font-mono text-xl tabular-nums text-ink">{formatMoney(amount)}</span>
+      {/* break-words: metric cells sit in query-sized columns, so a
+       * seven-figure value must wrap rather than clip. */}
+      <span className="break-words font-mono text-xl tabular-nums text-ink">{formatMoney(amount)}</span>
       {detail ? <span className="text-[12px] leading-4 text-ink-3">{detail}</span> : null}
     </div>
   );

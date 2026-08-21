@@ -22,7 +22,9 @@ const ENTRIES = [
 export default function ChangelogPage() {
   return (
     <section className="mx-auto w-full max-w-[100rem] px-4 py-16 md:px-8 md:py-24">
-      <header className="grid gap-4 border-b border-hairline pb-10">
+      {/* One measure for header rule and entries: the rule used to run the
+       * full container while the entries stopped at 5xl, leaving a ragged edge. */}
+      <header className="grid max-w-5xl gap-4 border-b border-hairline pb-10">
         <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-ink-3">
           Release record // Public
         </span>
@@ -30,9 +32,9 @@ export default function ChangelogPage() {
           Changelog
         </h1>
       </header>
-      <ol className="mt-12 grid max-w-5xl gap-px bg-hairline">
+      <ol className="rule-grid mt-12 max-w-5xl">
         {ENTRIES.map((entry) => (
-          <li key={entry.date} className="grid gap-5 bg-surface p-6 md:grid-cols-[minmax(0,1fr)_minmax(0,2fr)] md:p-8">
+          <li key={entry.date} className="grid content-start gap-5 bg-surface p-6 md:grid-cols-[minmax(0,1fr)_minmax(0,2fr)] md:p-8">
             <div className="flex flex-wrap items-baseline justify-between gap-2">
               <h2 className="text-lg font-semibold tracking-tight text-ink">{entry.title}</h2>
               <span className="font-mono text-[11px] uppercase tracking-[0.14em] text-ink-3">{entry.date}</span>

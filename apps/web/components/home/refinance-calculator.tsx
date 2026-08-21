@@ -108,7 +108,7 @@ export function RefinanceCalculator() {
   }, [result]);
 
   const rateInput =(id: string, label: string, value: string, onChange: (v: string) => void) => (
-    <div className="grid gap-1.5">
+    <div className="grid min-w-0 gap-1.5">
       <label htmlFor={id} className="font-mono text-[11px] uppercase tracking-[0.14em] text-ink-2">
         {label}
       </label>
@@ -144,12 +144,14 @@ export function RefinanceCalculator() {
             onChange={setBalanceRaw}
             error={!balance.ok && balance.error ? balance.error : undefined}
           />
-          <div className="grid items-start gap-4 sm:grid-cols-2">
+          {/* Container queries throughout: these pairs sit in the 360–440px
+            * inputs column, so they answer to the column, not the viewport. */}
+          <div className="grid items-start gap-4 @md:grid-cols-2">
             {rateInput("ref-old-rate", "Current rate % p.a.", oldRateRaw, setOldRateRaw)}
             {rateInput("ref-old-years", "Remaining term (years)", remainingYearsRaw, setRemainingYearsRaw)}
           </div>
           <FieldGroup legend="The refinance offer">
-            <div className="grid items-start gap-4 sm:grid-cols-2">
+            <div className="grid items-start gap-4 @md:grid-cols-2">
               {rateInput("ref-new-rate", "New rate % p.a.", newRateRaw, setNewRateRaw)}
               {rateInput("ref-new-years", "New term (years)", newTermYearsRaw, setNewTermYearsRaw)}
             </div>
@@ -197,7 +199,7 @@ export function RefinanceCalculator() {
             comparison never uses repayments alone.
           </EmptyState>
         ) : (
-          <div className="nexus-result grid gap-6 p-6 md:p-8">
+          <div className="nexus-result @container grid min-w-0 gap-6 p-6 md:p-8">
             <PrimaryResult
               label="Break-even"
               amount={moneyFromDecimalString("AUD", result.economicAdvantageAtHorizon, 2)}
@@ -207,7 +209,7 @@ export function RefinanceCalculator() {
                   : `No sustained break-even within the comparison horizon (${result.horizonDate ?? "term"}). The amount above is the position at the horizon, including residual balances.`
               }
             />
-            <div className="grid gap-4 border-t border-hairline pt-6 sm:grid-cols-3">
+            <div className="grid gap-4 border-t border-hairline pt-6 @sm:grid-cols-2 @xl:grid-cols-3">
               <ResultMetric
                 label="Repayment difference"
                 amount={moneyFromDecimalString("AUD", result.repaymentDifference, 2)}

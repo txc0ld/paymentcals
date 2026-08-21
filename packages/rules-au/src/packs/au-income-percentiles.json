@@ -1,0 +1,1037 @@
+{
+  "rulePackId": "au-income-percentiles",
+  "jurisdiction": "AU",
+  "subdivision": null,
+  "domain": "income-percentiles",
+  "effectiveFrom": "2025-07-01",
+  "effectiveTo": null,
+  "status": "active",
+  "schemaVersion": 1,
+  "rulesVersion": "0.1.0",
+  "sources": [
+    {
+      "sourceId": "ato-ts24-individuals-table16-2026-08-21",
+      "authority": "Australian Taxation Office (Taxation statistics 2023–24, via data.gov.au)",
+      "title": "Individuals Table 16A: Percentile distribution of taxable individuals, by taxable income and sex, 2023–24",
+      "url": "https://data.gov.au/data/dataset/faea4485-f407-457d-97f8-3f0822ccd654/resource/abb69db8-b053-4cd2-84d1-64ac75d02cb1/download/ts24individual16percentiledistributionontaxableincomebysexstate.xlsx",
+      "jurisdiction": "AU",
+      "domain": "income-percentiles",
+      "retrievedAt": "2026-08-21T13:00:00+08:00",
+      "archivedSnapshotRef": "compliance-archive/sources/ato/ts24-individuals-table16-percentiles.2026-08-21.xlsx",
+      "contentHash": "c07c6e4650407349619c318f53a0dbb823ddf8af02618941b17406ee77aaf537",
+      "notes": "National figures aggregated from the state rows of Table 16A (counts and dollar sums are additive; no medians were aggregated). Range labels verbatim. 2023–24 income year — the latest published edition."
+    }
+  ],
+  "review": {
+    "preparedBy": "claude-build-agent",
+    "approvedBy": "owner (directive: income range + super suite, 2026-08-21)",
+    "approvedAt": "2026-08-21T08:00:00Z"
+  },
+  "verifiedAt": null,
+  "rules": {
+    "incomeYear": "2023–24",
+    "totalIndividuals": "13239911",
+    "percentiles": [
+      {
+        "percentile": 1,
+        "rangeLabel": "$22,146 or less",
+        "lower": "0",
+        "upper": "22146",
+        "males": "64173",
+        "females": "68295",
+        "averageNetTax": "1476.87",
+        "shareOfNetTax": "0.000594"
+      },
+      {
+        "percentile": 2,
+        "rangeLabel": "$22,147 to $23,472",
+        "lower": "22147",
+        "upper": "23472",
+        "males": "57929",
+        "females": "74480",
+        "averageNetTax": "287.81",
+        "shareOfNetTax": "0.000116"
+      },
+      {
+        "percentile": 3,
+        "rangeLabel": "$23,473 to $24,765",
+        "lower": "23473",
+        "upper": "24765",
+        "males": "58518",
+        "females": "73824",
+        "averageNetTax": "503.44",
+        "shareOfNetTax": "0.000202"
+      },
+      {
+        "percentile": 4,
+        "rangeLabel": "$24,766 to $26,018",
+        "lower": "24766",
+        "upper": "26018",
+        "males": "58252",
+        "females": "74148",
+        "averageNetTax": "715.62",
+        "shareOfNetTax": "0.000288"
+      },
+      {
+        "percentile": 5,
+        "rangeLabel": "$26,019 to $27,170",
+        "lower": "26019",
+        "upper": "27170",
+        "males": "58353",
+        "females": "74086",
+        "averageNetTax": "899.05",
+        "shareOfNetTax": "0.000361"
+      },
+      {
+        "percentile": 6,
+        "rangeLabel": "$27,171 to $28,324",
+        "lower": "27171",
+        "upper": "28324",
+        "males": "58081",
+        "females": "74262",
+        "averageNetTax": "1181.39",
+        "shareOfNetTax": "0.000474"
+      },
+      {
+        "percentile": 7,
+        "rangeLabel": "$28,325 to $29,449",
+        "lower": "28325",
+        "upper": "29449",
+        "males": "58366",
+        "females": "74058",
+        "averageNetTax": "1453.47",
+        "shareOfNetTax": "0.000584"
+      },
+      {
+        "percentile": 8,
+        "rangeLabel": "$29,450 to $30,509",
+        "lower": "29450",
+        "upper": "30509",
+        "males": "58528",
+        "females": "73898",
+        "averageNetTax": "1681.36",
+        "shareOfNetTax": "0.000676"
+      },
+      {
+        "percentile": 9,
+        "rangeLabel": "$30,510 to $31,575",
+        "lower": "30510",
+        "upper": "31575",
+        "males": "58313",
+        "females": "74139",
+        "averageNetTax": "1938.42",
+        "shareOfNetTax": "0.000779"
+      },
+      {
+        "percentile": 10,
+        "rangeLabel": "$31,576 to $32,645",
+        "lower": "31576",
+        "upper": "32645",
+        "males": "57805",
+        "females": "74550",
+        "averageNetTax": "2226.31",
+        "shareOfNetTax": "0.000894"
+      },
+      {
+        "percentile": 11,
+        "rangeLabel": "$32,646 to $33,659",
+        "lower": "32646",
+        "upper": "33659",
+        "males": "56839",
+        "females": "75523",
+        "averageNetTax": "2351.55",
+        "shareOfNetTax": "0.000945"
+      },
+      {
+        "percentile": 12,
+        "rangeLabel": "$33,660 to $34,633",
+        "lower": "33660",
+        "upper": "34633",
+        "males": "55312",
+        "females": "77089",
+        "averageNetTax": "2470.72",
+        "shareOfNetTax": "0.000993"
+      },
+      {
+        "percentile": 13,
+        "rangeLabel": "$34,634 to $35,597",
+        "lower": "34634",
+        "upper": "35597",
+        "males": "55285",
+        "females": "77180",
+        "averageNetTax": "2685.40",
+        "shareOfNetTax": "0.001080"
+      },
+      {
+        "percentile": 14,
+        "rangeLabel": "$35,598 to $36,573",
+        "lower": "35598",
+        "upper": "36573",
+        "males": "55063",
+        "females": "77307",
+        "averageNetTax": "2920.60",
+        "shareOfNetTax": "0.001173"
+      },
+      {
+        "percentile": 15,
+        "rangeLabel": "$36,574 to $37,552",
+        "lower": "36574",
+        "upper": "37552",
+        "males": "55055",
+        "females": "77317",
+        "averageNetTax": "3141.43",
+        "shareOfNetTax": "0.001262"
+      },
+      {
+        "percentile": 16,
+        "rangeLabel": "$37,553 to $38,530",
+        "lower": "37553",
+        "upper": "38530",
+        "males": "55151",
+        "females": "77275",
+        "averageNetTax": "3385.78",
+        "shareOfNetTax": "0.001361"
+      },
+      {
+        "percentile": 17,
+        "rangeLabel": "$38,531 to $39,503",
+        "lower": "38531",
+        "upper": "39503",
+        "males": "55130",
+        "females": "77294",
+        "averageNetTax": "3640.95",
+        "shareOfNetTax": "0.001463"
+      },
+      {
+        "percentile": 18,
+        "rangeLabel": "$39,504 to $40,455",
+        "lower": "39504",
+        "upper": "40455",
+        "males": "55796",
+        "females": "76542",
+        "averageNetTax": "3903.02",
+        "shareOfNetTax": "0.001568"
+      },
+      {
+        "percentile": 19,
+        "rangeLabel": "$40,456 to $41,424",
+        "lower": "40456",
+        "upper": "41424",
+        "males": "55595",
+        "females": "76869",
+        "averageNetTax": "4156.98",
+        "shareOfNetTax": "0.001671"
+      },
+      {
+        "percentile": 20,
+        "rangeLabel": "$41,425 to $42,390",
+        "lower": "41425",
+        "upper": "42390",
+        "males": "55421",
+        "females": "76909",
+        "averageNetTax": "4702.94",
+        "shareOfNetTax": "0.001889"
+      },
+      {
+        "percentile": 21,
+        "rangeLabel": "$42,391 to $43,350",
+        "lower": "42391",
+        "upper": "43350",
+        "males": "55539",
+        "females": "76945",
+        "averageNetTax": "4695.73",
+        "shareOfNetTax": "0.001888"
+      },
+      {
+        "percentile": 22,
+        "rangeLabel": "$43,351 to $44,282",
+        "lower": "43351",
+        "upper": "44282",
+        "males": "56114",
+        "females": "76298",
+        "averageNetTax": "4959.22",
+        "shareOfNetTax": "0.001993"
+      },
+      {
+        "percentile": 23,
+        "rangeLabel": "$44,283 to $45,057",
+        "lower": "44283",
+        "upper": "45057",
+        "males": "58402",
+        "females": "73894",
+        "averageNetTax": "5207.95",
+        "shareOfNetTax": "0.002091"
+      },
+      {
+        "percentile": 24,
+        "rangeLabel": "$45,058 to $45,942",
+        "lower": "45058",
+        "upper": "45942",
+        "males": "56494",
+        "females": "75960",
+        "averageNetTax": "5462.06",
+        "shareOfNetTax": "0.002196"
+      },
+      {
+        "percentile": 25,
+        "rangeLabel": "$45,943 to $46,882",
+        "lower": "45943",
+        "upper": "46882",
+        "males": "56077",
+        "females": "76370",
+        "averageNetTax": "5795.15",
+        "shareOfNetTax": "0.002329"
+      },
+      {
+        "percentile": 26,
+        "rangeLabel": "$46,883 to $47,831",
+        "lower": "46883",
+        "upper": "47831",
+        "males": "56018",
+        "females": "76336",
+        "averageNetTax": "6139.75",
+        "shareOfNetTax": "0.002466"
+      },
+      {
+        "percentile": 27,
+        "rangeLabel": "$47,832 to $48,782",
+        "lower": "47832",
+        "upper": "48782",
+        "males": "56419",
+        "females": "75920",
+        "averageNetTax": "6487.66",
+        "shareOfNetTax": "0.002606"
+      },
+      {
+        "percentile": 28,
+        "rangeLabel": "$48,783 to $49,729",
+        "lower": "48783",
+        "upper": "49729",
+        "males": "56834",
+        "females": "75548",
+        "averageNetTax": "6840.99",
+        "shareOfNetTax": "0.002748"
+      },
+      {
+        "percentile": 29,
+        "rangeLabel": "$49,730 to $50,662",
+        "lower": "49730",
+        "upper": "50662",
+        "males": "57058",
+        "females": "75361",
+        "averageNetTax": "7195.65",
+        "shareOfNetTax": "0.002892"
+      },
+      {
+        "percentile": 30,
+        "rangeLabel": "$50,663 to $51,602",
+        "lower": "50663",
+        "upper": "51602",
+        "males": "57255",
+        "females": "75137",
+        "averageNetTax": "7529.76",
+        "shareOfNetTax": "0.003025"
+      },
+      {
+        "percentile": 31,
+        "rangeLabel": "$51,603 to $52,565",
+        "lower": "51603",
+        "upper": "52565",
+        "males": "57660",
+        "females": "74767",
+        "averageNetTax": "7874.87",
+        "shareOfNetTax": "0.003165"
+      },
+      {
+        "percentile": 32,
+        "rangeLabel": "$52,566 to $53,532",
+        "lower": "52566",
+        "upper": "53532",
+        "males": "57691",
+        "females": "74743",
+        "averageNetTax": "8227.87",
+        "shareOfNetTax": "0.003307"
+      },
+      {
+        "percentile": 33,
+        "rangeLabel": "$53,533 to $54,499",
+        "lower": "53533",
+        "upper": "54499",
+        "males": "57757",
+        "females": "74699",
+        "averageNetTax": "8584.48",
+        "shareOfNetTax": "0.003451"
+      },
+      {
+        "percentile": 34,
+        "rangeLabel": "$54,500 to $55,458",
+        "lower": "54500",
+        "upper": "55458",
+        "males": "58150",
+        "females": "74167",
+        "averageNetTax": "8940.66",
+        "shareOfNetTax": "0.003590"
+      },
+      {
+        "percentile": 35,
+        "rangeLabel": "$55,459 to $56,428",
+        "lower": "55459",
+        "upper": "56428",
+        "males": "58489",
+        "females": "73947",
+        "averageNetTax": "9292.77",
+        "shareOfNetTax": "0.003735"
+      },
+      {
+        "percentile": 36,
+        "rangeLabel": "$56,429 to $57,392",
+        "lower": "56429",
+        "upper": "57392",
+        "males": "59060",
+        "females": "73330",
+        "averageNetTax": "9656.25",
+        "shareOfNetTax": "0.003880"
+      },
+      {
+        "percentile": 37,
+        "rangeLabel": "$57,393 to $58,359",
+        "lower": "57393",
+        "upper": "58359",
+        "males": "59335",
+        "females": "73001",
+        "averageNetTax": "10005.90",
+        "shareOfNetTax": "0.004018"
+      },
+      {
+        "percentile": 38,
+        "rangeLabel": "$58,360 to $59,319",
+        "lower": "58360",
+        "upper": "59319",
+        "males": "59802",
+        "females": "72694",
+        "averageNetTax": "10368.97",
+        "shareOfNetTax": "0.004169"
+      },
+      {
+        "percentile": 39,
+        "rangeLabel": "$59,320 to $60,276",
+        "lower": "59320",
+        "upper": "60276",
+        "males": "60607",
+        "females": "71720",
+        "averageNetTax": "10720.24",
+        "shareOfNetTax": "0.004305"
+      },
+      {
+        "percentile": 40,
+        "rangeLabel": "$60,277 to $61,261",
+        "lower": "60277",
+        "upper": "61261",
+        "males": "60629",
+        "females": "71801",
+        "averageNetTax": "11071.04",
+        "shareOfNetTax": "0.004449"
+      },
+      {
+        "percentile": 41,
+        "rangeLabel": "$61,262 to $62,251",
+        "lower": "61262",
+        "upper": "62251",
+        "males": "61104",
+        "females": "71232",
+        "averageNetTax": "11434.22",
+        "shareOfNetTax": "0.004592"
+      },
+      {
+        "percentile": 42,
+        "rangeLabel": "$62,252 to $63,257",
+        "lower": "62252",
+        "upper": "63257",
+        "males": "61555",
+        "females": "70956",
+        "averageNetTax": "11795.84",
+        "shareOfNetTax": "0.004744"
+      },
+      {
+        "percentile": 43,
+        "rangeLabel": "$63,258 to $64,279",
+        "lower": "63258",
+        "upper": "64279",
+        "males": "62067",
+        "females": "70252",
+        "averageNetTax": "12165.37",
+        "shareOfNetTax": "0.004885"
+      },
+      {
+        "percentile": 44,
+        "rangeLabel": "$64,280 to $65,295",
+        "lower": "64280",
+        "upper": "65295",
+        "males": "62971",
+        "females": "69467",
+        "averageNetTax": "12537.73",
+        "shareOfNetTax": "0.005039"
+      },
+      {
+        "percentile": 45,
+        "rangeLabel": "$65,296 to $66,332",
+        "lower": "65296",
+        "upper": "66332",
+        "males": "63152",
+        "females": "69273",
+        "averageNetTax": "12907.21",
+        "shareOfNetTax": "0.005187"
+      },
+      {
+        "percentile": 46,
+        "rangeLabel": "$66,333 to $67,394",
+        "lower": "66333",
+        "upper": "67394",
+        "males": "64008",
+        "females": "68336",
+        "averageNetTax": "13286.63",
+        "shareOfNetTax": "0.005336"
+      },
+      {
+        "percentile": 47,
+        "rangeLabel": "$67,395 to $68,474",
+        "lower": "67395",
+        "upper": "68474",
+        "males": "64352",
+        "females": "68060",
+        "averageNetTax": "13657.78",
+        "shareOfNetTax": "0.005488"
+      },
+      {
+        "percentile": 48,
+        "rangeLabel": "$68,475 to $69,566",
+        "lower": "68475",
+        "upper": "69566",
+        "males": "64818",
+        "females": "67565",
+        "averageNetTax": "14029.05",
+        "shareOfNetTax": "0.005636"
+      },
+      {
+        "percentile": 49,
+        "rangeLabel": "$69,567 to $70,663",
+        "lower": "69567",
+        "upper": "70663",
+        "males": "65695",
+        "females": "66738",
+        "averageNetTax": "14415.78",
+        "shareOfNetTax": "0.005794"
+      },
+      {
+        "percentile": 50,
+        "rangeLabel": "$70,664 to $71,795",
+        "lower": "70664",
+        "upper": "71795",
+        "males": "65895",
+        "females": "66524",
+        "averageNetTax": "14793.96",
+        "shareOfNetTax": "0.005945"
+      },
+      {
+        "percentile": 51,
+        "rangeLabel": "$71,796 to $72,948",
+        "lower": "71796",
+        "upper": "72948",
+        "males": "66293",
+        "females": "66020",
+        "averageNetTax": "15192.75",
+        "shareOfNetTax": "0.006100"
+      },
+      {
+        "percentile": 52,
+        "rangeLabel": "$72,949 to $74,119",
+        "lower": "72949",
+        "upper": "74119",
+        "males": "66677",
+        "females": "65778",
+        "averageNetTax": "15589.56",
+        "shareOfNetTax": "0.006267"
+      },
+      {
+        "percentile": 53,
+        "rangeLabel": "$74,120 to $75,301",
+        "lower": "74120",
+        "upper": "75301",
+        "males": "67196",
+        "females": "65155",
+        "averageNetTax": "16007.11",
+        "shareOfNetTax": "0.006429"
+      },
+      {
+        "percentile": 54,
+        "rangeLabel": "$75,302 to $76,524",
+        "lower": "75302",
+        "upper": "76524",
+        "males": "67814",
+        "females": "64672",
+        "averageNetTax": "16418.48",
+        "shareOfNetTax": "0.006601"
+      },
+      {
+        "percentile": 55,
+        "rangeLabel": "$76,525 to $77,767",
+        "lower": "76525",
+        "upper": "77767",
+        "males": "68559",
+        "females": "63750",
+        "averageNetTax": "16845.06",
+        "shareOfNetTax": "0.006764"
+      },
+      {
+        "percentile": 56,
+        "rangeLabel": "$77,768 to $79,024",
+        "lower": "77768",
+        "upper": "79024",
+        "males": "68482",
+        "females": "63908",
+        "averageNetTax": "17277.13",
+        "shareOfNetTax": "0.006941"
+      },
+      {
+        "percentile": 57,
+        "rangeLabel": "$79,025 to $80,279",
+        "lower": "79025",
+        "upper": "80279",
+        "males": "69245",
+        "females": "63242",
+        "averageNetTax": "17716.66",
+        "shareOfNetTax": "0.007123"
+      },
+      {
+        "percentile": 58,
+        "rangeLabel": "$80,280 to $81,580",
+        "lower": "80280",
+        "upper": "81580",
+        "males": "69732",
+        "females": "62649",
+        "averageNetTax": "18152.20",
+        "shareOfNetTax": "0.007293"
+      },
+      {
+        "percentile": 59,
+        "rangeLabel": "$81,581 to $82,924",
+        "lower": "81581",
+        "upper": "82924",
+        "males": "69381",
+        "females": "63026",
+        "averageNetTax": "18618.03",
+        "shareOfNetTax": "0.007481"
+      },
+      {
+        "percentile": 60,
+        "rangeLabel": "$82,925 to $84,285",
+        "lower": "82925",
+        "upper": "84285",
+        "males": "70105",
+        "females": "62248",
+        "averageNetTax": "19087.58",
+        "shareOfNetTax": "0.007667"
+      },
+      {
+        "percentile": 61,
+        "rangeLabel": "$84,286 to $85,673",
+        "lower": "84286",
+        "upper": "85673",
+        "males": "70386",
+        "females": "62030",
+        "averageNetTax": "19568.74",
+        "shareOfNetTax": "0.007864"
+      },
+      {
+        "percentile": 62,
+        "rangeLabel": "$85,674 to $87,101",
+        "lower": "85674",
+        "upper": "87101",
+        "males": "70918",
+        "females": "61430",
+        "averageNetTax": "20046.75",
+        "shareOfNetTax": "0.008052"
+      },
+      {
+        "percentile": 63,
+        "rangeLabel": "$87,102 to $88,567",
+        "lower": "87102",
+        "upper": "88567",
+        "males": "71539",
+        "females": "60909",
+        "averageNetTax": "20562.03",
+        "shareOfNetTax": "0.008265"
+      },
+      {
+        "percentile": 64,
+        "rangeLabel": "$88,568 to $90,045",
+        "lower": "88568",
+        "upper": "90045",
+        "males": "71693",
+        "females": "60664",
+        "averageNetTax": "21066.02",
+        "shareOfNetTax": "0.008462"
+      },
+      {
+        "percentile": 65,
+        "rangeLabel": "$90,046 to $91,607",
+        "lower": "90046",
+        "upper": "91607",
+        "males": "72208",
+        "females": "60184",
+        "averageNetTax": "21596.47",
+        "shareOfNetTax": "0.008677"
+      },
+      {
+        "percentile": 66,
+        "rangeLabel": "$91,608 to $93,173",
+        "lower": "91608",
+        "upper": "93173",
+        "males": "72641",
+        "females": "59793",
+        "averageNetTax": "22150.28",
+        "shareOfNetTax": "0.008902"
+      },
+      {
+        "percentile": 67,
+        "rangeLabel": "$93,174 to $94,858",
+        "lower": "93174",
+        "upper": "94858",
+        "males": "72797",
+        "females": "59605",
+        "averageNetTax": "22794.35",
+        "shareOfNetTax": "0.009159"
+      },
+      {
+        "percentile": 68,
+        "rangeLabel": "$94,859 to $96,583",
+        "lower": "94859",
+        "upper": "96583",
+        "males": "73087",
+        "females": "59306",
+        "averageNetTax": "23395.18",
+        "shareOfNetTax": "0.009400"
+      },
+      {
+        "percentile": 69,
+        "rangeLabel": "$96,584 to $98,371",
+        "lower": "96584",
+        "upper": "98371",
+        "males": "73588",
+        "females": "58780",
+        "averageNetTax": "24000.84",
+        "shareOfNetTax": "0.009641"
+      },
+      {
+        "percentile": 70,
+        "rangeLabel": "$98,372 to $100,177",
+        "lower": "98372",
+        "upper": "100177",
+        "males": "74412",
+        "females": "58007",
+        "averageNetTax": "24629.92",
+        "shareOfNetTax": "0.009898"
+      },
+      {
+        "percentile": 71,
+        "rangeLabel": "$100,178 to $102,082",
+        "lower": "100178",
+        "upper": "102082",
+        "males": "74645",
+        "females": "57757",
+        "averageNetTax": "25259.75",
+        "shareOfNetTax": "0.010150"
+      },
+      {
+        "percentile": 72,
+        "rangeLabel": "$102,083 to $104,048",
+        "lower": "102083",
+        "upper": "104048",
+        "males": "75085",
+        "females": "57340",
+        "averageNetTax": "25921.78",
+        "shareOfNetTax": "0.010417"
+      },
+      {
+        "percentile": 73,
+        "rangeLabel": "$104,049 to $106,090",
+        "lower": "104049",
+        "upper": "106090",
+        "males": "75452",
+        "females": "56919",
+        "averageNetTax": "26619.43",
+        "shareOfNetTax": "0.010693"
+      },
+      {
+        "percentile": 74,
+        "rangeLabel": "$106,091 to $108,197",
+        "lower": "106091",
+        "upper": "108197",
+        "males": "75757",
+        "females": "56665",
+        "averageNetTax": "27339.66",
+        "shareOfNetTax": "0.010987"
+      },
+      {
+        "percentile": 75,
+        "rangeLabel": "$108,198 to $110,369",
+        "lower": "108198",
+        "upper": "110369",
+        "males": "76169",
+        "females": "56223",
+        "averageNetTax": "28094.69",
+        "shareOfNetTax": "0.011288"
+      },
+      {
+        "percentile": 76,
+        "rangeLabel": "$110,370 to $112,617",
+        "lower": "110370",
+        "upper": "112617",
+        "males": "76448",
+        "females": "55917",
+        "averageNetTax": "28844.15",
+        "shareOfNetTax": "0.011587"
+      },
+      {
+        "percentile": 77,
+        "rangeLabel": "$112,618 to $114,907",
+        "lower": "112618",
+        "upper": "114907",
+        "males": "76720",
+        "females": "55704",
+        "averageNetTax": "29631.91",
+        "shareOfNetTax": "0.011908"
+      },
+      {
+        "percentile": 78,
+        "rangeLabel": "$114,908 to $117,238",
+        "lower": "114908",
+        "upper": "117238",
+        "males": "76980",
+        "females": "55410",
+        "averageNetTax": "30424.56",
+        "shareOfNetTax": "0.012224"
+      },
+      {
+        "percentile": 79,
+        "rangeLabel": "$117,239 to $119,529",
+        "lower": "117239",
+        "upper": "119529",
+        "males": "77069",
+        "females": "55309",
+        "averageNetTax": "31222.43",
+        "shareOfNetTax": "0.012543"
+      },
+      {
+        "percentile": 80,
+        "rangeLabel": "$119,530 to $121,836",
+        "lower": "119530",
+        "upper": "121836",
+        "males": "77881",
+        "females": "54548",
+        "averageNetTax": "31993.76",
+        "shareOfNetTax": "0.012858"
+      },
+      {
+        "percentile": 81,
+        "rangeLabel": "$121,837 to $124,593",
+        "lower": "121837",
+        "upper": "124593",
+        "males": "79699",
+        "females": "52682",
+        "averageNetTax": "33009.95",
+        "shareOfNetTax": "0.013262"
+      },
+      {
+        "percentile": 82,
+        "rangeLabel": "$124,594 to $127,572",
+        "lower": "124594",
+        "upper": "127572",
+        "males": "80974",
+        "females": "51411",
+        "averageNetTax": "34115.84",
+        "shareOfNetTax": "0.013706"
+      },
+      {
+        "percentile": 83,
+        "rangeLabel": "$127,573 to $130,770",
+        "lower": "127573",
+        "upper": "130770",
+        "males": "82271",
+        "females": "50161",
+        "averageNetTax": "35309.92",
+        "shareOfNetTax": "0.014191"
+      },
+      {
+        "percentile": 84,
+        "rangeLabel": "$130,771 to $134,236",
+        "lower": "130771",
+        "upper": "134236",
+        "males": "83457",
+        "females": "48930",
+        "averageNetTax": "36599.91",
+        "shareOfNetTax": "0.014705"
+      },
+      {
+        "percentile": 85,
+        "rangeLabel": "$134,237 to $137,986",
+        "lower": "134237",
+        "upper": "137986",
+        "males": "84357",
+        "females": "48033",
+        "averageNetTax": "37979.68",
+        "shareOfNetTax": "0.015259"
+      },
+      {
+        "percentile": 86,
+        "rangeLabel": "$137,987 to $142,090",
+        "lower": "137987",
+        "upper": "142090",
+        "males": "86361",
+        "females": "46030",
+        "averageNetTax": "39501.84",
+        "shareOfNetTax": "0.015871"
+      },
+      {
+        "percentile": 87,
+        "rangeLabel": "$142,091 to $146,583",
+        "lower": "142091",
+        "upper": "146583",
+        "males": "87720",
+        "females": "44683",
+        "averageNetTax": "41174.74",
+        "shareOfNetTax": "0.016545"
+      },
+      {
+        "percentile": 88,
+        "rangeLabel": "$146,584 to $151,498",
+        "lower": "146584",
+        "upper": "151498",
+        "males": "88751",
+        "females": "43663",
+        "averageNetTax": "42978.59",
+        "shareOfNetTax": "0.017271"
+      },
+      {
+        "percentile": 89,
+        "rangeLabel": "$151,499 to $156,956",
+        "lower": "151499",
+        "upper": "156956",
+        "males": "90013",
+        "females": "42374",
+        "averageNetTax": "44977.81",
+        "shareOfNetTax": "0.018070"
+      },
+      {
+        "percentile": 90,
+        "rangeLabel": "$156,957 to $162,971",
+        "lower": "156957",
+        "upper": "162971",
+        "males": "90787",
+        "females": "41602",
+        "averageNetTax": "47193.38",
+        "shareOfNetTax": "0.018961"
+      },
+      {
+        "percentile": 91,
+        "rangeLabel": "$162,972 to $169,778",
+        "lower": "162972",
+        "upper": "169778",
+        "males": "91871",
+        "females": "40540",
+        "averageNetTax": "49636.21",
+        "shareOfNetTax": "0.019946"
+      },
+      {
+        "percentile": 92,
+        "rangeLabel": "$169,779 to $177,134",
+        "lower": "169779",
+        "upper": "177134",
+        "males": "91369",
+        "females": "41025",
+        "averageNetTax": "52388.74",
+        "shareOfNetTax": "0.021049"
+      },
+      {
+        "percentile": 93,
+        "rangeLabel": "$177,135 to $184,154",
+        "lower": "177135",
+        "upper": "184154",
+        "males": "87287",
+        "females": "45107",
+        "averageNetTax": "55144.75",
+        "shareOfNetTax": "0.022156"
+      },
+      {
+        "percentile": 94,
+        "rangeLabel": "$184,155 to $194,636",
+        "lower": "184155",
+        "upper": "194636",
+        "males": "92711",
+        "females": "39690",
+        "averageNetTax": "59176.61",
+        "shareOfNetTax": "0.023778"
+      },
+      {
+        "percentile": 95,
+        "rangeLabel": "$194,637 to $208,280",
+        "lower": "194637",
+        "upper": "208280",
+        "males": "93549",
+        "females": "38854",
+        "averageNetTax": "64684.04",
+        "shareOfNetTax": "0.025991"
+      },
+      {
+        "percentile": 96,
+        "rangeLabel": "$208,281 to $226,506",
+        "lower": "208281",
+        "upper": "226506",
+        "males": "93446",
+        "females": "38945",
+        "averageNetTax": "71933.38",
+        "shareOfNetTax": "0.028901"
+      },
+      {
+        "percentile": 97,
+        "rangeLabel": "$226,507 to $254,651",
+        "lower": "226507",
+        "upper": "254651",
+        "males": "93854",
+        "females": "38544",
+        "averageNetTax": "82198.66",
+        "shareOfNetTax": "0.033027"
+      },
+      {
+        "percentile": 98,
+        "rangeLabel": "$254,653 to $306,053",
+        "lower": "254653",
+        "upper": "306053",
+        "males": "93555",
+        "females": "38842",
+        "averageNetTax": "99503.15",
+        "shareOfNetTax": "0.039980"
+      },
+      {
+        "percentile": 99,
+        "rangeLabel": "$306,054 to $429,530",
+        "lower": "306054",
+        "upper": "429530",
+        "males": "92141",
+        "females": "40258",
+        "averageNetTax": "135443.83",
+        "shareOfNetTax": "0.054421"
+      },
+      {
+        "percentile": 100,
+        "rangeLabel": "$429,531 or more",
+        "lower": "429531",
+        "upper": null,
+        "males": "94165",
+        "females": "38234",
+        "averageNetTax": "417986.76",
+        "shareOfNetTax": "0.167947"
+      }
+    ]
+  }
+}
