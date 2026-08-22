@@ -34,7 +34,7 @@ const CAPABILITIES = [
   },
   {
     title: "Private by default",
-    body: "Calculations run client-side. Scenarios save to your browser. No accounts, no cookies, no ads.",
+    body: "Calculations run client-side. Scenarios save to your browser. No accounts, no ads.",
   },
 ];
 

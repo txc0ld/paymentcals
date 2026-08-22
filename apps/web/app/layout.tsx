@@ -137,7 +137,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               <Link href="/sources" className="transition-colors duration-500 hover:text-ink">Sources &amp; rule packs</Link>
               <Link href="/changelog" className="transition-colors duration-500 hover:text-ink">Changelog</Link>
               <span>Your numbers stay on your device</span>
-              <span>No accounts. No cookies. No ads.</span>
+              <span>No accounts. No ads.</span>
             </div>
             <div className="grid content-start gap-2 font-mono text-[11px] uppercase tracking-[0.14em] text-ink-3">
               <span className="text-ink-2">Status</span>
@@ -157,6 +157,16 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             defer
             data-domain="paymentcalcs.com"
             src="https://plausible.io/js/script.manual.js"
+            strategy="afterInteractive"
+          />
+        ) : null}
+        {process.env.NODE_ENV === "production" ? (
+          // Owner-approved exception to the analytics-safe-only rule (2026-08-22).
+          // Caveat: auto-tracks full URLs including ?s= scenario state — see §18.4.
+          <Script
+            async
+            data-key="b8lMHh3xHhRhvXuaku6K8A"
+            src="https://analytics.ahrefs.com/analytics.js"
             strategy="afterInteractive"
           />
         ) : null}
