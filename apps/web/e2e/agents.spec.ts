@@ -102,9 +102,10 @@ test.describe("trust anchor pages", () => {
     });
   }
 
-  test("contact page names a working channel", async ({ request }) => {
+  test("contact page names working channels", async ({ request }) => {
     const body = await (await request.get("/contact")).text();
     expect(body).toContain("github.com/txc0ld/paymentcals");
+    expect(body).toContain("team@fantomlabs.io");
   });
 });
 
@@ -128,7 +129,7 @@ test.describe("agent guidance and structured data", () => {
     const application = graph.find((node) => node["@type"] === "WebApplication");
     expect(organization?.name).toBe("PaymentCalcs");
     expect(typeof organization?.description).toBe("string");
-    expect(organization?.contactPoint).toBeTruthy();
+    expect((organization?.contactPoint as { email?: string })?.email).toBe("team@fantomlabs.io");
     expect(application?.applicationCategory).toBe("FinanceApplication");
     expect(application?.offers).toBeTruthy();
   });

@@ -66,6 +66,7 @@ const SITE_JSON_LD = JSON.stringify({
       contactPoint: {
         "@type": "ContactPoint",
         contactType: "customer support",
+        email: "team@fantomlabs.io",
         url: `${SITE_URL}/contact`,
         availableLanguage: "English",
       },
@@ -157,6 +158,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 Deterministic calculators for Australian money decisions. Every figure shows its
                 working, its assumptions and its sources.
               </p>
+              <a
+                href="https://fantomlabs.io"
+                rel="noopener"
+                className="font-mono text-[11px] uppercase tracking-[0.14em] text-ink-3 transition-colors duration-500 hover:text-ink focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-focus"
+              >
+                A website by Fantom Labs ↗
+              </a>
             </div>
             <div className="grid content-start gap-2 font-mono text-[11px] uppercase tracking-[0.14em] text-ink-3">
               <span className="text-ink-2">Trust</span>

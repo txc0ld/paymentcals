@@ -84,7 +84,11 @@ export const CONTACT_PAGE: ContentPage = {
     {
       heading: "Everything else",
       paragraphs: [
-        "General enquiries, media and partnership questions also go through the issue tracker for now; a direct email address is planned. The project does not run social media accounts, and anyone claiming to represent PaymentCalcs elsewhere does not.",
+        "General enquiries, media and partnership questions go to team@fantomlabs.io. PaymentCalcs is a Fantom Labs website. The project does not run social media accounts, and anyone claiming to represent PaymentCalcs elsewhere does not.",
+      ],
+      links: [
+        { label: "team@fantomlabs.io", href: "mailto:team@fantomlabs.io" },
+        { label: "fantomlabs.io", href: "https://fantomlabs.io" },
       ],
     },
   ],
