@@ -40,6 +40,9 @@ const nextConfig: NextConfig = {
     {
       source: "/:path*",
       headers: [
+        // Page routes are content-negotiated (HTML/markdown via Accept, see
+        // proxy.ts); caches must key on Accept for both representations.
+        { key: "Vary", value: "Accept" },
         { key: "X-Content-Type-Options", value: "nosniff" },
         { key: "X-Frame-Options", value: "DENY" },
         { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },

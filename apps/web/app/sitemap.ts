@@ -14,6 +14,10 @@ export default function sitemap(): MetadataRoute.Sitemap {
     "/global/savings-investing",
     "/sources",
     "/changelog",
+    "/about",
+    "/contact",
+    "/privacy",
+    "/developers",
   ];
   return [
     ...staticPages.map((path) => ({ url: `${base}${path}`, changeFrequency: "weekly" as const })),

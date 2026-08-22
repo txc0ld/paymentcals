@@ -5,7 +5,9 @@ import { SITE_URL } from "../lib/site";
 export default function robots(): MetadataRoute.Robots {
   return {
     rules: [
-      { userAgent: "*", allow: "/", disallow: ["/s/"] },
+      // /agent-markdown/ is the internal rewrite target for markdown content
+      // negotiation; its canonical addresses are the page URLs themselves.
+      { userAgent: "*", allow: "/", disallow: ["/s/", "/agent-markdown/"] },
       { userAgent: "GPTBot", allow: "/" },
       { userAgent: "ClaudeBot", allow: "/" },
       { userAgent: "PerplexityBot", allow: "/" },

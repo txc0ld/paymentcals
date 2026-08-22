@@ -68,9 +68,9 @@ export default function HomePage() {
       {/* S2 — Sources row */}
       <section aria-label="Rule sources" className="border-y border-hairline px-4 py-10 md:px-8">
         <div className="mx-auto flex w-full max-w-[100rem] flex-wrap items-baseline gap-x-12 gap-y-4">
-          <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-ink-3">
+          <h2 className="font-mono text-[10px] font-normal uppercase tracking-[0.2em] text-ink-3">
             Rules cited from
-          </span>
+          </h2>
           {SOURCE_AUTHORITIES.map((name) => (
             <span
               key={name}
@@ -84,6 +84,7 @@ export default function HomePage() {
 
       {/* S3 — Platform preview */}
       <section aria-label="Interface preview" className="px-4 py-24 md:px-8 md:py-32">
+        <h2 className="sr-only">Interface preview</h2>
         <div className="reveal-up mx-auto w-full max-w-[100rem]">
           {/* Each ratio only applies where it is taller than the content:
            * 16/10 clipped the caption at 390 and 21/9 clipped it at 768,
@@ -176,8 +177,42 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* S4.5 — What this is (dense server-rendered prose for people and crawlers alike) */}
+      <section aria-label="What PaymentCalcs is" className="border-t border-hairline px-4 py-20 md:px-8 md:py-28">
+        <div className="mx-auto grid w-full max-w-[100rem] gap-10 md:grid-cols-[1fr_2fr]">
+          <h2 className="reveal-up font-mono text-[10px] font-normal uppercase tracking-[0.2em] text-ink-3">
+            What this is
+          </h2>
+          <div className="reveal-up grid max-w-3xl gap-5 text-[15px] leading-7 text-ink-2">
+            <p>
+              PaymentCalcs is a set of deterministic calculators for Australian money decisions:
+              income tax and take-home pay by financial year, PAYG withholding by pay frequency,
+              stamp duty for every state and territory, mortgage and loan schedules run as full
+              period-by-period ledgers, savings projections and GST arithmetic. Every statutory
+              rate and threshold comes from a versioned rule pack citing the official document it
+              was taken from — never from memory, and never from a model.
+            </p>
+            <p>
+              Calculations run in your browser over exact integer-cent arithmetic. If a verified
+              rule set cannot be loaded for the year and jurisdiction you choose, the calculator
+              stops and says so. Results are general information, not financial advice; each one
+              names its assumptions and limitations beside the number, with the method documented
+              on a <Link href="/calculators" className="underline decoration-hairline-strong underline-offset-2 hover:decoration-current">per-calculator methodology page</Link>.
+            </p>
+            <p className="font-mono text-[11px] uppercase tracking-[0.14em] text-ink-3">
+              <Link href="/about" className="transition-colors duration-500 hover:text-ink">About the project</Link>
+              <span aria-hidden="true"> · </span>
+              <Link href="/sources" className="transition-colors duration-500 hover:text-ink">Sources</Link>
+              <span aria-hidden="true"> · </span>
+              <Link href="/developers" className="transition-colors duration-500 hover:text-ink">For developers &amp; agents</Link>
+            </p>
+          </div>
+        </div>
+      </section>
+
       {/* S5 — Metrics */}
       <section aria-label="Build status" className="border-t border-hairline px-4 py-20 md:px-8 md:py-28">
+        <h2 className="sr-only">Build status</h2>
         <div className="mx-auto grid w-full max-w-[100rem] gap-12 md:grid-cols-3">
           {[
             { value: calculatorRegistry.length, suffix: "", label: "Calculators live in this build" },

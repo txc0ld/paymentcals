@@ -49,6 +49,9 @@ const THEME_INIT = `(function(){try{var s=localStorage.getItem("pc-theme");docum
  * fabricated claims. Deliberately carries no SearchAction — there is no
  * site-search endpoint to point one at.
  */
+const SITE_DESCRIPTION =
+  "Deterministic Australian financial calculators — pay, tax, mortgage, loans, savings and business. Every result shows its working, assumptions, sources and limitations; statutory values come from versioned rule packs citing official sources.";
+
 const SITE_JSON_LD = JSON.stringify({
   "@context": "https://schema.org",
   "@graph": [
@@ -57,13 +60,36 @@ const SITE_JSON_LD = JSON.stringify({
       "@id": `${SITE_URL}/#organization`,
       name: SITE_NAME,
       url: SITE_URL,
+      description: SITE_DESCRIPTION,
+      logo: `${SITE_URL}/icon`,
+      sameAs: ["https://github.com/txc0ld/paymentcals"],
+      contactPoint: {
+        "@type": "ContactPoint",
+        contactType: "customer support",
+        url: `${SITE_URL}/contact`,
+        availableLanguage: "English",
+      },
     },
     {
       "@type": "WebSite",
       "@id": `${SITE_URL}/#website`,
       name: SITE_NAME,
       url: SITE_URL,
+      description: SITE_DESCRIPTION,
       inLanguage: "en-AU",
+      publisher: { "@id": `${SITE_URL}/#organization` },
+    },
+    {
+      "@type": "WebApplication",
+      "@id": `${SITE_URL}/#app`,
+      name: SITE_NAME,
+      url: SITE_URL,
+      description: SITE_DESCRIPTION,
+      applicationCategory: "FinanceApplication",
+      operatingSystem: "Any",
+      inLanguage: "en-AU",
+      isAccessibleForFree: true,
+      offers: { "@type": "Offer", price: "0", priceCurrency: "AUD" },
       publisher: { "@id": `${SITE_URL}/#organization` },
     },
   ],
@@ -136,12 +162,16 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               <span className="text-ink-2">Trust</span>
               <Link href="/sources" className="transition-colors duration-500 hover:text-ink">Sources &amp; rule packs</Link>
               <Link href="/changelog" className="transition-colors duration-500 hover:text-ink">Changelog</Link>
+              <Link href="/about" className="transition-colors duration-500 hover:text-ink">About</Link>
+              <Link href="/contact" className="transition-colors duration-500 hover:text-ink">Contact</Link>
+              <Link href="/privacy" className="transition-colors duration-500 hover:text-ink">Privacy</Link>
               <span>Your numbers stay on your device</span>
               <span>No accounts. No ads.</span>
             </div>
             <div className="grid content-start gap-2 font-mono text-[11px] uppercase tracking-[0.14em] text-ink-3">
               <span className="text-ink-2">Status</span>
               <span>P0 build · pre-launch preview</span>
+              <Link href="/developers" className="transition-colors duration-500 hover:text-ink">For developers &amp; agents</Link>
               <span>© {new Date().getFullYear()} PaymentCalcs</span>
             </div>
           </div>
@@ -169,6 +199,23 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             src="https://analytics.ahrefs.com/analytics.js"
             strategy="afterInteractive"
           />
+        ) : null}
+        {process.env.NODE_ENV === "production" ? (
+          // Google Analytics 4 — owner-approved (2026-08-22). Sets cookies;
+          // disclosed on /privacy. Same §18.4 full-URL caveat as Ahrefs.
+          <>
+            <Script
+              async
+              src="https://www.googletagmanager.com/gtag/js?id=G-G68G9EJR79"
+              strategy="afterInteractive"
+            />
+            <Script id="ga4-init" strategy="afterInteractive">
+              {`window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', 'G-G68G9EJR79');`}
+            </Script>
+          </>
         ) : null}
       </body>
     </html>
